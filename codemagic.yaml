@@ -12,9 +12,9 @@ workflows:
       # distribución con la clave de App Store Connect.
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.seba.haltercalc
+        bundle_identifier: com.example.plateCalc
       vars:
-        BUNDLE_ID: "com.seba.haltercalc"
+        BUNDLE_ID: "com.example.plateCalc"
         XCODE_SCHEME: "Runner"
       flutter: stable
       xcode: latest

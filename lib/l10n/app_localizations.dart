@@ -531,6 +531,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Just the bar, no plates.'**
   String get resultBarOnly;
+
+  /// No description provided for @converterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit converter'**
+  String get converterTitle;
+
+  /// No description provided for @converterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit converter'**
+  String get converterTooltip;
+
+  /// No description provided for @lbLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pounds (lb)'**
+  String get lbLabel;
+
+  /// No description provided for @kgLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilograms (kg)'**
+  String get kgLabel;
+
+  /// No description provided for @quickPlatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick plate equivalents'**
+  String get quickPlatesTitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -254,4 +254,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get resultBarOnly => 'Seulement la barre, sans disques.';
+
+  @override
+  String get converterTitle => 'Convertisseur d\'unités';
+
+  @override
+  String get converterTooltip => 'Convertisseur d\'unités';
+
+  @override
+  String get lbLabel => 'Livres (lb)';
+
+  @override
+  String get kgLabel => 'Kilogrammes (kg)';
+
+  @override
+  String get quickPlatesTitle => 'Équivalences rapides des disques';
 }

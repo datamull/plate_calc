@@ -57,7 +57,7 @@ class _ResultSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            BarbellView(perSide: result.perSide, unit: unit, height: 180),
+            BarbellView(perSide: result.perSide, unit: unit, height: 240),
             const SizedBox(height: 12),
             if (entries.isEmpty)
               Text(loc.resultBarOnly)

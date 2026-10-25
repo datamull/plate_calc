@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'l10n/app_localizations.dart';
 import 'services/app_storage.dart';
+import 'ui/theme/app_theme.dart';
 import 'ui/screens/app_settings_screen.dart';
 import 'ui/screens/rm_list_screen.dart';
 
@@ -33,16 +34,12 @@ class _PlateCalcAppState extends State<PlateCalcApp> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme(Brightness b) => ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6750A4), brightness: b),
-    );
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       locale: _localeCode == null ? null : Locale(_localeCode!),
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-      theme: theme(Brightness.light),
-      darkTheme: theme(Brightness.dark),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(

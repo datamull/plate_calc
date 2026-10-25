@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plate_calc/main.dart';
+import 'package:plate_calc/ui/widgets/glass_button.dart';
 import 'package:plate_calc/models/weight_unit.dart';
 import 'package:plate_calc/services/app_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,7 +64,7 @@ void main() {
   testWidgets('agregar y eliminar un movimiento', (tester) async {
     await pumpApp(tester, {'app_locale': 'es'});
 
-    await tester.tap(find.byType(FloatingActionButton));
+    await tester.tap(find.byType(GlassButton));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Front Squat');
     await tester.tap(find.text('Guardar'));

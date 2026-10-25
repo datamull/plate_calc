@@ -8,6 +8,7 @@ import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../services/plate_calculator.dart';
 import '../../utils/format.dart';
+import '../widgets/glass_button.dart';
 import '../widgets/percent_table.dart';
 import '../widgets/result_sheet.dart';
 import '../widgets/rm_history_sheet.dart';
@@ -323,9 +324,9 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 8),
             ],
 
-            FilledButton(onPressed: _calculate, child: Text(loc.calculateButton)),
+            GlassButton(onPressed: _calculate, prominent: true, label: loc.calculateButton),
             const SizedBox(height: 8),
-            OutlinedButton.icon(
+            GlassButton(
               onPressed: () => showRmHistorySheet(
                 context,
                 storage: _storage,
@@ -333,8 +334,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 displayName: name,
                 unit: _unit,
               ),
-              icon: const Icon(Icons.history),
-              label: Text(loc.historyButton),
+              icon: Icons.history,
+              label: loc.historyButton,
             ),
             const SizedBox(height: 24),
             TextButton.icon(

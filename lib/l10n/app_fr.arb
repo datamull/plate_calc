@@ -181,5 +181,10 @@
   "inventoryRemovePlate": "Retirer le disque de {weight} {units} ?",
   "inventoryReset": "Rétablir les valeurs par défaut",
   "settingsTooltip": "Paramètres",
-  "resultBarOnly": "Seulement la barre, sans disques."
+  "resultBarOnly": "Seulement la barre, sans disques.",
+  "converterTitle": "Convertisseur d'unités",
+  "converterTooltip": "Convertisseur d'unités",
+  "lbLabel": "Livres (lb)",
+  "kgLabel": "Kilogrammes (kg)",
+  "quickPlatesTitle": "Équivalences rapides des disques"
 }

@@ -5,7 +5,10 @@ import '../../l10n/lift_names.dart';
 import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../utils/format.dart';
+import '../theme/app_theme.dart';
+import '../widgets/glass_button.dart';
 import 'home_screen.dart';
+import 'unit_converter_screen.dart';
 
 class RmListScreen extends StatefulWidget {
   const RmListScreen({super.key, required this.storage, this.onOpenSettings});
@@ -59,6 +62,13 @@ class _RmListScreenState extends State<RmListScreen> {
       appBar: AppBar(
         title: Text(loc.yourLiftsTitle),
         actions: [
+          IconButton(
+            tooltip: loc.converterTooltip,
+            icon: const Icon(Icons.swap_horiz),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: SegmentedButton<WeightUnit>(
@@ -78,10 +88,15 @@ class _RmListScreenState extends State<RmListScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: loc.addLiftTitle,
-        onPressed: _addLiftDialog,
-        child: const Icon(Icons.add),
+      floatingActionButton: Tooltip(
+        message: loc.addLiftTitle,
+        child: GlassButton(
+          circular: true,
+          prominent: true,
+          tint: AppColors.purple,
+          onPressed: _addLiftDialog,
+          icon: Icons.add,
+        ),
       ),
       body: GridView.builder(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 88),

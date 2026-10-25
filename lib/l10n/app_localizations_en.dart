@@ -252,4 +252,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resultBarOnly => 'Just the bar, no plates.';
+
+  @override
+  String get converterTitle => 'Unit converter';
+
+  @override
+  String get converterTooltip => 'Unit converter';
+
+  @override
+  String get lbLabel => 'Pounds (lb)';
+
+  @override
+  String get kgLabel => 'Kilograms (kg)';
+
+  @override
+  String get quickPlatesTitle => 'Quick plate equivalents';
 }

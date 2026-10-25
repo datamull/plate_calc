@@ -30,7 +30,7 @@ workflows:
         script: flutter test
 
       - name: Firma de código
-        script: xcode-project use-profiles --export-method app-store
+        script: xcode-project use-profiles
 
       # Una sola compilación (antes se compilaba dos veces).
       # El número de build se toma de Codemagic ($BUILD_NUMBER) para que

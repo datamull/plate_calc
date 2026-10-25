@@ -86,12 +86,13 @@ class _HalfBarbellPainter extends CustomPainter {
       _metal(cy, shaftH, const [Color(0xFF8E97A3), Color(0xFFE4E8ED), Color(0xFF6B7480)]),
     );
 
-    // Marca del centro de la barra.
+    // Marca del centro de la barra: el extremo derecho, donde termina la parte larga.
     final centerLine = Paint()
       ..color = const Color(0xFF8FB4F5).withValues(alpha: 0.8)
       ..strokeWidth = 1.2;
+    final edge = size.width - 1.5;
     for (var y = 4.0; y < size.height - 4; y += 9) {
-      canvas.drawLine(Offset(1.5, y), Offset(1.5, y + 4), centerLine);
+      canvas.drawLine(Offset(edge, y), Offset(edge, y + 4), centerLine);
     }
     final centerTxt = TextPainter(
       text: const TextSpan(
@@ -105,7 +106,7 @@ class _HalfBarbellPainter extends CustomPainter {
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    centerTxt.paint(canvas, const Offset(6, 2));
+    centerTxt.paint(canvas, Offset(size.width - centerTxt.width - 6, 2));
 
     // Manga: parte de la barra donde van los discos y el collar (metal oscuro).
     final sleeveH = _sleeveMm * ppm;
@@ -120,7 +121,8 @@ class _HalfBarbellPainter extends CustomPainter {
 
     // Discos: de adentro (pesados) hacia afuera.
     var x = x0;
-    for (var i = 0; i < perSide.length; i++) {
+    // Del más liviano (pegado al centro) al más pesado (pegado al collar).
+    for (var i = perSide.length - 1; i >= 0; i--) {
       final tw = widths[i];
       final color = PlateVisual.color(unit, perSide[i]);
       final rect = Rect.fromLTWH(x, cy - plateH / 2, tw, plateH);

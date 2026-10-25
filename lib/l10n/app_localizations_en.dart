@@ -168,21 +168,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRmLabel => 'No RM';
 
   @override
-  String get rmDetailNewRmLabel => 'New RM';
-
-  @override
-  String get rmDetailNewRmHint => 'Ex: 150.5';
-
-  @override
-  String get rmSavedSnack => 'RM saved.';
-
-  @override
-  String get deleteRecordDialogTitle => 'Delete record';
-
-  @override
-  String get deleteRecordDialogContent => 'Delete this record from history?';
-
-  @override
   String get deleteRecordTooltip => 'Delete record';
 
   @override
@@ -223,4 +208,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inventorySaveButton => 'Save inventory';
+
+  @override
+  String get liftDeadlift => 'Deadlift';
+
+  @override
+  String get liftSnatch => 'Snatch';
+
+  @override
+  String get liftClean => 'Clean';
+
+  @override
+  String get liftJerk => 'Jerk';
+
+  @override
+  String get liftAlreadyExists => 'That movement already exists.';
+
+  @override
+  String get errorRmMissing => 'Enter your 1RM.';
+
+  @override
+  String get inventorySavedSnack => 'Inventory saved.';
+
+  @override
+  String get inventoryAddPlate => 'Add plate';
+
+  @override
+  String get inventoryAddPlateHint => 'Plate weight';
+
+  @override
+  String get inventoryDeletePlateHint => 'Long-press a plate to remove it.';
+
+  @override
+  String inventoryRemovePlate(String weight, String units) {
+    return 'Remove the $weight $units plate?';
+  }
+
+  @override
+  String get inventoryReset => 'Restore defaults';
+
+  @override
+  String get settingsTooltip => 'Settings';
+
+  @override
+  String get resultBarOnly => 'Just the bar, no plates.';
 }

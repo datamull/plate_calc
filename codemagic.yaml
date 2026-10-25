@@ -4,37 +4,49 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect: "SebaHalt" # <--- VERIFICA que este nombre sea igual al de tu integración en Codemagic
+      # Nombre de la clave de App Store Connect en Codemagic
+      # (Ajustes de la cuenta → Integrations → Developer Portal).
+      app_store_connect: "SebaHalt"
     environment:
-      groups:
-        - app_store_credentials # <--- Donde guardaste APP_STORE_CONNECT_PRIVATE_KEY, KEY_ID e ISSUER_ID
+      # Firma automática: Codemagic obtiene el certificado y el perfil de
+      # distribución con la clave de App Store Connect.
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.example.plateCalc
       vars:
-        BUNDLE_ID: "com.seba.haltercalc" # Tu Bundle ID exacto
+        BUNDLE_ID: "com.example.plateCalc"
         XCODE_SCHEME: "Runner"
       flutter: stable
       xcode: latest
     scripts:
-      - name: Flutter clean & get
+      - name: Instalar dependencias
+        script: flutter pub get
+
+      # Si el análisis o alguna prueba falla, la build se detiene y no se
+      # sube nada a TestFlight.
+      - name: Análisis estático
+        script: flutter analyze
+      - name: Pruebas
+        script: flutter test
+
+      - name: Firma de código
+        script: xcode-project use-profiles
+
+      # Una sola compilación (antes se compilaba dos veces).
+      # El número de build se toma de Codemagic ($BUILD_NUMBER) para que
+      # cada subida sea distinta; App Store rechaza números repetidos.
+      - name: Compilar IPA
         script: |
-          flutter clean
-          flutter pub get
-      - name: Set up code signing
-        script: |
-          # Configuramos Codemagic para que use perfiles de App Store
-          xcode-project use-profiles --export-method app-store
-      - name: Build iOS without signing
-        script: |
-          # Compilamos la app 'desnuda'. Esto NO dará error de certificados.
-          flutter build ios --release --no-codesign
-      - name: Build and Sign IPA
-        script: |
-          # Esta herramienta toma la app anterior y le 'pega' tu firma (.p8)
-          xcode-project build-ipa \
-            --workspace ios/Runner.xcworkspace \
-            --scheme "$XCODE_SCHEME"
+          flutter build ipa --release \
+            --build-number=$BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true # Se subirá directo a TestFlight si todo sale bien
+        # Las builds llegan a TestFlight para testers internos sin revisión.
+        # Para testers externos: completar "Test information" en App Store
+        # Connect y cambiar a true.
+        submit_to_testflight: false

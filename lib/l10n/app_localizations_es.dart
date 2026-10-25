@@ -168,21 +168,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noRmLabel => 'Sin RM';
 
   @override
-  String get rmDetailNewRmLabel => 'Nuevo RM';
-
-  @override
-  String get rmDetailNewRmHint => 'Ej: 150.5';
-
-  @override
-  String get rmSavedSnack => 'RM guardado.';
-
-  @override
-  String get deleteRecordDialogTitle => 'Eliminar registro';
-
-  @override
-  String get deleteRecordDialogContent => '¿Eliminar este registro del historial?';
-
-  @override
   String get deleteRecordTooltip => 'Eliminar registro';
 
   @override
@@ -223,4 +208,48 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get inventorySaveButton => 'Guardar inventario';
+
+  @override
+  String get liftDeadlift => 'Peso muerto';
+
+  @override
+  String get liftSnatch => 'Arranque';
+
+  @override
+  String get liftClean => 'Cargada';
+
+  @override
+  String get liftJerk => 'Envión';
+
+  @override
+  String get liftAlreadyExists => 'Ese movimiento ya existe.';
+
+  @override
+  String get errorRmMissing => 'Ingresa tu 1RM.';
+
+  @override
+  String get inventorySavedSnack => 'Inventario guardado.';
+
+  @override
+  String get inventoryAddPlate => 'Agregar disco';
+
+  @override
+  String get inventoryAddPlateHint => 'Peso del disco';
+
+  @override
+  String get inventoryDeletePlateHint => 'Mantén presionado un disco para quitarlo.';
+
+  @override
+  String inventoryRemovePlate(String weight, String units) {
+    return '¿Quitar el disco de $weight $units?';
+  }
+
+  @override
+  String get inventoryReset => 'Restaurar valores por defecto';
+
+  @override
+  String get settingsTooltip => 'Configuración';
+
+  @override
+  String get resultBarOnly => 'Solo la barra, sin discos.';
 }

@@ -82,7 +82,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get historyClear => 'Effacer';
 
   @override
-  String get historyEmpty => 'Aucun enregistrement pour l’instant. Enregistre un RM pour créer des entrées.';
+  String get historyEmpty =>
+      'Aucun enregistrement pour l’instant. Enregistre un RM pour créer des entrées.';
 
   @override
   String get historyClearedSnack => 'Historique effacé.';
@@ -134,7 +135,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorPercentInvalid => 'Entre un pourcentage valide (> 0).';
 
   @override
-  String get errorTargetTooLow => 'L’objectif est inférieur au poids de la barre ou les données ne sont pas valides.';
+  String get errorTargetTooLow =>
+      'L’objectif est inférieur au poids de la barre ou les données ne sont pas valides.';
 
   @override
   String get panelCloseTooltip => 'Fermer';
@@ -166,21 +168,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noRmLabel => 'Sans RM';
-
-  @override
-  String get rmDetailNewRmLabel => 'Nouveau RM';
-
-  @override
-  String get rmDetailNewRmHint => 'Ex : 150.5';
-
-  @override
-  String get rmSavedSnack => 'RM enregistré.';
-
-  @override
-  String get deleteRecordDialogTitle => 'Supprimer l’enregistrement';
-
-  @override
-  String get deleteRecordDialogContent => 'Supprimer cet enregistrement de l’historique ?';
 
   @override
   String get deleteRecordTooltip => 'Supprimer l’enregistrement';
@@ -223,4 +210,48 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get inventorySaveButton => 'Enregistrer l’inventaire';
+
+  @override
+  String get liftDeadlift => 'Soulevé de terre';
+
+  @override
+  String get liftSnatch => 'Arraché';
+
+  @override
+  String get liftClean => 'Épaulé';
+
+  @override
+  String get liftJerk => 'Jeté';
+
+  @override
+  String get liftAlreadyExists => 'Ce mouvement existe déjà.';
+
+  @override
+  String get errorRmMissing => 'Entrez votre 1RM.';
+
+  @override
+  String get inventorySavedSnack => 'Inventaire enregistré.';
+
+  @override
+  String get inventoryAddPlate => 'Ajouter un disque';
+
+  @override
+  String get inventoryAddPlateHint => 'Poids du disque';
+
+  @override
+  String get inventoryDeletePlateHint => 'Appuyez longuement sur un disque pour le retirer.';
+
+  @override
+  String inventoryRemovePlate(String weight, String units) {
+    return 'Retirer le disque de $weight $units ?';
+  }
+
+  @override
+  String get inventoryReset => 'Rétablir les valeurs par défaut';
+
+  @override
+  String get settingsTooltip => 'Paramètres';
+
+  @override
+  String get resultBarOnly => 'Seulement la barre, sans disques.';
 }

@@ -1,45 +1,51 @@
 import 'package:flutter/material.dart';
 
+import '../../models/weight_unit.dart';
+
+/// Colores y anchos (solo visuales) de los discos.
 class PlateVisual {
-  static Color color(String units, double w) {
-    if (units == 'kg') {
-      if ((w - 25).abs() < 0.01) return const Color(0xFFE53935); // rojo
-      if ((w - 20).abs() < 0.01) return const Color(0xFF1E88E5); // azul
-      if ((w - 15).abs() < 0.01) return const Color(0xFFFDD835); // amarillo
-      if ((w - 10).abs() < 0.01) return const Color(0xFF43A047); // verde
-      if ((w - 5 ).abs() < 0.01) return const Color(0xFF8E24AA); // morado
-      if ((w - 2.5).abs() < 0.01) return const Color(0xFF546E7A); // gris
-      if ((w - 1.25).abs() < 0.01) return const Color(0xFF90A4AE);
-      if ((w - 0.5).abs() < 0.01) return const Color(0xFFB0BEC5);
-      return const Color(0xFF757575);
-    } else {
-      // lb: 45, 25, 10, 5, 2.5
-      if ((w - 45).abs() < 0.01) return const Color(0xFFE53935); // rojo
-      if ((w - 25).abs() < 0.01) return const Color(0xFF43A047); // verde
-      if ((w - 10).abs() < 0.01) return const Color(0xFF1E88E5); // azul
-      if ((w - 5 ).abs() < 0.01) return const Color(0xFFFDD835); // amarillo
-      if ((w - 2.5).abs() < 0.01) return const Color(0xFF546E7A); // gris
-      return const Color(0xFF757575);
+  PlateVisual._();
+
+  static const _fallback = Color(0xFF757575);
+
+  static final Map<double, Color> _kg = {
+    25: const Color(0xFFE53935), // rojo
+    20: const Color(0xFF1E88E5), // azul
+    15: const Color(0xFFFDD835), // amarillo
+    10: const Color(0xFF43A047), // verde
+    5: const Color(0xFF8E24AA), // morado
+    2.5: const Color(0xFF546E7A),
+    2: const Color(0xFF64B5F6),
+    1.5: const Color(0xFFFFF176),
+    1.25: const Color(0xFF90A4AE),
+    1: const Color(0xFF81C784),
+    0.5: const Color(0xFFB0BEC5),
+  };
+
+  static final Map<double, Color> _lb = {
+    45: const Color(0xFFE53935), // rojo
+    35: const Color(0xFFFDD835), // amarillo
+    25: const Color(0xFF43A047), // verde
+    10: const Color(0xFF1E88E5), // azul
+    5: const Color(0xFF8E24AA), // morado
+    2.5: const Color(0xFF546E7A),
+    2: const Color(0xFF64B5F6),
+    1.25: const Color(0xFF90A4AE),
+    0.5: const Color(0xFFB0BEC5),
+  };
+
+  static Color color(WeightUnit unit, double w) {
+    final table = unit == WeightUnit.kg ? _kg : _lb;
+    for (final e in table.entries) {
+      if ((e.key - w).abs() < 0.001) return e.value;
     }
+    return _fallback;
   }
 
-  // Solo visual (no escala real); grandes un poco más anchos.
-  static double width(String units, double w) {
-    if (units == 'kg') {
-      if ((w - 25).abs() < 0.01) return 30;
-      if ((w - 20).abs() < 0.01) return 28;
-      if ((w - 15).abs() < 0.01) return 26;
-      if ((w - 10).abs() < 0.01) return 24;
-      if ((w - 5 ).abs() < 0.01) return 18;
-      if ((w - 2.5).abs() < 0.01) return 14;
-      return 10;
-    } else {
-      if ((w - 45).abs() < 0.01) return 30;
-      if ((w - 25).abs() < 0.01) return 28;
-      if ((w - 10).abs() < 0.01) return 20;
-      if ((w - 5 ).abs() < 0.01) return 14;
-      if ((w - 2.5).abs() < 0.01) return 10;
-      return 10;
-    }
+  /// Ancho relativo: los discos pesados son más anchos.
+  static double width(WeightUnit unit, double w) {
+    final big = unit == WeightUnit.kg ? 25.0 : 45.0;
+    final ratio = (w / big).clamp(0.0, 1.0);
+    return 10 + 20 * ratio; // de 10 a 30 px
   }
 }

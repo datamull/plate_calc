@@ -1,61 +1,68 @@
 {
   "@@locale": "en",
   "appTitle": "Plate Calculator",
-
   "unitsLabel": "Units:",
   "barLabel": "Bar",
   "collarsLabel": "Collars",
-
   "interpretRmAs": "Interpret RM% as:",
   "modeTotalInclBar": "Total (includes bar)",
   "modePerSide": "Per side (without bar)",
-
   "rmFieldNoMovement": "Your 1RM",
   "rmFieldWithMovement": "{movementName} 1RM",
   "@rmFieldWithMovement": {
     "description": "Label when a movement name exists",
     "placeholders": {
-      "movementName": { "type": "String" }
+      "movementName": {
+        "type": "String"
+      }
     }
   },
-
   "percentLabel": "Percent",
   "derivedTargetLabel": "Target derived from {percent}% RM:",
   "@derivedTargetLabel": {
     "placeholders": {
-      "percent": { "type": "String" }
+      "percent": {
+        "type": "String"
+      }
     }
   },
-
   "derivedTotal": "TOTAL: {weight} {units}",
   "@derivedTotal": {
     "placeholders": {
-      "weight": { "type": "String" },
-      "units": { "type": "String" }
+      "weight": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
     }
   },
-
   "derivedPerSide": "PER SIDE (plates): {weight} {units}",
   "@derivedPerSide": {
     "placeholders": {
-      "weight": { "type": "String" },
-      "units": { "type": "String" }
+      "weight": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
     }
   },
-
   "percentTableTitle": "Percentage table (tap to apply)",
   "percentTableHeaderPercent": "%",
   "percentTableHeaderTotal": "Total",
   "percentTableHeaderPerSide": "Per side (without bar)",
-
   "calculateButton": "Calculate plate distribution",
-
   "historyButton": "RM History",
   "historySheetTitle": "RM History — {movementName} ({units})",
   "@historySheetTitle": {
     "placeholders": {
-      "movementName": { "type": "String" },
-      "units": { "type": "String" }
+      "movementName": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
     }
   },
   "historyClear": "Clear",
@@ -64,26 +71,34 @@
   "historyRowRm": "RM: {rm} {units}",
   "@historyRowRm": {
     "placeholders": {
-      "rm": { "type": "String" },
-      "units": { "type": "String" }
+      "rm": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
     }
   },
-
   "saveRmTooltip": "Save RM",
   "saveRmInvalidSnack": "Enter a valid RM before saving.",
   "saveRmOkSnack": "RM saved for {movementName} ({units}).",
   "@saveRmOkSnack": {
     "placeholders": {
-      "movementName": { "type": "String" },
-      "units": { "type": "String" }
+      "movementName": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
     }
   },
-
   "deleteMovementDialogTitle": "Delete movement",
   "deleteMovementDialogContent": "Delete \"{movementName}\" completely? It will be removed along with its RM/History.",
   "@deleteMovementDialogContent": {
     "placeholders": {
-      "movementName": { "type": "String" }
+      "movementName": {
+        "type": "String"
+      }
     }
   },
   "deleteMovementCancel": "Cancel",
@@ -91,51 +106,54 @@
   "deleteMovementButton": "Delete {movementName}",
   "@deleteMovementButton": {
     "placeholders": {
-      "movementName": { "type": "String" }
+      "movementName": {
+        "type": "String"
+      }
     }
   },
   "deleteMovementOkSnack": "Movement deleted: {movementName}",
   "@deleteMovementOkSnack": {
     "placeholders": {
-      "movementName": { "type": "String" }
+      "movementName": {
+        "type": "String"
+      }
     }
   },
   "deleteMovementFailSnack": "Could not delete movement.",
-
   "errorPercentInvalid": "Enter a valid percentage (> 0).",
   "errorTargetTooLow": "Target is below bar weight or the data is invalid.",
-
   "panelCloseTooltip": "Close",
-
   "resultExact": "Reached: {weight} {units} (exact)",
   "@resultExact": {
     "placeholders": {
-      "weight": { "type": "String" },
-      "units": { "type": "String" }
+      "weight": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
     }
   },
   "resultApprox": "Best approximation: {weight} {units} (short by {shortfall} {units})",
   "@resultApprox": {
     "placeholders": {
-      "weight": { "type": "String" },
-      "shortfall": { "type": "String" },
-      "units": { "type": "String" }
+      "weight": {
+        "type": "String"
+      },
+      "shortfall": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
     }
   },
-
-  "chosenDiscsTitle": "Chosen discs (total):"
-    ,
+  "chosenDiscsTitle": "Chosen discs (total):",
   "yourLiftsTitle": "Your lifts",
   "addLiftTitle": "Add movement",
   "addLiftHint": "Ex: Front Squat",
   "saveLabel": "Save",
-  "noRmLabel": "No RM"
-  ,
-  "rmDetailNewRmLabel": "New RM",
-  "rmDetailNewRmHint": "Ex: 150.5",
-  "rmSavedSnack": "RM saved.",
-  "deleteRecordDialogTitle": "Delete record",
-  "deleteRecordDialogContent": "Delete this record from history?",
+  "noRmLabel": "No RM",
   "deleteRecordTooltip": "Delete record",
   "clearHistoryDialogTitle": "Clear history",
   "clearHistoryDialogContent": "Delete all history for this lift?",
@@ -147,10 +165,31 @@
   "settingsLanguageSpanish": "Spanish",
   "settingsLanguageFrench": "French",
   "settingsLanguageEnglish": "English",
-
   "inventoryKgTitle": "Plates in kg",
   "inventoryLbTitle": "Plates in lb",
-  "inventorySaveButton": "Save inventory"
-
-
+  "inventorySaveButton": "Save inventory",
+  "liftDeadlift": "Deadlift",
+  "liftSnatch": "Snatch",
+  "liftClean": "Clean",
+  "liftJerk": "Jerk",
+  "liftAlreadyExists": "That movement already exists.",
+  "errorRmMissing": "Enter your 1RM.",
+  "inventorySavedSnack": "Inventory saved.",
+  "inventoryAddPlate": "Add plate",
+  "inventoryAddPlateHint": "Plate weight",
+  "inventoryDeletePlateHint": "Long-press a plate to remove it.",
+  "inventoryRemovePlate": "Remove the {weight} {units} plate?",
+  "inventoryReset": "Restore defaults",
+  "settingsTooltip": "Settings",
+  "resultBarOnly": "Just the bar, no plates.",
+  "@inventoryRemovePlate": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "units": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -24,7 +24,7 @@
 - Fugas de memoria (controladores de texto que nunca se liberaban).
 
 ### Mejoras
-- Movimientos base traducidos (Peso muerto, Arranque, Cargada, Envión).
+- Movimientos base siempre en inglés (Deadlift, Snatch, Clean, Jerk), sin importar el idioma de la app.
 - Inventario: agregar discos de cualquier peso, quitarlos (mantener
   presionado) y restaurar valores por defecto.
 - Se recuerdan la unidad elegida, el modo de RM, la barra y los collares.

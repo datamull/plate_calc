@@ -109,7 +109,7 @@ class _RmListScreenState extends State<RmListScreen> {
         itemBuilder: (context, i) {
           final lift = lifts[i];
           return _LiftCard(
-            name: loc.liftName(lift),
+            name: liftDisplayName(lift),
             lastRm: _storage.lastRm(lift, _unit),
             unit: _unit,
             onTap: () => _openLift(lift),

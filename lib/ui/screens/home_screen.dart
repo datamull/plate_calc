@@ -122,13 +122,13 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     await _storage.saveRm(_lift, _unit, _rm);
     messenger.showSnackBar(
-      SnackBar(content: Text(loc.saveRmOkSnack(loc.liftName(_lift), _unit.label))),
+      SnackBar(content: Text(loc.saveRmOkSnack(liftDisplayName(_lift), _unit.label))),
     );
   }
 
   Future<void> _deleteMovement() async {
     final loc = AppLocalizations.of(context);
-    final name = loc.liftName(_lift);
+    final name = liftDisplayName(_lift);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final name = loc.liftName(_lift);
+    final name = liftDisplayName(_lift);
     final targets = _mode.targets(
       rm: _rm,
       fraction: _fraction,

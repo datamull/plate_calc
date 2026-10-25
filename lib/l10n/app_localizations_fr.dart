@@ -212,18 +212,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get inventorySaveButton => 'Enregistrer l’inventaire';
 
   @override
-  String get liftDeadlift => 'Soulevé de terre';
-
-  @override
-  String get liftSnatch => 'Arraché';
-
-  @override
-  String get liftClean => 'Épaulé';
-
-  @override
-  String get liftJerk => 'Jeté';
-
-  @override
   String get liftAlreadyExists => 'Ce mouvement existe déjà.';
 
   @override

@@ -33,10 +33,10 @@ void main() {
     });
 
     // Movimientos base traducidos y RM visible en la tarjeta.
-    expect(find.text('Arranque'), findsOneWidget);
+    expect(find.text('Snatch'), findsOneWidget);
     expect(find.text('RM: 100 kg'), findsOneWidget);
 
-    await tester.tap(find.text('Arranque'));
+    await tester.tap(find.text('Snatch'));
     await tester.pumpAndSettle();
 
     // El RM guardado se precarga.

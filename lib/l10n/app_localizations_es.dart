@@ -210,18 +210,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get inventorySaveButton => 'Guardar inventario';
 
   @override
-  String get liftDeadlift => 'Peso muerto';
-
-  @override
-  String get liftSnatch => 'Arranque';
-
-  @override
-  String get liftClean => 'Cargada';
-
-  @override
-  String get liftJerk => 'Envión';
-
-  @override
   String get liftAlreadyExists => 'Ese movimiento ya existe.';
 
   @override

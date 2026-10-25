@@ -210,18 +210,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inventorySaveButton => 'Save inventory';
 
   @override
-  String get liftDeadlift => 'Deadlift';
-
-  @override
-  String get liftSnatch => 'Snatch';
-
-  @override
-  String get liftClean => 'Clean';
-
-  @override
-  String get liftJerk => 'Jerk';
-
-  @override
   String get liftAlreadyExists => 'That movement already exists.';
 
   @override

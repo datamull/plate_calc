@@ -448,30 +448,6 @@ abstract class AppLocalizations {
   /// **'Save inventory'**
   String get inventorySaveButton;
 
-  /// No description provided for @liftDeadlift.
-  ///
-  /// In en, this message translates to:
-  /// **'Deadlift'**
-  String get liftDeadlift;
-
-  /// No description provided for @liftSnatch.
-  ///
-  /// In en, this message translates to:
-  /// **'Snatch'**
-  String get liftSnatch;
-
-  /// No description provided for @liftClean.
-  ///
-  /// In en, this message translates to:
-  /// **'Clean'**
-  String get liftClean;
-
-  /// No description provided for @liftJerk.
-  ///
-  /// In en, this message translates to:
-  /// **'Jerk'**
-  String get liftJerk;
-
   /// No description provided for @liftAlreadyExists.
   ///
   /// In en, this message translates to:

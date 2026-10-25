@@ -67,8 +67,8 @@ abstract class AppLocalizations {
 
   final String localeName;
 
-  static AppLocalizations? of(BuildContext context) {
-    return Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
   }
 
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
@@ -83,19 +83,16 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('es'),
-    Locale('fr')
-  ];
+  static const List<Locale> supportedLocales = <Locale>[Locale('en'), Locale('es'), Locale('fr')];
 
   /// No description provided for @appTitle.
   ///
@@ -367,36 +364,6 @@ abstract class AppLocalizations {
   /// **'No RM'**
   String get noRmLabel;
 
-  /// No description provided for @rmDetailNewRmLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'New RM'**
-  String get rmDetailNewRmLabel;
-
-  /// No description provided for @rmDetailNewRmHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Ex: 150.5'**
-  String get rmDetailNewRmHint;
-
-  /// No description provided for @rmSavedSnack.
-  ///
-  /// In en, this message translates to:
-  /// **'RM saved.'**
-  String get rmSavedSnack;
-
-  /// No description provided for @deleteRecordDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete record'**
-  String get deleteRecordDialogTitle;
-
-  /// No description provided for @deleteRecordDialogContent.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete this record from history?'**
-  String get deleteRecordDialogContent;
-
   /// No description provided for @deleteRecordTooltip.
   ///
   /// In en, this message translates to:
@@ -480,6 +447,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save inventory'**
   String get inventorySaveButton;
+
+  /// No description provided for @liftDeadlift.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadlift'**
+  String get liftDeadlift;
+
+  /// No description provided for @liftSnatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Snatch'**
+  String get liftSnatch;
+
+  /// No description provided for @liftClean.
+  ///
+  /// In en, this message translates to:
+  /// **'Clean'**
+  String get liftClean;
+
+  /// No description provided for @liftJerk.
+  ///
+  /// In en, this message translates to:
+  /// **'Jerk'**
+  String get liftJerk;
+
+  /// No description provided for @liftAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'That movement already exists.'**
+  String get liftAlreadyExists;
+
+  /// No description provided for @errorRmMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your 1RM.'**
+  String get errorRmMissing;
+
+  /// No description provided for @inventorySavedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory saved.'**
+  String get inventorySavedSnack;
+
+  /// No description provided for @inventoryAddPlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Add plate'**
+  String get inventoryAddPlate;
+
+  /// No description provided for @inventoryAddPlateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Plate weight'**
+  String get inventoryAddPlateHint;
+
+  /// No description provided for @inventoryDeletePlateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press a plate to remove it.'**
+  String get inventoryDeletePlateHint;
+
+  /// No description provided for @inventoryRemovePlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the {weight} {units} plate?'**
+  String inventoryRemovePlate(String weight, String units);
+
+  /// No description provided for @inventoryReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore defaults'**
+  String get inventoryReset;
+
+  /// No description provided for @settingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTooltip;
+
+  /// No description provided for @resultBarOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Just the bar, no plates.'**
+  String get resultBarOnly;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
@@ -498,19 +549,20 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'es': return AppLocalizationsEs();
-    case 'fr': return AppLocalizationsFr();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

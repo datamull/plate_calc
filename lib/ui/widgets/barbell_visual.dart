@@ -1,172 +1,138 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../../models/weight_unit.dart';
 import 'plate_colors.dart';
 
+/// Dibujo de la barra cargada (simétrica).
 class BarbellView extends StatelessWidget {
-  final List<double> perSide; // pesos por lado (ej: [45, 25, 10, 5])
-  final String units;
-  final double height;
+  const BarbellView({super.key, required this.perSide, required this.unit, this.height = 180});
 
-  const BarbellView({
-    super.key,
-    required this.perSide,
-    required this.units,
-    this.height = 180,
-  });
+  /// Discos de un lado, del más pesado al más liviano.
+  final List<double> perSide;
+  final WeightUnit unit;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return SizedBox(
       height: height,
       width: double.infinity,
       child: CustomPaint(
-        painter: _BarbellPainter(perSide: perSide, units: units),
+        painter: _BarbellPainter(
+          perSide: perSide,
+          unit: unit,
+          barColor: scheme.outline,
+          sleeveColor: scheme.onSurface,
+        ),
       ),
     );
   }
 }
 
 class _BarbellPainter extends CustomPainter {
-  final List<double> perSide;
-  final String units;
+  _BarbellPainter({
+    required this.perSide,
+    required this.unit,
+    required this.barColor,
+    required this.sleeveColor,
+  });
 
-  _BarbellPainter({required this.perSide, required this.units});
+  final List<double> perSide;
+  final WeightUnit unit;
+  final Color barColor;
+  final Color sleeveColor;
+
+  static const _barThickness = 10.0;
+  static const _baseGap = 4.0;
+  static const _clipWidth = 6.0;
 
   @override
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
+    final sleeveLength = size.width * 0.28;
+    final plateHeight = size.height * 0.45;
 
-    // MÁS CENTRADO: mangas largas hacia el centro.
-    final sleeveLength = size.width * 0.28;        // ↑ sube si quieres aún más centrado (0.30/0.32)
-    final innerBarLen  = size.width - 2 * sleeveLength;
-    final barThickness = 10.0;
-    final plateHeight  = size.height * 0.45;
-
-    final paintBar    = Paint()..color = const Color(0xFF424242);
-    final paintSleeve = Paint()..color = Colors.black87;
-
-    // Barra central
-    final barRect = Rect.fromCenter(
-      center: Offset(cx, cy),
-      width: innerBarLen,
-      height: barThickness,
-    );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(barRect, const Radius.circular(3)),
-      paintBar,
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: Offset(cx, cy),
+          width: size.width - 2 * sleeveLength,
+          height: _barThickness,
+        ),
+        const Radius.circular(3),
+      ),
+      Paint()..color = barColor,
     );
 
-    // Mangas
-    final leftSleeve  = Rect.fromLTWH(0, cy - barThickness / 2, sleeveLength, barThickness);
-    final rightSleeve = Rect.fromLTWH(size.width - sleeveLength, cy - barThickness / 2, sleeveLength, barThickness);
-    canvas.drawRect(leftSleeve,  paintSleeve);
-    canvas.drawRect(rightSleeve, paintSleeve);
-
-    // Orden: grandes → chicos (para que grandes queden pegados al centro)
-    final weights = [...perSide]..sort((a, b) => b.compareTo(a));
-
-    // Calculamos anchos base y compactamos si no caben dentro de la manga
-    const baseGap = 4.0;                     // gap base entre discos (se escala si es necesario)
-    final baseWidths = weights.map((w) => PlateVisual.width(units, w)).toList();
-
-    double available = sleeveLength - 16;    // margen visual dentro de la manga
-    double need = 0;
-    for (final w in baseWidths) {
-      need += w;
-    }
-    if (weights.isNotEmpty) need += baseGap * (weights.length - 1);
-
-    final scale = need > available ? (available / need) : 1.0;
-    final gap   = baseGap * scale;
-    final widths = baseWidths.map((w) => w * scale).toList();
-
-    // Partimos pegado al borde interno de cada manga (cerca del centro)
-    double leftStart  = sleeveLength;                 // borde interno manga izq
-    double rightStart = size.width - sleeveLength;    // borde interno manga der
-
-    for (int i = 0; i < weights.length; i++) {
-      final w  = weights[i];
-      final pw = widths[i];
-      final c  = PlateVisual.color(units, w);
-
-      // DERECHO: desde el centro hacia afuera (→)
-      final rRect = Rect.fromLTWH(
-        rightStart + (i == 0 ? 0 : gap),
-        cy - plateHeight / 2,
-        pw,
-        plateHeight,
-      );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(rRect, const Radius.circular(6)),
-        Paint()..color = c,
-      );
-      rightStart += pw + gap;
-
-      // IZQUIERDO: simétrico desde el centro hacia afuera (←)
-      final lRect = Rect.fromLTWH(
-        leftStart - pw - (i == 0 ? 0 : gap),
-        cy - plateHeight / 2,
-        pw,
-        plateHeight,
-      );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(lRect, const Radius.circular(6)),
-        Paint()..color = c,
-      );
-      leftStart -= pw + gap;
-    }
-// Collar final (más bajo y completamente negro)
-final clipW = 6.0; // ancho del collar (más angosto)
-final clipH = plateHeight * 0.35; // más bajo respecto al disco
-final clipPaint = Paint()..color = Colors.black; // negro sólido
-
-final leftClip = Rect.fromCenter(
-  center: Offset(leftStart - clipW / 2, cy),
-  width: clipW,
-  height: clipH,
-);
-final rightClip = Rect.fromCenter(
-  center: Offset(rightStart + clipW / 2, cy),
-  width: clipW,
-  height: clipH,
-);
-
-// bordes redondeados mínimos
-canvas.drawRRect(
-  RRect.fromRectAndRadius(leftClip, const Radius.circular(1)),
-  clipPaint,
-);
-canvas.drawRRect(
-  RRect.fromRectAndRadius(rightClip, const Radius.circular(1)),
-  clipPaint,
-);
-
-  
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
-class PlateLegend extends StatelessWidget {
-  final Map<double, int> used;
-  final String units;
-  const PlateLegend({super.key, required this.used, required this.units});
-
-  @override
-  Widget build(BuildContext context) {
-    final entries = used.entries.toList()..sort((a, b) => b.key.compareTo(a.key));
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: entries.map((e) {
-        final color = PlateVisual.color(units, e.key); // MISMO color que en la barra
-        final label = '${e.key.toString().replaceAll('.0', '')} $units';
-        return Chip(
-          avatar: CircleAvatar(backgroundColor: color),
-          label: Text('$label  x${e.value}'),
-        );
-      }).toList(),
+    final sleevePaint = Paint()..color = sleeveColor;
+    canvas.drawRect(
+      Rect.fromLTWH(0, cy - _barThickness / 2, sleeveLength, _barThickness),
+      sleevePaint,
     );
+    canvas.drawRect(
+      Rect.fromLTWH(size.width - sleeveLength, cy - _barThickness / 2, sleeveLength, _barThickness),
+      sleevePaint,
+    );
+
+    // Si los discos no caben en la manga, se escalan.
+    final baseWidths = perSide.map((w) => PlateVisual.width(unit, w)).toList();
+    final available = sleeveLength - 16;
+    final need =
+        baseWidths.fold<double>(0, (s, w) => s + w) +
+        (perSide.isEmpty ? 0 : _baseGap * (perSide.length - 1));
+    final scale = need > available ? available / need : 1.0;
+    final gap = _baseGap * scale;
+
+    var leftEdge = sleeveLength; // borde interno de la manga izquierda
+    var rightEdge = size.width - sleeveLength; // borde interno de la derecha
+
+    for (var i = 0; i < perSide.length; i++) {
+      final pw = baseWidths[i] * scale;
+      final g = i == 0 ? 0.0 : gap;
+      final paint = Paint()..color = PlateVisual.color(unit, perSide[i]);
+      final top = cy - plateHeight / 2;
+
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(rightEdge + g, top, pw, plateHeight),
+          const Radius.circular(6),
+        ),
+        paint,
+      );
+      rightEdge += pw + g;
+
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(leftEdge - pw - g, top, pw, plateHeight),
+          const Radius.circular(6),
+        ),
+        paint,
+      );
+      leftEdge -= pw + g;
+    }
+
+    // Collares al final de los discos.
+    final clipPaint = Paint()..color = sleeveColor;
+    final clipH = plateHeight * 0.35;
+    for (final x in [leftEdge - _clipWidth / 2, rightEdge + _clipWidth / 2]) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset(x, cy), width: _clipWidth, height: clipH),
+          const Radius.circular(1),
+        ),
+        clipPaint,
+      );
+    }
   }
+
+  // En la v1 siempre devolvía true (redibujaba en cada frame del panel).
+  @override
+  bool shouldRepaint(_BarbellPainter old) =>
+      !listEquals(old.perSide, perSide) ||
+      old.unit != unit ||
+      old.barColor != barColor ||
+      old.sleeveColor != sleeveColor;
 }

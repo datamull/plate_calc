@@ -1,1082 +1,347 @@
 import 'package:flutter/material.dart';
-import 'package:plate_calc/ui/widgets/plate_colors.dart';
+
+import '../../l10n/app_localizations.dart';
+import '../../l10n/lift_names.dart';
 import '../../models/settings.dart';
-import '../../models/plate.dart';
+import '../../models/target_mode.dart';
+import '../../models/weight_unit.dart';
+import '../../services/app_storage.dart';
 import '../../services/plate_calculator.dart';
-import '../widgets/barbell_visual.dart';
-import '../../services/rm_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:plate_calc/l10n/app_localizations.dart';
+import '../../utils/format.dart';
+import '../widgets/percent_table.dart';
+import '../widgets/result_sheet.dart';
+import '../widgets/rm_history_sheet.dart';
 
-enum TargetInputMode { totalInclBar, perSideWithoutBar }
-
+/// Calculadora de discos para un movimiento.
 class HomeScreen extends StatefulWidget {
-  final Settings initial;
-  final String? movementName; // nombre del movimiento (para guardar RM)
-  final double? initialRm; // RM inicial precargado (opcional)
-  final String? forceUnits; // 'kg' | 'lb' (opcional)
-
   const HomeScreen({
     super.key,
-    required this.initial,
-    this.movementName,
-    this.initialRm,
-    this.forceUnits,
+    required this.storage,
+    required this.movementName,
+    required this.initialUnit,
   });
+
+  final AppStorage storage;
+
+  /// Clave del movimiento (para guardar RM e historial).
+  final String movementName;
+  final WeightUnit initialUnit;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Settings settings;
+  AppStorage get _storage => widget.storage;
+  String get _lift => widget.movementName;
 
-  final rmCtrl = TextEditingController();
-  final pctCtrl = TextEditingController(text: '100');
+  late WeightUnit _unit;
+  late Settings _settings;
+  late TargetMode _mode;
 
-  TargetInputMode mode = TargetInputMode.perSideWithoutBar;
+  final _rmCtrl = TextEditingController();
+  final _pctCtrl = TextEditingController(text: '100');
+  final _collarsCtrl = TextEditingController();
 
-  PlateResult? result;
-  String? error;
-  bool _showPanel = false;
-  bool _wasDeleted = false;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    settings = widget.initial;
-
-    // Forzar unidades si vienen de la pantalla anterior
-    if (widget.forceUnits != null && widget.forceUnits != settings.units) {
-      settings = settings.copyWith(units: widget.forceUnits);
-      settings =
-          settings.copyWith(barWeight: settings.units == 'lb' ? 45 : 20);
-    }
-
-    _initRm();
+    _mode = TargetMode.parse(_storage.targetMode);
+    _loadUnit(widget.initialUnit);
+    // Antes la tabla de % no se actualizaba al escribir el RM.
+    _rmCtrl.addListener(_onInputChanged);
+    _pctCtrl.addListener(_onInputChanged);
   }
 
-  String _fmtDate(DateTime dt) {
-    final d = dt.toLocal();
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${two(d.day)}/${two(d.month)}/${d.year}  ${two(d.hour)}:${two(d.minute)}';
+  @override
+  void dispose() {
+    _rmCtrl.dispose();
+    _pctCtrl.dispose();
+    _collarsCtrl.dispose();
+    super.dispose();
   }
 
-  Future<void> _initRm() async {
-    if (widget.initialRm != null) {
-      rmCtrl.text = _fmt(widget.initialRm!);
+  void _onInputChanged() => setState(() => _error = null);
+
+  /// Carga el equipamiento y el último RM de la unidad.
+  /// En la v1 cambiar kg <-> lb dejaba los discos de la otra unidad
+  /// (p. ej. discos de 25 kg tratados como 25 lb) y no recargaba el RM.
+  void _loadUnit(WeightUnit u) {
+    _unit = u;
+    _settings = _storage.settings(u);
+    final rm = _storage.lastRm(_lift, u);
+    _rmCtrl.text = rm == null ? '' : fmtWeight(rm);
+    _collarsCtrl.text = fmtWeight(_settings.collarsWeight);
+    _error = null;
+  }
+
+  double get _rm => parseNumber(_rmCtrl.text) ?? 0;
+
+  /// Porcentaje escrito, limitado a 0–120 %.
+  double get _fraction => ((parseNumber(_pctCtrl.text) ?? 0) / 100).clamp(0.0, 1.2);
+
+  Future<void> _updateSettings(Settings s) async {
+    setState(() => _settings = s);
+    await _storage.saveSettings(s);
+  }
+
+  void _calculate() {
+    final loc = AppLocalizations.of(context);
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if (_rm <= 0) return setState(() => _error = loc.errorRmMissing);
+    if (_fraction <= 0) return setState(() => _error = loc.errorPercentInvalid);
+
+    final t = _mode.targets(
+      rm: _rm,
+      fraction: _fraction,
+      bar: _settings.barWeight,
+      collars: _settings.collarsWeight,
+    );
+    final result = computePlates(
+      target: t.total,
+      barWeight: _settings.barWeight,
+      collarsWeight: _settings.collarsWeight,
+      plates: _settings.plates,
+    );
+    if (result == null) return setState(() => _error = loc.errorTargetTooLow);
+
+    setState(() => _error = null);
+    showResultSheet(context, result: result, unit: _unit);
+  }
+
+  Future<void> _saveRm() async {
+    final loc = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    if (_rm <= 0) {
+      messenger.showSnackBar(SnackBar(content: Text(loc.saveRmInvalidSnack)));
       return;
     }
-    if (widget.movementName != null) {
-      final last =
-          await RmStorage.loadLastRm(widget.movementName!, settings.units);
-      if (last != null) {
-        rmCtrl.text = _fmt(last);
-        setState(() {});
-      }
-    }
-  }
-
-  Future<void> _openRmHistory() async {
-    if (widget.movementName == null) return;
-    final name = widget.movementName!;
-    final unit = settings.units;
-
-    List<Map<String, dynamic>> entries =
-        await RmStorage.loadRmHistory(name, unit);
-
-    if (!mounted) return;
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setSheetState) {
-            Future<void> _clear() async {
-              final ok = await RmStorage.clearRmHistory(name, unit);
-              if (ok) {
-                entries = [];
-                setSheetState(() {});
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        AppLocalizations.of(context)!.historyClearedSnack,
-                      ),
-                    ),
-                  );
-                }
-              }
-            }
-
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade400,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            AppLocalizations.of(context)!.historySheetTitle(
-                              name,
-                              unit,
-                            ),
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                        TextButton.icon(
-                          onPressed: entries.isEmpty ? null : _clear,
-                          icon: const Icon(Icons.delete_outline),
-                          label: Text(
-                            AppLocalizations.of(context)!.historyClear,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (entries.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Text(
-                          AppLocalizations.of(context)!.historyEmpty,
-                        ),
-                      )
-                    else
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 420),
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          itemCount: entries.length,
-                          separatorBuilder: (_, __) =>
-                              const Divider(height: 1),
-                          itemBuilder: (_, i) {
-                            final e = entries[i];
-                            final rm = (e['rm'] as num).toDouble();
-                            final ts = DateTime.tryParse(
-                                      e['ts'] as String? ?? '',
-                                    ) ??
-                                DateTime.now();
-                            return ListTile(
-                              leading: const Icon(Icons.history),
-                              title: Text(
-                                AppLocalizations.of(context)!.historyRowRm(
-                                  rm.toStringAsFixed(1),
-                                  unit,
-                                ),
-                              ),
-                              subtitle: Text(_fmtDate(ts)),
-                            );
-                          },
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  String _fmt(double v) =>
-      v.toStringAsFixed(v.truncateToDouble() == v ? 0 : 1);
-
-  List<double> _barOptions() =>
-      settings.units == 'lb' ? [45, 33] : [20, 15];
-
-  double _mapBarBetweenUnits(double bar, String from, String to) {
-    if (from == to) return bar;
-    if (from == 'lb' && to == 'kg') {
-      return (bar - 45).abs() <= (bar - 33).abs() ? 20 : 15;
-    }
-    if (from == 'kg' && to == 'lb') {
-      return (bar - 20).abs() <= (bar - 15).abs() ? 45 : 33;
-    }
-    return (to == 'lb') ? 45 : 20;
-  }
-
-  double _parsePct(String raw) {
-    final cleaned =
-        raw.trim().replaceAll('%', '').replaceAll(',', '.');
-    final v = double.tryParse(cleaned) ?? 0.0;
-    return (v / 100.0).clamp(0.0, 1.2);
-  }
-
-  Map<String, double> _targetsForPct(double pct) {
-    final rm =
-        double.tryParse(rmCtrl.text.replaceAll(',', '.')) ?? 0.0;
-    final bar = settings.barWeight;
-    final col = settings.collarsWeight;
-
-    if (mode == TargetInputMode.totalInclBar) {
-      final total = rm * pct;
-      final perSide =
-          ((total - bar - col) / 2.0).clamp(0.0, double.infinity);
-      return {'total': total, 'perSide': perSide};
-    } else {
-      final perSide = rm * pct;
-      final total = bar + col + 2.0 * perSide;
-      return {'total': total, 'perSide': perSide};
-    }
-  }
-
-  double _targetTotalFromPct(double pct) =>
-      _targetsForPct(pct)['total']!;
-
-  Future<void> _saveRmManually() async {
-    if (widget.movementName == null) return;
-    final rm =
-        double.tryParse(rmCtrl.text.replaceAll(',', '.'));
-    if (rm == null || rm <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.saveRmInvalidSnack,
-          ),
-        ),
-      );
-      return;
-    }
-
-    await RmStorage.saveLastRm(
-      widget.movementName!,
-      settings.units,
-      rm,
-    );
-
-    await RmStorage.appendRmHistory(
-      widget.movementName!,
-      settings.units,
-      rm,
-      DateTime.now(),
-    );
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLocalizations.of(context)!.saveRmOkSnack(
-            widget.movementName!,
-            settings.units,
-          ),
-        ),
-      ),
+    await _storage.saveRm(_lift, _unit, _rm);
+    messenger.showSnackBar(
+      SnackBar(content: Text(loc.saveRmOkSnack(loc.liftName(_lift), _unit.label))),
     );
   }
 
   Future<void> _deleteMovement() async {
-    if (widget.movementName == null) return;
-    final name = widget.movementName!.trim();
-
+    final loc = AppLocalizations.of(context);
+    final name = loc.liftName(_lift);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-          AppLocalizations.of(context)!.deleteMovementDialogTitle,
-        ),
-        content: Text(
-          AppLocalizations.of(context)!.deleteMovementDialogContent(
-            name,
-          ),
-        ),
+        title: Text(loc.deleteMovementDialogTitle),
+        content: Text(loc.deleteMovementDialogContent(name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(
-              AppLocalizations.of(context)!.deleteMovementCancel,
-            ),
+            child: Text(loc.deleteMovementCancel),
           ),
           FilledButton.tonal(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              AppLocalizations.of(context)!.deleteMovementConfirm,
-            ),
+            child: Text(loc.deleteMovementConfirm),
           ),
         ],
       ),
     );
+    if (confirmed != true || !mounted) return;
 
-    if (confirmed != true) return;
-
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
     try {
-      final ok = await RmStorage.deleteMovement(name);
-      if (!mounted) return;
-
-      if (ok) {
-        _wasDeleted = true;
-        rmCtrl.clear();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.deleteMovementOkSnack(
-                name,
-              ),
-            ),
-          ),
-        );
-
-        Future.microtask(() {
-          if (mounted) {
-            Navigator.of(context).pop(<String, dynamic>{
-              'deleted': true,
-              'name': name,
-            });
-          }
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.deleteMovementFailSnack,
-            ),
-          ),
-        );
-      }
+      await _storage.deleteLift(_lift);
+      messenger.showSnackBar(SnackBar(content: Text(loc.deleteMovementOkSnack(name))));
+      navigator.pop();
     } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.deleteMovementFailSnack,
-          ),
-        ),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(loc.deleteMovementFailSnack)));
     }
-  }
-
-  void _onCalculate() {
-    FocusManager.instance.primaryFocus?.unfocus();
-
-    setState(() {
-      error = null;
-    });
-
-    final pct = _parsePct(pctCtrl.text);
-    if (pct <= 0) {
-      setState(() {
-        error = AppLocalizations.of(context)!.errorPercentInvalid;
-        result = null;
-        _showPanel = false;
-      });
-      return;
-    }
-
-    final targetTotal = _targetTotalFromPct(pct);
-    final r = computePlates(
-      target: targetTotal,
-      barWeight: settings.barWeight,
-      collarsWeight: settings.collarsWeight,
-      plates: settings.plates
-          .map((p) => Plate(weight: p.weight, count: p.count))
-          .toList(),
-    );
-
-    if (r == null) {
-      setState(() {
-        error = AppLocalizations.of(context)!.errorTargetTooLow;
-        result = null;
-        _showPanel = false;
-      });
-      return;
-    }
-
-    setState(() {
-      result = r;
-      _showPanel = true;
-    });
-  }
-
-  Widget _percentRow(double fraction) {
-    final t = _targetsForPct(fraction);
-    final percentLabel = '${(fraction * 100).round()}%';
-
-    return InkWell(
-      onTap: () {
-        pctCtrl.text =
-            (fraction * 100).round().toString();
-        _onCalculate();
-      },
-      child: Padding(
-        padding:
-            const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-        child: Row(
-          children: [
-            SizedBox(width: 56, child: Text(percentLabel)),
-            Expanded(
-              child: Text(t['total']!.toStringAsFixed(1)),
-            ),
-            Expanded(
-              child: Text(t['perSide']!.toStringAsFixed(1)),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final size = MediaQuery.of(context).size;
-    final pct = _parsePct(pctCtrl.text);
-    final targets = _targetsForPct(pct);
-    final totalFromPct = targets['total']!;
-    final perSideFromPct = targets['perSide']!;
-    final tableRows =
-        List<double>.generate(10, (i) => (i + 1) * 0.10);
-    final panelHeight = size.height * 0.65;
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final name = loc.liftName(_lift);
+    final targets = _mode.targets(
+      rm: _rm,
+      fraction: _fraction,
+      bar: _settings.barWeight,
+      collars: _settings.collarsWeight,
+    );
+    final barOptions = {..._unit.barOptions, _settings.barWeight}.toList();
+    const numberKeyboard = TextInputType.numberWithOptions(decimal: true);
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (_showPanel) {
-          setState(() => _showPanel = false);
-          return false;
-        }
-        if (_wasDeleted) {
-          Navigator.of(context)
-              .pop(<String, dynamic>{'deleted': true});
-          return false;
-        }
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.movementName ??
-                AppLocalizations.of(context)!.appTitle,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(name),
+        actions: [
+          IconButton(
+            tooltip: loc.saveRmTooltip,
+            onPressed: _saveRm,
+            icon: const Icon(Icons.save_outlined),
           ),
-          actions: [
-            if (widget.movementName != null)
-              IconButton(
-                tooltip:
-                    AppLocalizations.of(context)!.saveRmTooltip,
-                onPressed: _saveRmManually,
-                icon: const Icon(Icons.save_outlined),
-              ),
-          ],
-        ),
-        body: Stack(
+        ],
+      ),
+      body: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: ListView(
+          padding: const EdgeInsets.all(16),
           children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  // Unidades
-                  Row(
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.unitsLabel,
-                      ),
-                      const SizedBox(width: 8),
-                      DropdownButton<String>(
-                        value: settings.units,
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'kg',
-                            child: Text('kg'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'lb',
-                            child: Text('lb'),
-                          ),
-                        ],
-                        onChanged: (v) {
-                          if (v == null) return;
-                          final newBar =
-                              _mapBarBetweenUnits(
-                            settings.barWeight,
-                            settings.units,
-                            v,
-                          );
-                          setState(() {
-                            settings = settings.copyWith(
-                              units: v,
-                              barWeight: newBar,
-                            );
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Barra + Collares
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)!
-                                  .barLabel,
-                            ),
-                            DropdownButton<double>(
-                              isExpanded: true,
-                              value: _barOptions().contains(
-                                      settings.barWeight)
-                                  ? settings.barWeight
-                                  : _barOptions().first,
-                              items: _barOptions()
-                                  .map(
-                                    (w) => DropdownMenuItem(
-                                      value: w,
-                                      child: Text(
-                                        '${w.toStringAsFixed(0)} ${settings.units}',
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (w) {
-                                if (w == null) return;
-                                setState(() {
-                                  settings =
-                                      settings.copyWith(
-                                          barWeight: w);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: settings
-                              .collarsWeight
-                              .toString(),
-                          decoration: InputDecoration(
-                            labelText:
-                                AppLocalizations.of(context)!
-                                    .collarsLabel,
-                          ),
-                          keyboardType:
-                              TextInputType.number,
-                          onChanged: (v) {
-                            setState(() {
-                              settings = settings.copyWith(
-                                collarsWeight:
-                                    double.tryParse(v) ??
-                                        settings
-                                            .collarsWeight,
-                              );
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Interpretación
-                  Row(
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!
-                            .interpretRmAs,
-                      ),
-                      const SizedBox(width: 8),
-                      DropdownButton<TargetInputMode>(
-                        value: mode,
-                        items: [
-                          DropdownMenuItem(
-                            value: TargetInputMode
-                                .totalInclBar,
-                            child: Text(
-                              AppLocalizations.of(context)!
-                                  .modeTotalInclBar,
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: TargetInputMode
-                                .perSideWithoutBar,
-                            child: Text(
-                              AppLocalizations.of(context)!
-                                  .modePerSide,
-                            ),
-                          ),
-                        ],
-                        onChanged: (m) => setState(
-                          () => mode = m ?? mode,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // RM y %
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: rmCtrl,
-                          keyboardType:
-                              TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText:
-                                widget.movementName ==
-                                        null
-                                    ? AppLocalizations.of(
-                                            context)!
-                                        .rmFieldNoMovement
-                                    : AppLocalizations.of(
-                                            context)!
-                                        .rmFieldWithMovement(
-                                          widget
-                                              .movementName!,
-                                        ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      SizedBox(
-                        width: 120,
-                        child: TextField(
-                          controller: pctCtrl,
-                          keyboardType:
-                              TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText:
-                                AppLocalizations.of(
-                                        context)!
-                                    .percentLabel,
-                            suffixText: '%',
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Vista derivada
-                  Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!
-                            .derivedTargetLabel(
-                          (pct * 100)
-                              .toStringAsFixed(1),
-                        ),
-                        style: theme.textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        mode ==
-                                TargetInputMode
-                                    .totalInclBar
-                            ? AppLocalizations.of(
-                                    context)!
-                                .derivedTotal(
-                                  totalFromPct
-                                      .toStringAsFixed(
-                                          1),
-                                  settings.units,
-                                )
-                            : AppLocalizations.of(
-                                    context)!
-                                .derivedPerSide(
-                                  perSideFromPct
-                                      .toStringAsFixed(
-                                          1),
-                                  settings.units,
-                                ),
-                        style:
-                            theme.textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Tabla de % clickeable
-                  Card(
-                    elevation: 0,
-                    color: theme.colorScheme.surfaceVariant
-                        .withOpacity(0.35),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!
-                                .percentTableTitle,
-                          ),
-                          const SizedBox(height: 8),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(
-                              vertical: 4,
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 56,
-                                  child: Text(
-                                    AppLocalizations.of(
-                                            context)!
-                                        .percentTableHeaderPercent,
-                                    style: const TextStyle(
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    AppLocalizations.of(
-                                            context)!
-                                        .percentTableHeaderTotal,
-                                    style: const TextStyle(
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    AppLocalizations.of(
-                                            context)!
-                                        .percentTableHeaderPerSide,
-                                    style: const TextStyle(
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Column(
-                            children: tableRows
-                                .map(_percentRow)
-                                .toList(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Botón calcular
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _onCalculate,
-                      child: Text(
-                        AppLocalizations.of(context)!
-                            .calculateButton,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Botón historial RM (si hay movimiento)
-                  if (widget.movementName != null) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _openRmHistory,
-                        icon: const Icon(Icons.history),
-                        label: Text(
-                          AppLocalizations.of(context)!
-                              .historyButton,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+            // Unidades
+            Row(
+              children: [
+                Text(loc.unitsLabel),
+                const SizedBox(width: 12),
+                SegmentedButton<WeightUnit>(
+                  showSelectedIcon: false,
+                  segments: [
+                    for (final u in WeightUnit.values)
+                      ButtonSegment(value: u, label: Text(u.label)),
                   ],
-
-                  // Botón eliminar movimiento
-                  if (widget.movementName != null)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context)
-                                  .colorScheme
-                                  .error,
-                          foregroundColor:
-                              Theme.of(context)
-                                  .colorScheme
-                                  .onError,
-                        ),
-                        onPressed: _deleteMovement,
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .deleteMovementButton(
-                            widget.movementName ?? '',
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  if (error != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      error!,
-                      style: const TextStyle(
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 120),
-                ],
-              ),
-            ),
-
-            // Overlay oscuro
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: _showPanel ? 0.65 : 0.0,
-              child: IgnorePointer(
-                ignoring: !_showPanel,
-                child: GestureDetector(
-                  onTap: () =>
-                      setState(() => _showPanel = false),
-                  child: Container(color: Colors.black),
+                  selected: {_unit},
+                  onSelectionChanged: (s) {
+                    _loadUnit(s.first);
+                    setState(() {});
+                  },
                 ),
-              ),
+              ],
             ),
+            const SizedBox(height: 12),
 
-            // Panel resultado
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              left: 0,
-              right: 0,
-              bottom: _showPanel ? 0 : -panelHeight,
-              height:
-                  panelHeight + (bottomInset > 0 ? 12 : 0),
-              child: SafeArea(
-                top: false,
-                child: Material(
-                  elevation: 12,
-                  color: theme.colorScheme.surface,
-                  borderRadius:
-                      const BorderRadius.vertical(
-                    top: Radius.circular(20),
+            // Barra + collares
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<double>(
+                    key: ValueKey('bar-${_unit.name}'),
+                    initialValue: _settings.barWeight,
+                    decoration: InputDecoration(labelText: loc.barLabel),
+                    items: [
+                      for (final w in barOptions)
+                        DropdownMenuItem(value: w, child: Text('${fmtWeight(w)} ${_unit.label}')),
+                    ],
+                    onChanged: (w) {
+                      if (w != null) _updateSettings(_settings.copyWith(barWeight: w));
+                    },
                   ),
-                  child: result == null
-                      ? const SizedBox.shrink()
-                      : Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(
-                                      16, 10, 8, 6),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 4,
-                                    decoration:
-                                        BoxDecoration(
-                                      color: Colors
-                                          .grey.shade400,
-                                      borderRadius:
-                                          BorderRadius
-                                              .circular(2),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  IconButton(
-                                    tooltip:
-                                        AppLocalizations.of(
-                                                context)!
-                                            .panelCloseTooltip,
-                                    onPressed: () =>
-                                        setState(() =>
-                                            _showPanel =
-                                                false),
-                                    icon: const Icon(
-                                      Icons.close,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets
-                                        .symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment
-                                          .start,
-                                  children: [
-                                    Text(
-                                      result!.exact
-                                          ? AppLocalizations.of(
-                                                  context)!
-                                              .resultExact(
-                                                result!
-                                                    .totalAchieved
-                                                    .toStringAsFixed(
-                                                        2),
-                                                settings
-                                                    .units,
-                                              )
-                                          : AppLocalizations.of(
-                                                  context)!
-                                              .resultApprox(
-                                                result!
-                                                    .totalAchieved
-                                                    .toStringAsFixed(
-                                                        2),
-                                                result!
-                                                    .shortfall
-                                                    .toStringAsFixed(
-                                                        2),
-                                                settings
-                                                    .units,
-                                              ),
-                                      style: theme.textTheme
-                                          .titleMedium,
-                                    ),
-                                    const SizedBox(
-                                        height: 12),
-                                    Expanded(
-                                      child: Center(
-                                        child: BarbellView(
-                                          perSide:
-                                              result!.perSide,
-                                          units:
-                                              settings.units,
-                                          height: 200,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                        height: 12),
-                                    Text(
-                                      AppLocalizations.of(
-                                              context)!
-                                          .chosenDiscsTitle,
-                                      style: theme.textTheme
-                                          .bodyMedium,
-                                    ),
-                                    const SizedBox(
-                                        height: 6),
-                                    Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children: () {
-                                        final entries = result!
-                                            .used.entries
-                                            .toList()
-                                          ..sort((a, b) => b
-                                              .key
-                                              .compareTo(
-                                                  a.key));
-
-                                        final baseStyle = Theme.of(
-                                                context)
-                                            .textTheme
-                                            .bodyMedium!
-                                            .copyWith(
-                                              color: Theme.of(
-                                                      context)
-                                                  .colorScheme
-                                                  .onSurface,
-                                            );
-
-                                        return entries
-                                            .map((e) {
-                                          final c =
-                                              PlateVisual
-                                                  .color(
-                                            settings.units,
-                                            e.key,
-                                          );
-
-                                          return Chip(
-                                            shape:
-                                                StadiumBorder(
-                                              side:
-                                                  BorderSide(
-                                                color: c,
-                                                width: 1.5,
-                                              ),
-                                            ),
-                                            backgroundColor:
-                                                Theme.of(
-                                                        context)
-                                                    .colorScheme
-                                                    .surfaceVariant
-                                                    .withOpacity(
-                                                        0.20),
-                                            label: RichText(
-                                              text:
-                                                  TextSpan(
-                                                style:
-                                                    baseStyle,
-                                                children: [
-                                                  TextSpan(
-                                                    text: e.key
-                                                        .toString()
-                                                        .replaceAll(
-                                                            '.0',
-                                                            ''),
-                                                    style:
-                                                        baseStyle
-                                                            .copyWith(
-                                                      color:
-                                                          c,
-                                                      fontWeight:
-                                                          FontWeight
-                                                              .w700,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text:
-                                                        ' ${settings.units}  x${e.value}',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        }).toList();
-                                      }(),
-                                    ),
-                                    const SizedBox(
-                                        height: 10),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _collarsCtrl,
+                    keyboardType: numberKeyboard,
+                    decoration: InputDecoration(
+                      labelText: loc.collarsLabel,
+                      suffixText: _unit.label,
+                    ),
+                    onChanged: (v) {
+                      final c = parseNumber(v);
+                      if (c != null && c >= 0) {
+                        _updateSettings(_settings.copyWith(collarsWeight: c));
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Interpretación del RM
+            DropdownButtonFormField<TargetMode>(
+              initialValue: _mode,
+              decoration: InputDecoration(labelText: loc.interpretRmAs),
+              items: [
+                DropdownMenuItem(value: TargetMode.totalInclBar, child: Text(loc.modeTotalInclBar)),
+                DropdownMenuItem(value: TargetMode.perSideWithoutBar, child: Text(loc.modePerSide)),
+              ],
+              onChanged: (m) {
+                if (m == null) return;
+                setState(() => _mode = m);
+                _storage.setTargetMode(m.name);
+              },
+            ),
+            const SizedBox(height: 12),
+
+            // RM y %
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _rmCtrl,
+                    keyboardType: numberKeyboard,
+                    decoration: InputDecoration(
+                      labelText: loc.rmFieldWithMovement(name),
+                      suffixText: _unit.label,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 120,
+                  child: TextField(
+                    controller: _pctCtrl,
+                    keyboardType: numberKeyboard,
+                    decoration: InputDecoration(labelText: loc.percentLabel, suffixText: '%'),
+                    onSubmitted: (_) => _calculate(),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Objetivo derivado
+            Text(
+              loc.derivedTargetLabel(fmtWeight(_fraction * 100, maxDecimals: 1)),
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _mode == TargetMode.totalInclBar
+                  ? loc.derivedTotal(fmtWeight(targets.total, maxDecimals: 1), _unit.label)
+                  : loc.derivedPerSide(fmtWeight(targets.perSide, maxDecimals: 1), _unit.label),
+              style: theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+
+            PercentTable(
+              rm: _rm,
+              mode: _mode,
+              bar: _settings.barWeight,
+              collars: _settings.collarsWeight,
+              selectedPercent: (_fraction * 100).round(),
+              onSelect: (p) {
+                _pctCtrl.text = '$p';
+                _calculate();
+              },
+            ),
+            const SizedBox(height: 16),
+
+            if (_error != null) ...[
+              Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
+              const SizedBox(height: 8),
+            ],
+
+            FilledButton(onPressed: _calculate, child: Text(loc.calculateButton)),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () => showRmHistorySheet(
+                context,
+                storage: _storage,
+                lift: _lift,
+                displayName: name,
+                unit: _unit,
               ),
+              icon: const Icon(Icons.history),
+              label: Text(loc.historyButton),
+            ),
+            const SizedBox(height: 24),
+            TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+              onPressed: _deleteMovement,
+              icon: const Icon(Icons.delete_outline),
+              label: Text(loc.deleteMovementButton(name)),
             ),
           ],
         ),

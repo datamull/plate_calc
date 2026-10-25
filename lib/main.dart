@@ -1,78 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'ui/screens/rm_list_screen.dart';
-import 'package:plate_calc/l10n/app_localizations.dart';
+
+import 'l10n/app_localizations.dart';
+import 'services/app_storage.dart';
 import 'ui/screens/app_settings_screen.dart';
+import 'ui/screens/rm_list_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Se cargan los datos antes del primer frame: así el idioma guardado se
+  // aplica desde el inicio (en la v1 la app arrancaba en el idioma del
+  // sistema y cambiaba un instante después).
+  final storage = await AppStorage.load();
+  runApp(PlateCalcApp(storage: storage));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class PlateCalcApp extends StatefulWidget {
+  const PlateCalcApp({super.key, required this.storage});
+
+  final AppStorage storage;
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<PlateCalcApp> createState() => _PlateCalcAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
-
-  Locale? _appLocale; // null => usa idioma del sistema
-
-  @override
-  void initState() {
-    super.initState();
-    _loadLocale();
-  }
-
-  Future<void> _loadLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString('app_locale');
-    if (code != null) {
-      setState(() => _appLocale = Locale(code));
-    }
-  }
+class _PlateCalcAppState extends State<PlateCalcApp> {
+  late String? _localeCode = widget.storage.localeCode;
 
   Future<void> _changeLocale(String? code) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    if (code == null) {
-      await prefs.remove('app_locale');
-      setState(() => _appLocale = null);
-    } else {
-      await prefs.setString('app_locale', code);
-      setState(() => _appLocale = Locale(code));
-    }
-  }
-
-  Future<void> _openSettings() async {
-    final ctx = _navKey.currentContext;
-    if (ctx == null) return;
-
-    await Navigator.of(ctx).push(
-      MaterialPageRoute(
-        builder: (_) => AppSettingsScreen(
-          currentLocaleCode: _appLocale?.languageCode,
-          onLocaleChanged: _changeLocale,
-        ),
-      ),
-    );
+    await widget.storage.setLocaleCode(code);
+    setState(() => _localeCode = code);
   }
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme(Brightness b) => ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6750A4), brightness: b),
+    );
+
     return MaterialApp(
-      navigatorKey: _navKey,
-      locale: _appLocale, // si es null, usa la del sistema
-      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6750A4)),
-        useMaterial3: true,
-      ),
+      debugShowCheckedModeBanner: false,
+      locale: _localeCode == null ? null : Locale(_localeCode!),
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+      theme: theme(Brightness.light),
+      darkTheme: theme(Brightness.dark),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: RmListScreen(onOpenSettings: _openSettings),
+      home: Builder(
+        builder: (context) => RmListScreen(
+          storage: widget.storage,
+          onOpenSettings: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => AppSettingsScreen(
+                storage: widget.storage,
+                currentLocaleCode: _localeCode,
+                onLocaleChanged: _changeLocale,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

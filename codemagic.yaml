@@ -4,10 +4,15 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect: "SebaHalt" # nombre de tu integración en Codemagic
+      # Nombre de la clave de App Store Connect en Codemagic
+      # (Ajustes de la cuenta → Integrations → Developer Portal).
+      app_store_connect: "SebaHalt"
     environment:
-      groups:
-        - app_store_credentials # APP_STORE_CONNECT_PRIVATE_KEY, KEY_ID, ISSUER_ID
+      # Firma automática: Codemagic obtiene el certificado y el perfil de
+      # distribución con la clave de App Store Connect.
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.seba.haltercalc
       vars:
         BUNDLE_ID: "com.seba.haltercalc"
         XCODE_SCHEME: "Runner"

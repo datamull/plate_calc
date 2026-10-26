@@ -62,13 +62,6 @@ class _RmListScreenState extends State<RmListScreen> {
       appBar: AppBar(
         title: Text(loc.yourLiftsTitle),
         actions: [
-          IconButton(
-            tooltip: loc.converterTooltip,
-            icon: const Icon(Icons.swap_horiz),
-            onPressed: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: SegmentedButton<WeightUnit>(
@@ -88,15 +81,33 @@ class _RmListScreenState extends State<RmListScreen> {
           ),
         ],
       ),
-      floatingActionButton: Tooltip(
-        message: loc.addLiftTitle,
-        child: GlassButton(
-          circular: true,
-          prominent: true,
-          tint: AppColors.purple,
-          onPressed: _addLiftDialog,
-          icon: Icons.add,
-        ),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Tooltip(
+            message: loc.converterTooltip,
+            child: GlassButton(
+              circular: true,
+              prominent: true,
+              tint: AppColors.blue,
+              onPressed: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
+              icon: Icons.calculate_outlined,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Tooltip(
+            message: loc.addLiftTitle,
+            child: GlassButton(
+              circular: true,
+              prominent: true,
+              tint: AppColors.purple,
+              onPressed: _addLiftDialog,
+              icon: Icons.add,
+            ),
+          ),
+        ],
       ),
       body: GridView.builder(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 88),

@@ -6,7 +6,7 @@ workflows:
     integrations:
       # Nombre de la clave de App Store Connect en Codemagic
       # (Ajustes de la cuenta → Integrations → Developer Portal).
-      app_store_connect: "SebaHalt"
+      app_store_connect: "datamull"
     environment:
       # Firma automática: Codemagic obtiene el certificado y el perfil de
       # distribución con la clave de App Store Connect.

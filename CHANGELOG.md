@@ -14,6 +14,13 @@
 - Pictograma propio para cada movimiento (Deadlift, Snatch, Clean, Jerk). Los movimientos creados por el usuario se reconocen por nombre (squat, bench, press, etc. en inglés, español o francés); si no hay coincidencia se muestra una barra.
 - Movimientos base siempre en inglés (Deadlift, Snatch, Clean, Jerk), sin importar el idioma de la app.
 
+### Mejoras
+- Al cambiar kg ↔ lb dentro de un movimiento, el RM escrito se convierte a la
+  otra unidad (redondeado a 0.5 kg / 1 lb) y la tabla de porcentajes se
+  actualiza; antes quedaba todo en cero. Al volver se recupera el valor original.
+- Tabla de porcentajes redondeada a 0.5 (pesos que se pueden cargar).
+- Botón de la calculadora lb ↔ kg dentro de cada movimiento, junto a guardar.
+
 ## 2.0.0
 
 ### Errores corregidos

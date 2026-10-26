@@ -5,9 +5,6 @@ import '../../models/weight_unit.dart';
 import '../../utils/format.dart';
 import '../widgets/plate_colors.dart';
 
-const double kgPerLb = 0.45359237;
-const double lbPerKg = 2.20462262;
-
 /// Conversor rápido lb ↔ kg, con los discos más comunes como referencia.
 class UnitConverterScreen extends StatefulWidget {
   const UnitConverterScreen({super.key});

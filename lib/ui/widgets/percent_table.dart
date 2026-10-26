@@ -73,8 +73,8 @@ class PercentTable extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(width: 56, child: Text('$percent%')),
-              Expanded(child: Text(fmtWeight(t.total, maxDecimals: 1))),
-              Expanded(child: Text(fmtWeight(t.perSide, maxDecimals: 1))),
+              Expanded(child: Text(fmtWeight(_half(t.total)))),
+              Expanded(child: Text(fmtWeight(_half(t.perSide)))),
             ],
           ),
         ),
@@ -82,3 +82,7 @@ class PercentTable extends StatelessWidget {
     );
   }
 }
+
+/// Los pesos de la tabla se redondean a 0.5 (kg o lb): son cargas reales,
+/// no tiene sentido mostrar 32.2 kg.
+double _half(double v) => (v * 2).round() / 2;

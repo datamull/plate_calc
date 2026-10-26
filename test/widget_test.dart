@@ -52,6 +52,32 @@ void main() {
     expect(find.text('Alcanzado: 80 kg (exacto)'), findsOneWidget);
   });
 
+  testWidgets('cambiar kg/lb convierte el RM y vuelve al valor original', (tester) async {
+    await pumpApp(tester, {
+      'app_locale': 'es',
+      'lifts_units': 'lb',
+      'rm_Snatch_lb': 135.0,
+    });
+    await tester.tap(find.text('Snatch'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextField, '135'), findsWidgets);
+
+    // 135 lb = 61.2 kg -> redondeado a 61 kg (no queda en cero).
+    await tester.tap(find.text('kg').first);
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextField, '61'), findsWidgets);
+
+    // Al volver a lb se recupera el valor original, sin error de redondeo.
+    await tester.tap(find.text('lb').first);
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextField, '135'), findsWidgets);
+
+    // Botón de la calculadora dentro del movimiento.
+    await tester.tap(find.byIcon(Icons.calculate_outlined));
+    await tester.pumpAndSettle();
+    expect(find.text('Conversor de unidades'), findsOneWidget);
+  });
+
   testWidgets('sin RM muestra un error claro', (tester) async {
     await pumpApp(tester, {'app_locale': 'en', 'lifts_units': 'kg'});
     await tester.tap(find.text('Clean'));

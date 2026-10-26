@@ -13,6 +13,7 @@ import '../widgets/lift_icon.dart';
 import '../widgets/percent_table.dart';
 import '../widgets/result_sheet.dart';
 import '../widgets/rm_history_sheet.dart';
+import 'unit_converter_screen.dart';
 
 /// Calculadora de discos para un movimiento.
 class HomeScreen extends StatefulWidget {
@@ -47,13 +48,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _error;
 
+  /// RM tal como lo escribió o cargó el usuario, con su unidad. Al cambiar
+  /// kg <-> lb se convierte desde este valor, así ir y volver no acumula
+  /// errores de redondeo (135 lb -> 61 kg -> 135 lb).
+  double? _rmOrigin;
+  WeightUnit? _rmOriginUnit;
+  bool _settingRmText = false;
+
   @override
   void initState() {
     super.initState();
     _mode = TargetMode.parse(_storage.targetMode);
     _loadUnit(widget.initialUnit);
     // Antes la tabla de % no se actualizaba al escribir el RM.
-    _rmCtrl.addListener(_onInputChanged);
+    _rmCtrl.addListener(_onRmChanged);
     _pctCtrl.addListener(_onInputChanged);
   }
 
@@ -67,6 +75,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onInputChanged() => setState(() => _error = null);
 
+  void _onRmChanged() {
+    if (!_settingRmText) {
+      final v = parseNumber(_rmCtrl.text);
+      _rmOrigin = (v != null && v > 0) ? v : null;
+      _rmOriginUnit = _unit;
+    }
+    _onInputChanged();
+  }
+
+  void _setRmText(String text) {
+    _settingRmText = true;
+    _rmCtrl.text = text;
+    _settingRmText = false;
+  }
+
   /// Carga el equipamiento y el último RM de la unidad.
   /// En la v1 cambiar kg <-> lb dejaba los discos de la otra unidad
   /// (p. ej. discos de 25 kg tratados como 25 lb) y no recargaba el RM.
@@ -75,8 +98,29 @@ class _HomeScreenState extends State<HomeScreen> {
     _settings = _storage.settings(u);
     final rm = _storage.lastRm(_lift, u);
     _rmCtrl.text = rm == null ? '' : fmtWeight(rm);
+    _rmOrigin = rm;
+    _rmOriginUnit = u;
     _collarsCtrl.text = fmtWeight(_settings.collarsWeight);
     _error = null;
+  }
+
+  /// Cambia de unidad. Si hay un RM escrito, se convierte a la nueva unidad
+  /// (redondeado a 0.5 kg / 1 lb) y la tabla de porcentajes sigue mostrando
+  /// los mismos pesos. Si no hay RM, se carga el guardado para esa unidad.
+  void _switchUnit(WeightUnit u) {
+    if (u == _unit) return;
+    final origin = _rmOrigin;
+    final originUnit = _rmOriginUnit;
+    if (origin == null || originUnit == null) {
+      _loadUnit(u);
+      return;
+    }
+    _unit = u;
+    _settings = _storage.settings(u);
+    _collarsCtrl.text = fmtWeight(_settings.collarsWeight);
+    _error = null;
+    final value = originUnit == u ? origin : u.round(originUnit.convert(origin, u));
+    _setRmText(fmtWeight(value));
   }
 
   double get _rm => parseNumber(_rmCtrl.text) ?? 0;
@@ -186,6 +230,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
+            tooltip: loc.converterTooltip,
+            icon: const Icon(Icons.calculate_outlined),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
+          ),
+          IconButton(
             tooltip: loc.saveRmTooltip,
             onPressed: _saveRm,
             icon: const Icon(Icons.save_outlined),
@@ -210,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                   selected: {_unit},
                   onSelectionChanged: (s) {
-                    _loadUnit(s.first);
+                    _switchUnit(s.first);
                     setState(() {});
                   },
                 ),

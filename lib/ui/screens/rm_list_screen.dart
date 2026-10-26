@@ -7,6 +7,7 @@ import '../../services/app_storage.dart';
 import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_button.dart';
+import '../widgets/lift_icon.dart';
 import 'home_screen.dart';
 import 'unit_converter_screen.dart';
 
@@ -158,7 +159,7 @@ class _LiftCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.fitness_center, size: 28),
+              LiftIcon(liftName: name, size: 80),
               const SizedBox(height: 8),
               Text(
                 name,

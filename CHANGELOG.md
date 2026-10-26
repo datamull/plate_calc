@@ -25,6 +25,7 @@
 
 ### Mejoras
 - Movimientos base siempre en inglés (Deadlift, Snatch, Clean, Jerk), sin importar el idioma de la app.
+- Pictograma propio para cada movimiento (Deadlift, Snatch, Clean, Jerk). Los movimientos creados por el usuario se reconocen por nombre (squat, bench, press, etc. en inglés, español o francés); si no hay coincidencia se muestra una barra.
 - Inventario: agregar discos de cualquier peso, quitarlos (mantener
   presionado) y restaurar valores por defecto.
 - Se recuerdan la unidad elegida, el modo de RM, la barra y los collares.

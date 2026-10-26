@@ -9,6 +9,7 @@ import '../../services/app_storage.dart';
 import '../../services/plate_calculator.dart';
 import '../../utils/format.dart';
 import '../widgets/glass_button.dart';
+import '../widgets/lift_icon.dart';
 import '../widgets/percent_table.dart';
 import '../widgets/result_sheet.dart';
 import '../widgets/rm_history_sheet.dart';
@@ -175,7 +176,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            LiftIcon(liftName: _lift, size: 34),
+            const SizedBox(width: 10),
+            Flexible(child: Text(name, overflow: TextOverflow.ellipsis)),
+          ],
+        ),
         actions: [
           IconButton(
             tooltip: loc.saveRmTooltip,

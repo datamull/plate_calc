@@ -5,7 +5,7 @@ publish_to: 'none'
 # version: <nombre visible>+<número de build>
 # En iOS el nombre es CFBundleShortVersionString y el build es CFBundleVersion.
 # Codemagic reemplaza el número de build automáticamente (ver codemagic.yaml).
-version: 2.0.0+2
+version: 2.1.0+2
 
 environment:
   sdk: ^3.9.2

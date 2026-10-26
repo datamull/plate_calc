@@ -171,6 +171,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  LiftPose? get _iconPose => LiftPose.parse(_storage.liftIcon(_lift));
+
+  Future<void> _chooseIcon() async {
+    final picked = await showLiftIconPicker(context, liftName: _lift, current: _iconPose);
+    if (picked == null) return;
+    await _storage.setLiftIcon(_lift, picked.pose?.name);
+    if (mounted) setState(() {});
+  }
+
   Future<void> _deleteMovement() async {
     final loc = AppLocalizations.of(context);
     final name = liftDisplayName(_lift);
@@ -223,7 +232,14 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            LiftIcon(liftName: _lift, size: 34),
+            Tooltip(
+              message: loc.chooseIconTooltip,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: _chooseIcon,
+                child: LiftIcon(liftName: _lift, pose: _iconPose, size: 34),
+              ),
+            ),
             const SizedBox(width: 10),
             Flexible(child: Text(name, overflow: TextOverflow.ellipsis)),
           ],

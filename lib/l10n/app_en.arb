@@ -192,5 +192,8 @@
   "converterTooltip": "Unit converter",
   "lbLabel": "Pounds (lb)",
   "kgLabel": "Kilograms (kg)",
-  "quickPlatesTitle": "Quick plate equivalents"
+  "quickPlatesTitle": "Quick plate equivalents",
+  "chooseIconTitle": "Choose an icon",
+  "chooseIconTooltip": "Change icon",
+  "iconAuto": "Automatic (by name)"
 }

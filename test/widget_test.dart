@@ -78,6 +78,30 @@ void main() {
     expect(find.text('Conversor de unidades'), findsOneWidget);
   });
 
+  testWidgets('elegir un ícono distinto para un movimiento', (tester) async {
+    await pumpApp(tester, {'app_locale': 'es'});
+    await tester.tap(find.text('Snatch'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Cambiar ícono'));
+    await tester.pumpAndSettle();
+    expect(find.text('Elige un ícono'), findsOneWidget);
+    await tester.tap(find.text('Squat'));
+    await tester.pumpAndSettle();
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('lift_icon_Snatch'), 'squat');
+
+    // Volver a automático borra la elección.
+    await tester.tap(find.byTooltip('Cambiar ícono'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Automático (según el nombre)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Automático (según el nombre)'));
+    await tester.pumpAndSettle();
+    expect(prefs.getString('lift_icon_Snatch'), isNull);
+  });
+
   testWidgets('sin RM muestra un error claro', (tester) async {
     await pumpApp(tester, {'app_locale': 'en', 'lifts_units': 'kg'});
     await tester.tap(find.text('Clean'));

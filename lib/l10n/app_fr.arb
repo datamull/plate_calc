@@ -182,5 +182,8 @@
   "converterTooltip": "Convertisseur d'unités",
   "lbLabel": "Livres (lb)",
   "kgLabel": "Kilogrammes (kg)",
-  "quickPlatesTitle": "Équivalences rapides des disques"
+  "quickPlatesTitle": "Équivalences rapides des disques",
+  "chooseIconTitle": "Choisir une icône",
+  "chooseIconTooltip": "Changer l'icône",
+  "iconAuto": "Automatique (selon le nom)"
 }

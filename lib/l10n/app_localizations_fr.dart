@@ -257,4 +257,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get quickPlatesTitle => 'Équivalences rapides des disques';
+
+  @override
+  String get chooseIconTitle => 'Choisir une icône';
+
+  @override
+  String get chooseIconTooltip => 'Changer l\'icône';
+
+  @override
+  String get iconAuto => 'Automatique (selon le nom)';
 }

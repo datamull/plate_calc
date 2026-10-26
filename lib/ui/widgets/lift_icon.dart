@@ -1,9 +1,32 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 /// Posición del levantamiento que se dibuja en el pictograma.
-enum LiftPose { deadlift, clean, snatch, jerk, squat, bench, press, generic }
+enum LiftPose {
+  deadlift('Deadlift'),
+  clean('Clean'),
+  snatch('Snatch'),
+  jerk('Jerk'),
+  squat('Squat'),
+  bench('Bench'),
+  press('Press'),
+  generic('Barbell');
+
+  const LiftPose(this.label);
+
+  /// Nombre corto que se muestra en el selector (siempre en inglés, como los
+  /// movimientos base).
+  final String label;
+
+  static LiftPose? parse(String? raw) {
+    for (final p in values) {
+      if (p.name == raw) return p;
+    }
+    return null;
+  }
+}
 
 /// Elige el pictograma según el nombre del movimiento. Los 4 base vienen en
 /// inglés; para los creados por el usuario se reconocen palabras clave en
@@ -42,9 +65,18 @@ String _normalize(String s) {
 /// Pictograma del movimiento: una figura de perfil con la barra (vista de
 /// frente al disco) en la posición característica del levantamiento.
 class LiftIcon extends StatelessWidget {
-  const LiftIcon({super.key, required this.liftName, this.size = 48, this.framed = true});
+  const LiftIcon({
+    super.key,
+    required this.liftName,
+    this.pose,
+    this.size = 48,
+    this.framed = true,
+  });
 
   final String liftName;
+
+  /// Pictograma elegido por el usuario; si es null se elige según el nombre.
+  final LiftPose? pose;
   final double size;
 
   /// Si es true, se dibuja dentro de un círculo con el degradado de la marca.
@@ -53,7 +85,7 @@ class LiftIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final pose = liftPoseFor(liftName);
+    final pose = this.pose ?? liftPoseFor(liftName);
     final icon = CustomPaint(
       size: Size.square(size),
       painter: _LiftPainter(pose: pose, figure: scheme.onSurface),
@@ -220,4 +252,90 @@ class _LiftPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_LiftPainter old) => old.pose != pose || old.figure != figure;
+}
+
+/// Selector de ícono para un movimiento. Devuelve null si se cierra sin
+/// elegir; `(pose: null)` significa "automático según el nombre".
+Future<({LiftPose? pose})?> showLiftIconPicker(
+  BuildContext context, {
+  required String liftName,
+  LiftPose? current,
+}) {
+  return showModalBottomSheet<({LiftPose? pose})>(
+    context: context,
+    showDragHandle: true,
+    builder: (ctx) {
+      final loc = AppLocalizations.of(ctx);
+      final scheme = Theme.of(ctx).colorScheme;
+      Widget option({required LiftPose? pose, required String label}) {
+        final selected = pose == current;
+        return InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: () => Navigator.of(ctx).pop((pose: pose)),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: selected ? AppColors.blue : Colors.transparent,
+                width: 2,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                LiftIcon(liftName: liftName, pose: pose, size: 56),
+                const SizedBox(height: 6),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: scheme.onSurface),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      return SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(loc.chooseIconTitle, style: Theme.of(ctx).textTheme.titleMedium),
+              const SizedBox(height: 12),
+              GridView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 96,
+                  mainAxisExtent: 112,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
+                children: [
+                  for (final p in LiftPose.values) option(pose: p, label: p.label),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: TextButton.icon(
+                  onPressed: () => Navigator.of(ctx).pop((pose: null)),
+                  icon: Icon(
+                    current == null ? Icons.check_circle : Icons.auto_awesome,
+                    size: 18,
+                  ),
+                  label: Text(loc.iconAuto),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

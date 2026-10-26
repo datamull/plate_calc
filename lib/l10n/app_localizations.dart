@@ -537,6 +537,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quick plate equivalents'**
   String get quickPlatesTitle;
+
+  /// No description provided for @chooseIconTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an icon'**
+  String get chooseIconTitle;
+
+  /// No description provided for @chooseIconTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Change icon'**
+  String get chooseIconTooltip;
+
+  /// No description provided for @iconAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic (by name)'**
+  String get iconAuto;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

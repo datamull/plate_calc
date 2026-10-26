@@ -255,4 +255,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickPlatesTitle => 'Quick plate equivalents';
+
+  @override
+  String get chooseIconTitle => 'Choose an icon';
+
+  @override
+  String get chooseIconTooltip => 'Change icon';
+
+  @override
+  String get iconAuto => 'Automatic (by name)';
 }

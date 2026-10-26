@@ -38,6 +38,7 @@ class AppStorage {
   static const _kHiddenBaseLifts = 'hidden_base_lifts';
   static const _kListUnit = 'lifts_units';
   static const _kTargetMode = 'target_mode';
+  static String _kLiftIcon(String lift) => 'lift_icon_$lift';
 
   // ── Idioma ────────────────────────────────────────────────────────────────
   String? get localeCode => _prefs.getString(_kLocale);
@@ -94,9 +95,18 @@ class AppStorage {
       await _prefs.remove(_kRm(name, u));
       await _prefs.remove(_kHistory(name, u));
     }
+    await _prefs.remove(_kLiftIcon(name));
     // Clave usada por una pantalla antigua de la v1.
     await _prefs.remove('rm_history_$name');
   }
+
+  /// Ícono elegido por el usuario para un movimiento (nombre de [LiftPose]),
+  /// o null si se elige automáticamente según el nombre.
+  String? liftIcon(String lift) => _prefs.getString(_kLiftIcon(lift));
+
+  Future<void> setLiftIcon(String lift, String? pose) => pose == null
+      ? _prefs.remove(_kLiftIcon(lift))
+      : _prefs.setString(_kLiftIcon(lift), pose);
 
   static bool _same(String a, String b) => a.trim().toLowerCase() == b.trim().toLowerCase();
 

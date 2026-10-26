@@ -122,6 +122,7 @@ class _RmListScreenState extends State<RmListScreen> {
           final lift = lifts[i];
           return _LiftCard(
             name: liftDisplayName(lift),
+            pose: LiftPose.parse(_storage.liftIcon(lift)),
             lastRm: _storage.lastRm(lift, _unit),
             unit: _unit,
             onTap: () => _openLift(lift),
@@ -135,12 +136,14 @@ class _RmListScreenState extends State<RmListScreen> {
 class _LiftCard extends StatelessWidget {
   const _LiftCard({
     required this.name,
+    required this.pose,
     required this.lastRm,
     required this.unit,
     required this.onTap,
   });
 
   final String name;
+  final LiftPose? pose;
   final double? lastRm;
   final WeightUnit unit;
   final VoidCallback onTap;
@@ -159,7 +162,7 @@ class _LiftCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              LiftIcon(liftName: name, size: 80),
+              LiftIcon(liftName: name, pose: pose, size: 80),
               const SizedBox(height: 8),
               Text(
                 name,

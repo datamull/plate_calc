@@ -20,6 +20,8 @@
   actualiza; antes quedaba todo en cero. Al volver se recupera el valor original.
 - Tabla de porcentajes redondeada a 0.5 (pesos que se pueden cargar).
 - Botón de la calculadora lb ↔ kg dentro de cada movimiento, junto a guardar.
+- Elegir el ícono de cada movimiento: tocar el ícono dentro del movimiento
+  abre un selector con los 8 dibujos o la opción automática (según el nombre).
 
 ## 2.0.0
 

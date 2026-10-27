@@ -12,6 +12,9 @@ enum LiftPose {
   squat('Squat'),
   bench('Bench'),
   press('Press'),
+  row('Row'),
+  curl('Curl'),
+  core('Core'),
   generic('Barbell');
 
   const LiftPose(this.label);
@@ -41,12 +44,18 @@ LiftPose liftPoseFor(String name) {
   if (has(['clean', 'cargada', 'epaule', 'front squat', 'sentadilla frontal'])) {
     return LiftPose.clean;
   }
-  if (has(['deadlift', 'peso muerto', 'souleve', 'rdl', 'muerto'])) return LiftPose.deadlift;
-  if (has(['bench', 'banca', 'couche', 'pecho'])) return LiftPose.bench;
-  if (has(['squat', 'sentadilla', 'accroupi', 'flexion'])) return LiftPose.squat;
-  if (has(['press', 'militar', 'thruster', 'push', 'developpe', 'hombro'])) {
-    return LiftPose.press;
+  if (has(['curl', 'biceps', 'bicep'])) return LiftPose.curl;
+  if (has(['crunch', 'leg raise', 'ab wheel', 'abs', 'abdom', 'plank', 'plancha', 'sit-up', 'situp', 'russian twist', 'gainage'])) {
+    return LiftPose.core;
   }
+  if (has(['row', 'remo', 'rowing', 'tirage'])) return LiftPose.row;
+  if (has(['deadlift', 'peso muerto', 'souleve', 'rdl', 'muerto'])) return LiftPose.deadlift;
+  if (has(['leg press', 'prensa'])) return LiftPose.squat;
+  if (has(['bench', 'banca', 'couche', 'pecho', 'dumbbell press', 'incline', 'fly', 'aperturas'])) {
+    return LiftPose.bench;
+  }
+  if (has(['squat', 'sentadilla', 'accroupi', 'flexion'])) return LiftPose.squat;
+  if (has(['press', 'militar', 'thruster', 'developpe', 'hombro'])) return LiftPose.press;
   return LiftPose.generic;
 }
 
@@ -219,6 +228,26 @@ class _LiftPainter extends CustomPainter {
         canvas.drawCircle(o(40, 40), 8.5, head);
         limb([o(50, 50), o(50, 72), o(50, 92), o(62, 92)]);
         limb([o(50, 50), o(52, 17)]);
+      case LiftPose.row:
+        // Remo: torso inclinado, barra colgando a la altura de las rodillas.
+        canvas.drawLine(o(6, 94), o(94, 94), floor);
+        canvas.drawCircle(o(76, 30), 8.5, head);
+        limb([o(66, 38), o(32, 50), o(46, 70), o(40, 92), o(52, 92)]);
+        plate(o(60, 62), 15);
+        limb([o(66, 40), o(70, 54), o(60, 62)]);
+      case LiftPose.curl:
+        // Curl: de pie, codos pegados al cuerpo y barra a la altura del pecho.
+        canvas.drawLine(o(6, 94), o(94, 94), floor);
+        canvas.drawCircle(o(46, 16), 8.5, head);
+        limb([o(46, 27), o(46, 60), o(46, 92), o(58, 92)]);
+        plate(o(68, 36), 13);
+        limb([o(46, 30), o(50, 52), o(68, 36)]);
+      case LiftPose.core:
+        // Abdominal: sentado con rodillas flexionadas, sin barra.
+        canvas.drawLine(o(6, 94), o(94, 94), floor);
+        canvas.drawCircle(o(54, 40), 8.5, head);
+        limb([o(48, 50), o(30, 86), o(58, 66), o(76, 88), o(86, 88)]);
+        limb([o(46, 56), o(62, 62)]);
       case LiftPose.generic:
         // Barra vista de frente.
         final bar = Paint()

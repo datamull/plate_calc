@@ -264,4 +264,66 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get iconAuto => 'Automatic (by name)';
+
+  @override
+  String get categoryHaltero => 'Weightlifting';
+
+  @override
+  String get categoryHalteroSubtitle => 'Olympic lifts and your movements';
+
+  @override
+  String get categoryGym => 'Gym';
+
+  @override
+  String get categoryGymSubtitle => 'Exercises by muscle group';
+
+  @override
+  String get groupChest => 'Chest';
+
+  @override
+  String get groupBack => 'Back';
+
+  @override
+  String get groupLegs => 'Legs';
+
+  @override
+  String get groupShoulders => 'Shoulders';
+
+  @override
+  String get groupArms => 'Arms';
+
+  @override
+  String get groupCore => 'Core';
+
+  @override
+  String exerciseCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercises',
+      one: '1 exercise',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get barbellSwitch => 'Uses an Olympic barbell (plate calculator)';
+
+  @override
+  String get noCalculatorHint =>
+      'No plate calculator for this exercise: just save your 1RM and keep its history.';
+
+  @override
+  String get iCloudSyncTitle => 'iCloud backup';
+
+  @override
+  String get iCloudSyncOn =>
+      'Your data is saved to iCloud and restored automatically on a new iPhone with the same Apple ID.';
+
+  @override
+  String get iCloudSyncOff =>
+      'iCloud is not available. Sign in to iCloud in Settings to back up your data.';
+
+  @override
+  String get iCloudRestored => 'Data restored from iCloud';
 }

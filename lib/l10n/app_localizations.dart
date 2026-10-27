@@ -555,6 +555,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Automatic (by name)'**
   String get iconAuto;
+
+  /// No description provided for @categoryHaltero.
+  ///
+  /// In en, this message translates to:
+  /// **'Weightlifting'**
+  String get categoryHaltero;
+
+  /// No description provided for @categoryHalteroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Olympic lifts and your movements'**
+  String get categoryHalteroSubtitle;
+
+  /// No description provided for @categoryGym.
+  ///
+  /// In en, this message translates to:
+  /// **'Gym'**
+  String get categoryGym;
+
+  /// No description provided for @categoryGymSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercises by muscle group'**
+  String get categoryGymSubtitle;
+
+  /// No description provided for @groupChest.
+  ///
+  /// In en, this message translates to:
+  /// **'Chest'**
+  String get groupChest;
+
+  /// No description provided for @groupBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get groupBack;
+
+  /// No description provided for @groupLegs.
+  ///
+  /// In en, this message translates to:
+  /// **'Legs'**
+  String get groupLegs;
+
+  /// No description provided for @groupShoulders.
+  ///
+  /// In en, this message translates to:
+  /// **'Shoulders'**
+  String get groupShoulders;
+
+  /// No description provided for @groupArms.
+  ///
+  /// In en, this message translates to:
+  /// **'Arms'**
+  String get groupArms;
+
+  /// No description provided for @groupCore.
+  ///
+  /// In en, this message translates to:
+  /// **'Core'**
+  String get groupCore;
+
+  /// No description provided for @exerciseCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 exercise} other{{count} exercises}}'**
+  String exerciseCount(int count);
+
+  /// No description provided for @barbellSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses an Olympic barbell (plate calculator)'**
+  String get barbellSwitch;
+
+  /// No description provided for @noCalculatorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No plate calculator for this exercise: just save your 1RM and keep its history.'**
+  String get noCalculatorHint;
+
+  /// No description provided for @iCloudSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'iCloud backup'**
+  String get iCloudSyncTitle;
+
+  /// No description provided for @iCloudSyncOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is saved to iCloud and restored automatically on a new iPhone with the same Apple ID.'**
+  String get iCloudSyncOn;
+
+  /// No description provided for @iCloudSyncOff.
+  ///
+  /// In en, this message translates to:
+  /// **'iCloud is not available. Sign in to iCloud in Settings to back up your data.'**
+  String get iCloudSyncOff;
+
+  /// No description provided for @iCloudRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Data restored from iCloud'**
+  String get iCloudRestored;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

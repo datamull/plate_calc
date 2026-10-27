@@ -1,5 +1,19 @@
 # Cambios
 
+## 2.2.0
+
+### Nuevo
+- Pantalla de inicio con dos secciones: **Haltero** (los movimientos de
+  siempre) y **Gym**.
+- Gym: 6 grupos musculares (pecho, espalda, piernas, hombros, brazos,
+  abdomen) con 4 ejercicios cada uno. Se pueden agregar y borrar ejercicios
+  en cada grupo.
+- Los ejercicios con barra olímpica usan la calculadora de discos; los de
+  mancuernas, máquina o peso corporal solo guardan RM e historial.
+- Respaldo automático en iCloud, sin login: los datos se recuperan solos al
+  instalar la app en otro iPhone con el mismo Apple ID.
+- Nuevos pictogramas: remo, curl y abdominales.
+
 ## 2.1.0
 
 ### Nuevo diseño

@@ -22,6 +22,7 @@ class HomeScreen extends StatefulWidget {
     required this.storage,
     required this.movementName,
     required this.initialUnit,
+    this.onDelete,
   });
 
   final AppStorage storage;
@@ -29,6 +30,10 @@ class HomeScreen extends StatefulWidget {
   /// Clave del movimiento (para guardar RM e historial).
   final String movementName;
   final WeightUnit initialUnit;
+
+  /// Cómo se borra este movimiento (Haltero o un grupo de Gym). Si es null
+  /// se borra de Haltero.
+  final Future<void> Function(String lift)? onDelete;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -205,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     try {
-      await _storage.deleteLift(_lift);
+      await (widget.onDelete ?? _storage.deleteLift)(_lift);
       messenger.showSnackBar(SnackBar(content: Text(loc.deleteMovementOkSnack(name))));
       navigator.pop();
     } catch (_) {

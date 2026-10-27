@@ -111,4 +111,38 @@ void main() {
     expect(again.settings(WeightUnit.kg).barWeight, 15);
     expect(again.settings(WeightUnit.kg).collarsWeight, 2.5);
   });
+
+  group('gym', () {
+    test('cada grupo trae 4 ejercicios y solo algunos son con barra', () async {
+      final s = await storageWith({});
+      for (final g in Defaults.gymGroups.keys) {
+        expect(s.gymExercises(g), hasLength(4));
+      }
+      expect(s.isGymBarbell('Bench Press'), isTrue);
+      expect(s.isGymBarbell('Dumbbell Press'), isFalse);
+    });
+
+    test('borrar un ejercicio de Gym que también está en Haltero conserva su RM', () async {
+      final s = await storageWith({
+        'custom_lifts': ['Back Squat'],
+      });
+      await s.saveRm('Back Squat', WeightUnit.kg, 140);
+      await s.deleteGymExercise('legs', 'Back Squat');
+      expect(s.gymExercises('legs'), isNot(contains('Back Squat')));
+      expect(s.lastRm('Back Squat', WeightUnit.kg), 140);
+
+      // Volver a agregarlo lo muestra de nuevo.
+      expect(await s.addGymExercise('legs', 'back squat', barbell: true), isTrue);
+      expect(s.gymExercises('legs'), contains('Back Squat'));
+    });
+
+    test('borrar un ejercicio propio de Gym borra su RM', () async {
+      final s = await storageWith({});
+      await s.addGymExercise('arms', 'Hammer Curl', barbell: false);
+      await s.saveRm('Hammer Curl', WeightUnit.kg, 18);
+      await s.deleteGymExercise('arms', 'Hammer Curl');
+      expect(s.gymExercises('arms'), isNot(contains('Hammer Curl')));
+      expect(s.lastRm('Hammer Curl', WeightUnit.kg), isNull);
+    });
+  });
 }

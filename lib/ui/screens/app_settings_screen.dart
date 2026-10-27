@@ -6,6 +6,7 @@ import '../../models/plate.dart';
 import '../../models/settings.dart';
 import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
+import '../../services/cloud_sync.dart';
 import '../../utils/format.dart';
 import '../widgets/plate_colors.dart';
 
@@ -13,11 +14,13 @@ class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({
     super.key,
     required this.storage,
+    this.cloud,
     required this.currentLocaleCode,
     required this.onLocaleChanged,
   });
 
   final AppStorage storage;
+  final CloudSync? cloud;
 
   /// 'es', 'en', 'fr' o null (idioma del sistema).
   final String? currentLocaleCode;
@@ -76,6 +79,18 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           const SizedBox(height: 8),
           for (final e in options.entries)
             RadioListTile<String?>(value: e.key, title: Text(e.value)),
+          const SizedBox(height: 24),
+          Text(loc.iCloudSyncTitle, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(
+              widget.cloud?.available == true ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
+            ),
+            title: Text(
+              widget.cloud?.available == true ? loc.iCloudSyncOn : loc.iCloudSyncOff,
+            ),
+          ),
         ],
       ),
     );

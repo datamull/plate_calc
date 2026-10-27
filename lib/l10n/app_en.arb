@@ -195,5 +195,29 @@
   "quickPlatesTitle": "Quick plate equivalents",
   "chooseIconTitle": "Choose an icon",
   "chooseIconTooltip": "Change icon",
-  "iconAuto": "Automatic (by name)"
+  "iconAuto": "Automatic (by name)",
+  "categoryHaltero": "Weightlifting",
+  "categoryHalteroSubtitle": "Olympic lifts and your movements",
+  "categoryGym": "Gym",
+  "categoryGymSubtitle": "Exercises by muscle group",
+  "groupChest": "Chest",
+  "groupBack": "Back",
+  "groupLegs": "Legs",
+  "groupShoulders": "Shoulders",
+  "groupArms": "Arms",
+  "groupCore": "Core",
+  "exerciseCount": "{count, plural, =1{1 exercise} other{{count} exercises}}",
+  "barbellSwitch": "Uses an Olympic barbell (plate calculator)",
+  "noCalculatorHint": "No plate calculator for this exercise: just save your 1RM and keep its history.",
+  "iCloudSyncTitle": "iCloud backup",
+  "iCloudSyncOn": "Your data is saved to iCloud and restored automatically on a new iPhone with the same Apple ID.",
+  "iCloudSyncOff": "iCloud is not available. Sign in to iCloud in Settings to back up your data.",
+  "iCloudRestored": "Data restored from iCloud",
+  "@exerciseCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -185,5 +185,22 @@
   "quickPlatesTitle": "Equivalencias rápidas de discos",
   "chooseIconTitle": "Elige un ícono",
   "chooseIconTooltip": "Cambiar ícono",
-  "iconAuto": "Automático (según el nombre)"
+  "iconAuto": "Automático (según el nombre)",
+  "categoryHaltero": "Haltero",
+  "categoryHalteroSubtitle": "Movimientos olímpicos y los tuyos",
+  "categoryGym": "Gym",
+  "categoryGymSubtitle": "Ejercicios por grupo muscular",
+  "groupChest": "Pecho",
+  "groupBack": "Espalda",
+  "groupLegs": "Piernas",
+  "groupShoulders": "Hombros",
+  "groupArms": "Brazos",
+  "groupCore": "Abdomen",
+  "exerciseCount": "{count, plural, =1{1 ejercicio} other{{count} ejercicios}}",
+  "barbellSwitch": "Usa barra olímpica (calculadora de discos)",
+  "noCalculatorHint": "Este ejercicio no usa calculadora de discos: guarda tu RM y lleva su historial.",
+  "iCloudSyncTitle": "Respaldo en iCloud",
+  "iCloudSyncOn": "Tus datos se guardan en iCloud y se recuperan solos en un iPhone nuevo con el mismo Apple ID.",
+  "iCloudSyncOff": "iCloud no está disponible. Inicia sesión en iCloud en Ajustes para respaldar tus datos.",
+  "iCloudRestored": "Datos recuperados de iCloud"
 }

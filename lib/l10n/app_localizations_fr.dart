@@ -266,4 +266,66 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get iconAuto => 'Automatique (selon le nom)';
+
+  @override
+  String get categoryHaltero => 'Haltérophilie';
+
+  @override
+  String get categoryHalteroSubtitle => 'Mouvements olympiques et les vôtres';
+
+  @override
+  String get categoryGym => 'Gym';
+
+  @override
+  String get categoryGymSubtitle => 'Exercices par groupe musculaire';
+
+  @override
+  String get groupChest => 'Pectoraux';
+
+  @override
+  String get groupBack => 'Dos';
+
+  @override
+  String get groupLegs => 'Jambes';
+
+  @override
+  String get groupShoulders => 'Épaules';
+
+  @override
+  String get groupArms => 'Bras';
+
+  @override
+  String get groupCore => 'Abdominaux';
+
+  @override
+  String exerciseCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count exercices',
+      one: '1 exercice',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get barbellSwitch => 'Avec barre olympique (calcul des disques)';
+
+  @override
+  String get noCalculatorHint =>
+      'Pas de calcul des disques pour cet exercice : enregistrez votre 1RM et son historique.';
+
+  @override
+  String get iCloudSyncTitle => 'Sauvegarde iCloud';
+
+  @override
+  String get iCloudSyncOn =>
+      'Vos données sont sauvegardées dans iCloud et restaurées automatiquement sur un nouvel iPhone avec le même identifiant Apple.';
+
+  @override
+  String get iCloudSyncOff =>
+      'iCloud n\'est pas disponible. Connectez-vous à iCloud dans Réglages pour sauvegarder vos données.';
+
+  @override
+  String get iCloudRestored => 'Données restaurées depuis iCloud';
 }

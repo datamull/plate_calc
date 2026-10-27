@@ -39,6 +39,66 @@ class AppStorage {
   static const _kListUnit = 'lifts_units';
   static const _kTargetMode = 'target_mode';
   static String _kLiftIcon(String lift) => 'lift_icon_$lift';
+  static String _kGymCustom(String group) => 'gym_custom_$group';
+  static String _kGymHidden(String group) => 'gym_hidden_$group';
+  static const _kGymBarbell = 'gym_barbell';
+
+  // ── Respaldo (iCloud) ─────────────────────────────────────────────────────
+  /// Claves locales del respaldo que no se copian a la nube.
+  static bool _isLocalOnly(String key) => key.startsWith('cloud_');
+
+  /// true si hay datos propios del usuario (RM, historial, movimientos,
+  /// inventario...). Una instalación nueva no tiene ninguno.
+  bool get hasUserData => _prefs.getKeys().any(
+    (k) =>
+        k.startsWith('rm_') ||
+        k.startsWith('history_') ||
+        k.startsWith('inventory_settings_') ||
+        k.startsWith('gym_') ||
+        k == _kCustomLifts ||
+        k == _kHiddenBaseLifts,
+  );
+
+  /// Todos los datos guardados, listos para convertir a JSON.
+  Map<String, Object> exportAll() {
+    final out = <String, Object>{};
+    for (final k in _prefs.getKeys()) {
+      if (_isLocalOnly(k)) continue;
+      final v = _prefs.get(k);
+      if (v != null) out[k] = v;
+    }
+    return out;
+  }
+
+  /// Reemplaza los datos locales por los del respaldo.
+  Future<void> importAll(Map<String, Object?> data) async {
+    for (final k in _prefs.getKeys().toList()) {
+      if (!_isLocalOnly(k)) await _prefs.remove(k);
+    }
+    for (final e in data.entries) {
+      final v = e.value;
+      if (_isLocalOnly(e.key)) continue;
+      if (v is bool) {
+        await _prefs.setBool(e.key, v);
+      } else if (v is int) {
+        await _prefs.setInt(e.key, v);
+      } else if (v is double) {
+        await _prefs.setDouble(e.key, v);
+      } else if (v is String) {
+        await _prefs.setString(e.key, v);
+      } else if (v is List) {
+        await _prefs.setStringList(e.key, v.map((x) => '$x').toList());
+      }
+    }
+  }
+
+  String? get cloudLocalUpdatedAt => _prefs.getString('cloud_local_updated_at');
+  String? get cloudLastHash => _prefs.getString('cloud_last_hash');
+
+  Future<void> setCloudState({required String updatedAt, required String hash}) async {
+    await _prefs.setString('cloud_local_updated_at', updatedAt);
+    await _prefs.setString('cloud_last_hash', hash);
+  }
 
   // ── Idioma ────────────────────────────────────────────────────────────────
   String? get localeCode => _prefs.getString(_kLocale);
@@ -80,6 +140,64 @@ class AppStorage {
     return true;
   }
 
+  // ── Gym: ejercicios por grupo muscular ────────────────────────────────────
+  List<String> gymExercises(String group) {
+    final base = Defaults.gymGroups[group] ?? const <String>[];
+    final hidden = _prefs.getStringList(_kGymHidden(group)) ?? const [];
+    final custom = _prefs.getStringList(_kGymCustom(group)) ?? const [];
+    return [...base.where((l) => !hidden.contains(l)), ...custom];
+  }
+
+  /// true si el ejercicio de Gym se hace con barra (tiene calculadora).
+  bool isGymBarbell(String name) =>
+      Defaults.gymBarbell.contains(name) ||
+      (_prefs.getStringList(_kGymBarbell) ?? const []).contains(name);
+
+  /// Agrega un ejercicio al grupo. Devuelve false si ya existe en ese grupo.
+  Future<bool> addGymExercise(String group, String name, {required bool barbell}) async {
+    final n = name.trim();
+    if (n.isEmpty) return false;
+    final base = (Defaults.gymGroups[group] ?? const <String>[]).where((b) => _same(b, n));
+    final hidden = [...?_prefs.getStringList(_kGymHidden(group))];
+    if (base.isNotEmpty && hidden.remove(base.first)) {
+      await _prefs.setStringList(_kGymHidden(group), hidden);
+      return true;
+    }
+    if (gymExercises(group).any((l) => _same(l, n))) return false;
+    await _prefs.setStringList(_kGymCustom(group), [...?_prefs.getStringList(_kGymCustom(group)), n]);
+    if (barbell) {
+      final list = {...?_prefs.getStringList(_kGymBarbell), n}.toList();
+      await _prefs.setStringList(_kGymBarbell, list);
+    }
+    return true;
+  }
+
+  /// Quita un ejercicio del grupo. Su RM e historial se borran solo si el
+  /// mismo nombre no se usa en Haltero ni en otro grupo.
+  Future<void> deleteGymExercise(String group, String name) async {
+    if ((Defaults.gymGroups[group] ?? const <String>[]).contains(name)) {
+      final hidden = {...?_prefs.getStringList(_kGymHidden(group)), name}.toList();
+      await _prefs.setStringList(_kGymHidden(group), hidden);
+    } else {
+      final custom = [...?_prefs.getStringList(_kGymCustom(group))]
+        ..removeWhere((l) => _same(l, name));
+      await _prefs.setStringList(_kGymCustom(group), custom);
+    }
+    final stillUsed = lifts.contains(name) ||
+        Defaults.gymGroups.keys.any((g) => g != group && gymExercises(g).contains(name));
+    if (!stillUsed) await _removeLiftData(name);
+  }
+
+  Future<void> _removeLiftData(String name) async {
+    for (final u in WeightUnit.values) {
+      await _prefs.remove(_kRm(name, u));
+      await _prefs.remove(_kHistory(name, u));
+    }
+    await _prefs.remove(_kLiftIcon(name));
+    final barbell = [...?_prefs.getStringList(_kGymBarbell)]..remove(name);
+    await _prefs.setStringList(_kGymBarbell, barbell);
+  }
+
   /// Elimina un movimiento con su RM e historial en ambas unidades.
   /// En la v1 los movimientos base reaparecían y el RM no se borraba
   /// (se usaba una clave distinta a la de guardado).
@@ -91,11 +209,9 @@ class AppStorage {
       final custom = [...?_prefs.getStringList(_kCustomLifts)]..removeWhere((l) => _same(l, name));
       await _prefs.setStringList(_kCustomLifts, custom);
     }
-    for (final u in WeightUnit.values) {
-      await _prefs.remove(_kRm(name, u));
-      await _prefs.remove(_kHistory(name, u));
-    }
-    await _prefs.remove(_kLiftIcon(name));
+    // Si el mismo ejercicio está en Gym, se conservan su RM e historial.
+    final inGym = Defaults.gymGroups.keys.any((g) => gymExercises(g).contains(name));
+    if (!inGym) await _removeLiftData(name);
     // Clave usada por una pantalla antigua de la v1.
     await _prefs.remove('rm_history_$name');
   }

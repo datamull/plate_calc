@@ -264,4 +264,66 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get iconAuto => 'Automático (según el nombre)';
+
+  @override
+  String get categoryHaltero => 'Haltero';
+
+  @override
+  String get categoryHalteroSubtitle => 'Movimientos olímpicos y los tuyos';
+
+  @override
+  String get categoryGym => 'Gym';
+
+  @override
+  String get categoryGymSubtitle => 'Ejercicios por grupo muscular';
+
+  @override
+  String get groupChest => 'Pecho';
+
+  @override
+  String get groupBack => 'Espalda';
+
+  @override
+  String get groupLegs => 'Piernas';
+
+  @override
+  String get groupShoulders => 'Hombros';
+
+  @override
+  String get groupArms => 'Brazos';
+
+  @override
+  String get groupCore => 'Abdomen';
+
+  @override
+  String exerciseCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ejercicios',
+      one: '1 ejercicio',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get barbellSwitch => 'Usa barra olímpica (calculadora de discos)';
+
+  @override
+  String get noCalculatorHint =>
+      'Este ejercicio no usa calculadora de discos: guarda tu RM y lleva su historial.';
+
+  @override
+  String get iCloudSyncTitle => 'Respaldo en iCloud';
+
+  @override
+  String get iCloudSyncOn =>
+      'Tus datos se guardan en iCloud y se recuperan solos en un iPhone nuevo con el mismo Apple ID.';
+
+  @override
+  String get iCloudSyncOff =>
+      'iCloud no está disponible. Inicia sesión en iCloud en Ajustes para respaldar tus datos.';
+
+  @override
+  String get iCloudRestored => 'Datos recuperados de iCloud';
 }

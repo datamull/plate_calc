@@ -4,17 +4,27 @@ import '../../l10n/app_localizations.dart';
 import '../../l10n/lift_names.dart';
 import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
+import '../../services/lift_collection.dart';
 import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/lift_icon.dart';
 import 'home_screen.dart';
+import 'simple_rm_screen.dart';
 import 'unit_converter_screen.dart';
 
 class RmListScreen extends StatefulWidget {
-  const RmListScreen({super.key, required this.storage, this.onOpenSettings});
+  const RmListScreen({
+    super.key,
+    required this.storage,
+    required this.collection,
+    this.onOpenSettings,
+  });
 
   final AppStorage storage;
+
+  /// Movimientos que muestra esta lista (Haltero o un grupo de Gym).
+  final LiftCollection collection;
   final VoidCallback? onOpenSettings;
 
   @override
@@ -33,9 +43,12 @@ class _RmListScreenState extends State<RmListScreen> {
 
   Future<void> _addLiftDialog() async {
     final loc = AppLocalizations.of(context);
-    final name = await showDialog<String>(context: context, builder: (_) => const _AddLiftDialog());
-    if (name == null || name.trim().isEmpty) return;
-    final added = await _storage.addLift(name);
+    final res = await showDialog<({String name, bool barbell})>(
+      context: context,
+      builder: (_) => _AddLiftDialog(asksBarbell: widget.collection.asksBarbell),
+    );
+    if (res == null || res.name.trim().isEmpty) return;
+    final added = await widget.collection.add(res.name, barbell: res.barbell);
     if (!mounted) return;
     if (!added) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.liftAlreadyExists)));
@@ -46,7 +59,19 @@ class _RmListScreenState extends State<RmListScreen> {
   Future<void> _openLift(String lift) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => HomeScreen(storage: _storage, movementName: lift, initialUnit: _unit),
+        builder: (_) => widget.collection.isBarbell(lift)
+            ? HomeScreen(
+                storage: _storage,
+                movementName: lift,
+                initialUnit: _unit,
+                onDelete: widget.collection.delete,
+              )
+            : SimpleRmScreen(
+                storage: _storage,
+                movementName: lift,
+                initialUnit: _unit,
+                onDelete: widget.collection.delete,
+              ),
       ),
     );
     // Al volver se refrescan los RM (o se quita el movimiento si se borró).
@@ -56,12 +81,12 @@ class _RmListScreenState extends State<RmListScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final lifts = _storage.lifts;
+    final lifts = widget.collection.lifts;
     final crossAxisCount = (MediaQuery.sizeOf(context).width ~/ 160).clamp(2, 4);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.yourLiftsTitle),
+        title: Text(widget.collection.title(loc)),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -75,11 +100,12 @@ class _RmListScreenState extends State<RmListScreen> {
               onSelectionChanged: (s) => _setUnit(s.first),
             ),
           ),
-          IconButton(
-            tooltip: loc.settingsTooltip,
-            icon: const Icon(Icons.settings),
-            onPressed: widget.onOpenSettings,
-          ),
+          if (widget.onOpenSettings != null)
+            IconButton(
+              tooltip: loc.settingsTooltip,
+              icon: const Icon(Icons.settings),
+              onPressed: widget.onOpenSettings,
+            ),
         ],
       ),
       floatingActionButton: Row(
@@ -189,7 +215,9 @@ class _LiftCard extends StatelessWidget {
 /// Diálogo con su propio controlador (en la v1 el controlador nunca se
 /// liberaba).
 class _AddLiftDialog extends StatefulWidget {
-  const _AddLiftDialog();
+  const _AddLiftDialog({required this.asksBarbell});
+
+  final bool asksBarbell;
 
   @override
   State<_AddLiftDialog> createState() => _AddLiftDialogState();
@@ -197,6 +225,7 @@ class _AddLiftDialog extends StatefulWidget {
 
 class _AddLiftDialogState extends State<_AddLiftDialog> {
   final _ctrl = TextEditingController();
+  bool _barbell = false;
 
   @override
   void dispose() {
@@ -204,19 +233,33 @@ class _AddLiftDialogState extends State<_AddLiftDialog> {
     super.dispose();
   }
 
-  void _submit() => Navigator.of(context).pop(_ctrl.text.trim());
+  void _submit() => Navigator.of(context).pop((name: _ctrl.text.trim(), barbell: _barbell));
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(loc.addLiftTitle),
-      content: TextField(
-        controller: _ctrl,
-        autofocus: true,
-        textCapitalization: TextCapitalization.words,
-        decoration: InputDecoration(hintText: loc.addLiftHint),
-        onSubmitted: (_) => _submit(),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _ctrl,
+            autofocus: true,
+            textCapitalization: TextCapitalization.words,
+            decoration: InputDecoration(hintText: loc.addLiftHint),
+            onSubmitted: (_) => _submit(),
+          ),
+          if (widget.asksBarbell) ...[
+            const SizedBox(height: 8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _barbell,
+              onChanged: (v) => setState(() => _barbell = v),
+              title: Text(loc.barbellSwitch),
+            ),
+          ],
+        ],
       ),
       actions: [
         TextButton(

@@ -22,4 +22,18 @@ void main() {
     expect(liftPoseFor('Arranque'), LiftPose.snatch);
     expect(liftPoseFor('Hip Thrust'), LiftPose.generic);
   });
+
+  test('ejercicios de Gym tienen un pictograma razonable', () {
+    expect(liftPoseFor('Barbell Row'), LiftPose.row);
+    expect(liftPoseFor('Seated Row'), LiftPose.row);
+    expect(liftPoseFor('Romanian Deadlift'), LiftPose.deadlift);
+    expect(liftPoseFor('Leg Press'), LiftPose.squat);
+    expect(liftPoseFor('Dumbbell Press'), LiftPose.bench);
+    expect(liftPoseFor('Chest Fly'), LiftPose.bench);
+    expect(liftPoseFor('Dumbbell Shoulder Press'), LiftPose.press);
+    expect(liftPoseFor('Barbell Curl'), LiftPose.curl);
+    expect(liftPoseFor('Cable Crunch'), LiftPose.core);
+    expect(liftPoseFor('Russian Twist'), LiftPose.core);
+    expect(liftPoseFor('Triceps Pushdown'), LiftPose.generic);
+  });
 }

@@ -11,6 +11,32 @@ class Defaults {
   /// almacenamiento, por eso no se traduce aquí (se traduce al mostrarlo).
   static const baseLifts = ['Deadlift', 'Snatch', 'Clean', 'Jerk'];
 
+  /// Ejercicios de la sección Gym por grupo muscular (siempre en inglés, como
+  /// los movimientos base). La clave del grupo se usa para guardar datos.
+  static const gymGroups = <String, List<String>>{
+    'chest': ['Bench Press', 'Incline Bench Press', 'Dumbbell Press', 'Chest Fly'],
+    'back': ['Barbell Row', 'Lat Pulldown', 'Seated Row', 'Pull-Up'],
+    'legs': ['Back Squat', 'Front Squat', 'Leg Press', 'Romanian Deadlift'],
+    'shoulders': ['Overhead Press', 'Dumbbell Shoulder Press', 'Lateral Raise', 'Upright Row'],
+    'arms': ['Barbell Curl', 'Dumbbell Curl', 'Triceps Pushdown', 'Skull Crusher'],
+    'core': ['Cable Crunch', 'Hanging Leg Raise', 'Ab Wheel', 'Russian Twist'],
+  };
+
+  /// Ejercicios de Gym que se hacen con barra olímpica: solo estos tienen
+  /// calculadora de discos. El resto (mancuernas, máquinas, peso corporal)
+  /// solo guarda RM e historial.
+  static const gymBarbell = {
+    'Bench Press',
+    'Incline Bench Press',
+    'Barbell Row',
+    'Back Squat',
+    'Front Squat',
+    'Romanian Deadlift',
+    'Overhead Press',
+    'Upright Row',
+    'Barbell Curl',
+  };
+
   static Settings settingsFor(WeightUnit unit) => unit == WeightUnit.kg
       ? Settings(
           unit: WeightUnit.kg,

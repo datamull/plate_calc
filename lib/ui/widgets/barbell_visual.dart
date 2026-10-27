@@ -50,6 +50,13 @@ class _HalfBarbellPainter extends CustomPainter {
     return (10 + 1.05 * lb).clamp(8.0, 70.0);
   }
 
+  /// Los discos de menos de 10 lb (unos 4.5 kg) son de la mitad de diámetro
+  /// que los grandes, como en un gimnasio.
+  static bool _isSmall(WeightUnit unit, double w) {
+    final lb = unit == WeightUnit.kg ? w * 2.2046 : w;
+    return lb < 9.99;
+  }
+
   /// Grosor en píxeles: proporcional al peso, con un mínimo para poder
   /// escribir el peso sobre el disco.
   static double _thicknessPx(WeightUnit unit, double w) {
@@ -125,7 +132,8 @@ class _HalfBarbellPainter extends CustomPainter {
     for (var i = perSide.length - 1; i >= 0; i--) {
       final tw = widths[i];
       final color = PlateVisual.color(unit, perSide[i]);
-      final rect = Rect.fromLTWH(x, cy - plateH / 2, tw, plateH);
+      final h = _isSmall(unit, perSide[i]) ? plateH / 2 : plateH;
+      final rect = Rect.fromLTWH(x, cy - h / 2, tw, h);
       final rrect = RRect.fromRectAndRadius(rect, Radius.circular(tw * 0.18));
 
       // Caucho: color base con sombra arriba y abajo para dar volumen.
@@ -149,7 +157,7 @@ class _HalfBarbellPainter extends CustomPainter {
       // Brillo lateral.
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(x + tw * 0.2, rect.top + plateH * 0.03, tw * 0.12, plateH * 0.94),
+          Rect.fromLTWH(x + tw * 0.2, rect.top + h * 0.03, tw * 0.12, h * 0.94),
           Radius.circular(tw * 0.06),
         ),
         Paint()..color = Colors.white.withValues(alpha: 0.2),
@@ -167,7 +175,7 @@ class _HalfBarbellPainter extends CustomPainter {
             ),
           ),
           textDirection: TextDirection.ltr,
-        )..layout(maxWidth: plateH * 0.9);
+        )..layout(maxWidth: h * 0.9);
         canvas.save();
         canvas.translate(x + tw / 2, cy);
         canvas.rotate(-math.pi / 2);

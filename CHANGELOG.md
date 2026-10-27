@@ -8,6 +8,8 @@
 - Ícono de la app con el logo.
 - Resultado con media barra realista: discos con grosor según su peso, peso
   impreso, collar como tope y marca del centro de la barra.
+- Discos de menos de 10 lb (unos 4.5 kg) dibujados a la mitad del diámetro,
+  como en un gimnasio.
 - Colores de discos por peso (lb: 45 azul, 35 rojo, 25 verde, 10 amarillo,
   5 azul, 2.5 verde; kg con su equivalente).
 - Conversor rápido lb ↔ kg, junto al botón "+" en la pantalla principal.

@@ -21,7 +21,9 @@ android {
     defaultConfig {
         applicationId = "com.datamull.plate_calc"
         minSdk = flutter.minSdkVersion
-        targetSdk = 35
+        // Google Play exige API 36 para apps nuevas y actualizaciones desde
+        // el 31 de agosto de 2026.
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -48,7 +50,13 @@ compileOptions {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Sin key.properties (p. ej. en una compilación de prueba) se firma
+            // con la clave de depuración en vez de fallar.
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             isMinifyEnabled = false
             isShrinkResources = false
         }

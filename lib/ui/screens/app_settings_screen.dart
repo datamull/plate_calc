@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/defaults.dart';
@@ -79,6 +80,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           const SizedBox(height: 8),
           for (final e in options.entries)
             RadioListTile<String?>(value: e.key, title: Text(e.value)),
+          // El respaldo en iCloud solo existe en iPhone; en Android los datos
+          // se respaldan con la copia de seguridad de Google.
+          if (defaultTargetPlatform == TargetPlatform.iOS) ...[
           const SizedBox(height: 24),
           Text(loc.iCloudSyncTitle, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
@@ -91,6 +95,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               widget.cloud?.available == true ? loc.iCloudSyncOn : loc.iCloudSyncOff,
             ),
           ),
+          ],
         ],
       ),
     );

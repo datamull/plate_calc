@@ -13,6 +13,8 @@
 - Respaldo automático en iCloud, sin login: los datos se recuperan solos al
   instalar la app en otro iPhone con el mismo Apple ID.
 - Nuevos pictogramas: remo, curl y abdominales.
+- Android: nombre "Plate Calc", API 36 (exigida por Google Play) y
+  compilación firmada del App Bundle en Codemagic.
 
 ## 2.1.0
 

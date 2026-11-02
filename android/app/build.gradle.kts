@@ -3,7 +3,6 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -28,14 +27,9 @@ android {
         versionName = flutter.versionName
     }
 
-compileOptions {
+    compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    // 2) Fuerza JVM target 17 para Kotlin
-    kotlinOptions {
-        jvmTarget = "17"
     }
     signingConfigs {
         create("release") {
@@ -63,9 +57,12 @@ compileOptions {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 flutter {
     source = "../.."
-}
-kotlin {
-    jvmToolchain(17)
 }

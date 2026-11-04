@@ -1,6 +1,6 @@
 # Cambios
 
-## Próxima versión
+## 2.3.0
 
 ### Nuevo
 - Gym: los ejercicios sin barra guardan también las repeticiones máximas,

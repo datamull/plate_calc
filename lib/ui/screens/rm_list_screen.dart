@@ -9,6 +9,7 @@ import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/lift_icon.dart';
+import '../widgets/rm_history_sheet.dart';
 import 'home_screen.dart';
 import 'simple_rm_screen.dart';
 import 'unit_converter_screen.dart';
@@ -150,6 +151,7 @@ class _RmListScreenState extends State<RmListScreen> {
             name: liftDisplayName(lift),
             pose: LiftPose.parse(_storage.liftIcon(lift)),
             lastRm: _storage.lastRm(lift, _unit),
+            last: _storage.history(lift, _unit).firstOrNull,
             unit: _unit,
             onTap: () => _openLift(lift),
           );
@@ -164,6 +166,7 @@ class _LiftCard extends StatelessWidget {
     required this.name,
     required this.pose,
     required this.lastRm,
+    required this.last,
     required this.unit,
     required this.onTap,
   });
@@ -171,6 +174,7 @@ class _LiftCard extends StatelessWidget {
   final String name;
   final LiftPose? pose;
   final double? lastRm;
+  final RmEntry? last;
   final WeightUnit unit;
   final VoidCallback onTap;
 
@@ -198,10 +202,20 @@ class _LiftCard extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 6),
-              Text(
-                lastRm == null ? loc.noRmLabel : loc.historyRowRm(fmtWeight(lastRm!), unit.label),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+              // Una sola línea: si el texto es largo se achica en vez de
+              // desbordar la tarjeta.
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  last?.reps != null
+                      ? rmEntryText(loc, last!, unit.label)
+                      : lastRm == null
+                      ? loc.noRmLabel
+                      : loc.historyRowRm(fmtWeight(lastRm!), unit.label),
+                  maxLines: 1,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],

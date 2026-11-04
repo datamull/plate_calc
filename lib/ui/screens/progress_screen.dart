@@ -13,9 +13,12 @@ import 'workout_detail_screen.dart';
 
 /// Pestaña Progreso: racha, calendario, RM estimado y récords por ejercicio.
 class ProgressScreen extends StatefulWidget {
-  const ProgressScreen({super.key, required this.store});
+  const ProgressScreen({super.key, required this.store, this.onGoTrain});
 
   final TrainingStore store;
+
+  /// Lleva a la pestaña Entrenar (se muestra si aún no hay entrenamientos).
+  final VoidCallback? onGoTrain;
 
   @override
   State<ProgressScreen> createState() => _ProgressScreenState();
@@ -50,45 +53,95 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final r = int.tryParse(_calcReps.text.trim()) ?? 0;
     final est = estimate1Rm(w, r);
 
+    Widget section(String title, String help) => Padding(
+      padding: const EdgeInsets.fromLTRB(4, 22, 4, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          const SizedBox(height: 2),
+          Text(
+            help,
+            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+
     return Scaffold(
       appBar: AppBar(title: Text(loc.tabProgress)),
       body: ListView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: StatTile(
-                      icon: Icons.local_fire_department,
-                      value: '${weekStreak(workouts)}',
-                      label: loc.statStreak,
+          if (workouts.isEmpty)
+            Card(
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.show_chart),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            loc.progressIntroTitle,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: StatTile(
-                      icon: Icons.calendar_month,
-                      value: '$thisMonth',
-                      label: loc.statThisMonth,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: StatTile(
-                      icon: Icons.fitness_center,
-                      value: '${workouts.length}',
-                      label: loc.statTotal,
-                    ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(loc.progressIntroBody),
+                    if (widget.onGoTrain != null) ...[
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        icon: const Icon(Icons.fitness_center),
+                        label: Text(loc.progressGoTrain),
+                        onPressed: widget.onGoTrain,
+                      ),
+                    ],
+                  ],
+                ),
               ),
             ),
+          section(loc.progressConsistencyTitle, loc.progressConsistencyHelp),
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.local_fire_department,
+                    value: '${weekStreak(workouts)}',
+                    label: loc.statStreak,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.calendar_month,
+                    value: '$thisMonth',
+                    label: loc.statThisMonth,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: StatTile(
+                    icon: Icons.fitness_center,
+                    value: '${workouts.length}',
+                    label: loc.statTotal,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
+          section(loc.progressCalendarTitle, loc.progressCalendarHelp),
           _Calendar(
             month: _month,
             trained: trainedDays(workouts),
@@ -106,63 +159,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
               );
             },
           ),
-          const SizedBox(height: 12),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(loc.e1rmCalcTitle, style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 4),
-                  Text(loc.e1rmCalcHelp, style: theme.textTheme.bodySmall),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _calcWeight,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          decoration: InputDecoration(
-                            labelText: loc.e1rmWeight,
-                            suffixText: unit.label,
-                            border: const OutlineInputBorder(),
-                          ),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: _calcReps,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: loc.workoutReps,
-                            border: const OutlineInputBorder(),
-                          ),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (est > 0) ...[
-                    const SizedBox(height: 10),
-                    Text(
-                      loc.e1rmResult(fmtWeight(est, maxDecimals: 1), unit.label),
-                      style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
-            child: Text(
-              loc.recordsTitle,
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-            ),
-          ),
+          section(loc.recordsTitle, loc.progressRecordsHelp),
           if (lifts.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -192,6 +189,61 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 );
               },
             ),
+          section(loc.e1rmCalcTitle, loc.e1rmCalcHelp),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _calcWeight,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          textInputAction: TextInputAction.next,
+                          decoration: InputDecoration(
+                            labelText: loc.e1rmWeight,
+                            suffixText: unit.label,
+                            border: const OutlineInputBorder(),
+                          ),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: _calcReps,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration(
+                            labelText: loc.workoutReps,
+                            border: const OutlineInputBorder(),
+                          ),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    est > 0
+                        ? loc.e1rmResult(fmtWeight(est, maxDecimals: 1), unit.label)
+                        : loc.e1rmExample(
+                            unit == WeightUnit.kg ? '100 kg' : '225 lb',
+                            unit == WeightUnit.kg ? '117 kg' : '263 lb',
+                          ),
+                    style: est > 0
+                        ? theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)
+                        : theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

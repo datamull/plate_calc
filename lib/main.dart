@@ -6,6 +6,7 @@ import 'services/cloud_sync.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/screens/app_settings_screen.dart';
 import 'ui/screens/main_shell.dart';
+import 'ui/widgets/keyboard_done_bar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,6 +74,9 @@ class _PlateCalcAppState extends State<PlateCalcApp> {
       darkTheme: AppTheme.dark(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      // En iPhone el teclado numérico no tiene tecla para cerrarlo: se agrega
+      // una barra con "Listo" encima del teclado en toda la app.
+      builder: (context, child) => KeyboardDoneBar(child: child ?? const SizedBox()),
       home: Builder(
         builder: (context) => MainShell(
           storage: widget.storage,

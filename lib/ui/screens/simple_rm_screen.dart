@@ -10,8 +10,9 @@ import '../widgets/lift_icon.dart';
 import '../widgets/rm_history_sheet.dart';
 import 'unit_converter_screen.dart';
 
-/// Ejercicio sin barra olímpica (mancuernas, máquina, peso corporal): solo se
-/// guarda el RM y su historial, sin calculadora de discos.
+/// Ejercicio sin barra olímpica (mancuernas, máquina, peso corporal): se
+/// guarda peso, repeticiones hechas y, si se quiere, rondas, con su
+/// historial. No tiene calculadora de discos.
 class SimpleRmScreen extends StatefulWidget {
   const SimpleRmScreen({
     super.key,
@@ -36,6 +37,8 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
 
   late WeightUnit _unit;
   final _rmCtrl = TextEditingController();
+  final _repsCtrl = TextEditingController();
+  final _roundsCtrl = TextEditingController();
 
   // Igual que en la calculadora: al cambiar kg <-> lb se convierte desde el
   // valor original para no acumular redondeos.
@@ -53,6 +56,8 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
   @override
   void dispose() {
     _rmCtrl.dispose();
+    _repsCtrl.dispose();
+    _roundsCtrl.dispose();
     super.dispose();
   }
 
@@ -71,6 +76,12 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
     _settingRmText = false;
     _rmOrigin = rm;
     _rmOriginUnit = u;
+    // Se precargan las reps y rondas del último registro.
+    final last = _storage.history(_lift, u).firstOrNull;
+    if (last?.reps != null && _repsCtrl.text.isEmpty) {
+      _repsCtrl.text = '${last!.reps}';
+      _roundsCtrl.text = last.rounds == null ? '' : '${last.rounds}';
+    }
   }
 
   void _switchUnit(WeightUnit u) {
@@ -101,18 +112,31 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
     if (mounted) setState(() {});
   }
 
+  int? get _reps {
+    final v = int.tryParse(_repsCtrl.text.trim());
+    return (v != null && v > 0) ? v : null;
+  }
+
+  int? get _rounds {
+    final v = int.tryParse(_roundsCtrl.text.trim());
+    return (v != null && v > 0) ? v : null;
+  }
+
   Future<void> _saveRm() async {
     final loc = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     FocusManager.instance.primaryFocus?.unfocus();
-    if (_rm <= 0) {
-      messenger.showSnackBar(SnackBar(content: Text(loc.saveRmInvalidSnack)));
+    final reps = _reps;
+    // Sin reps hace falta un peso (sería un RM); con reps el peso puede ser 0
+    // (peso corporal: dominadas, abdominales...).
+    if (reps == null && _rm <= 0) {
+      messenger.showSnackBar(SnackBar(content: Text(loc.saveSetInvalidSnack)));
       return;
     }
-    await _storage.saveRm(_lift, _unit, _rm);
-    messenger.showSnackBar(
-      SnackBar(content: Text(loc.saveRmOkSnack(liftDisplayName(_lift), _unit.label))),
-    );
+    await _storage.saveRm(_lift, _unit, _rm, reps: reps, rounds: reps == null ? null : _rounds);
+    if (!mounted) return;
+    setState(() {});
+    messenger.showSnackBar(SnackBar(content: Text(loc.saveSetOkSnack(liftDisplayName(_lift)))));
   }
 
   Future<void> _deleteMovement() async {
@@ -209,19 +233,54 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
             TextField(
               controller: _rmCtrl,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
-                labelText: loc.rmFieldWithMovement(name),
+                labelText: loc.simpleWeightLabel,
+                helperText: loc.simpleWeightHelp,
                 suffixText: _unit.label,
               ),
-              onSubmitted: (_) => _saveRm(),
             ),
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _repsCtrl,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(labelText: loc.simpleRepsLabel),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _roundsCtrl,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      labelText: loc.simpleRoundsLabel,
+                      helperText: loc.optional,
+                    ),
+                    onSubmitted: (_) => _saveRm(),
+                  ),
+                ),
+              ],
+            ),
+            if (_storage.history(_lift, _unit).firstOrNull case final last?) ...[
+              const SizedBox(height: 12),
+              Text(
+                loc.simpleLastEntry(rmEntryText(loc, last, _unit.label)),
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
             const SizedBox(height: 12),
             Text(
               loc.noCalculatorHint,
               style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 20),
-            GlassButton(onPressed: _saveRm, prominent: true, label: loc.saveRmTooltip),
+            GlassButton(onPressed: _saveRm, prominent: true, label: loc.saveSetButton),
             const SizedBox(height: 8),
             GlassButton(
               onPressed: () => showRmHistorySheet(

@@ -217,4 +217,40 @@ void main() {
     expect(find.text('Configura tu perfil de coach'), findsOneWidget);
     expect(find.text('Crear plan o WOD'), findsOneWidget);
   });
+
+  testWidgets('el teclado numérico se cierra con "Listo" y se puede cambiar de pestaña', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'app_locale': 'es', 'lifts_units': 'kg'});
+    final storage = await AppStorage.load();
+    await tester.pumpWidget(PlateCalcApp(storage: storage));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Progreso'));
+    await tester.pumpAndSettle();
+
+    // Pestaña vacía: explica para qué sirve.
+    expect(find.text('¿Para qué sirve esta pestaña?'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.widgetWithText(TextField, 'Peso'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.widgetWithText(TextField, 'Peso'));
+    // Simula el teclado abierto (300 px).
+    tester.view.viewInsets = const FakeViewPadding(bottom: 900);
+    addTearDown(tester.view.resetViewInsets);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('keyboard-done')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('keyboard-done')));
+    await tester.pumpAndSettle();
+    expect(FocusManager.instance.primaryFocus?.context?.widget is EditableText, isFalse);
+
+    tester.view.resetViewInsets();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Entrenar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Empezar entrenamiento'), findsOneWidget);
+  });
 }

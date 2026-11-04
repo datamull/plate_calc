@@ -313,7 +313,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noCalculatorHint =>
-      'Pas de calcul des disques pour cet exercice : enregistrez votre 1RM et son historique.';
+      'Pas de barre pour cet exercice : note la charge, les répétitions et les tours, et garde son historique.';
 
   @override
   String get iCloudSyncTitle => 'Sauvegarde iCloud';
@@ -787,5 +787,91 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String athleteDeleteTitle(String name) {
     return 'Supprimer $name et ses résultats ?';
+  }
+
+  @override
+  String get keyboardDone => 'OK';
+
+  @override
+  String get optional => 'Facultatif';
+
+  @override
+  String get progressIntroTitle => 'À quoi sert cet onglet ?';
+
+  @override
+  String get progressIntroBody =>
+      'Il montre comment tu progresses. Il se remplit tout seul avec les entraînements terminés dans l’onglet Entraîner : jours entraînés, records et un graphique par exercice.';
+
+  @override
+  String get progressGoTrain => 'Aller à Entraîner';
+
+  @override
+  String get progressConsistencyTitle => 'Régularité';
+
+  @override
+  String get progressConsistencyHelp =>
+      'Semaines de suite avec au moins un entraînement, et combien tu en as fait.';
+
+  @override
+  String get progressCalendarTitle => 'Calendrier';
+
+  @override
+  String get progressCalendarHelp =>
+      'Les jours en couleur sont ceux où tu t’es entraîné. Touche-en un pour voir la séance.';
+
+  @override
+  String get progressRecordsHelp =>
+      'Ta meilleure marque pour chaque exercice. Touche-en un pour voir son graphique.';
+
+  @override
+  String e1rmExample(String weight, String result) {
+    return 'Exemple : $weight pour 5 reps ≈ 1RM de $result';
+  }
+
+  @override
+  String get simpleWeightLabel => 'Charge';
+
+  @override
+  String get simpleWeightHelp => 'Laisse vide pour le poids du corps';
+
+  @override
+  String get simpleRepsLabel => 'Répétitions faites';
+
+  @override
+  String get simpleRoundsLabel => 'Tours';
+
+  @override
+  String simpleLastEntry(String entry) {
+    return 'Dernier : $entry';
+  }
+
+  @override
+  String get saveSetButton => 'Enregistrer';
+
+  @override
+  String get saveSetInvalidSnack => 'Indique les répétitions faites (ou une charge).';
+
+  @override
+  String saveSetOkSnack(String movementName) {
+    return 'Enregistré pour $movementName.';
+  }
+
+  @override
+  String get bodyweight => 'Poids du corps';
+
+  @override
+  String setsRepsLine(String weight, int reps) {
+    return '$weight × $reps reps';
+  }
+
+  @override
+  String roundsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tours',
+      one: '1 tour',
+    );
+    return '$_temp0';
   }
 }

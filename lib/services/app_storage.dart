@@ -7,9 +7,14 @@ import '../models/settings.dart';
 import '../models/weight_unit.dart';
 
 class RmEntry {
+  /// Peso (en ejercicios sin barra puede ser 0: peso corporal).
   final double rm;
   final DateTime ts;
-  const RmEntry(this.rm, this.ts);
+
+  /// Repeticiones hechas y rondas (solo ejercicios sin barra).
+  final int? reps;
+  final int? rounds;
+  const RmEntry(this.rm, this.ts, {this.reps, this.rounds});
 }
 
 /// Único punto de acceso a los datos guardados.
@@ -253,9 +258,18 @@ class AppStorage {
   double? lastRm(String lift, WeightUnit u) => _prefs.getDouble(_kRm(lift, u));
 
   /// Guarda el RM como último valor y lo agrega al historial.
-  Future<void> saveRm(String lift, WeightUnit u, double rm) async {
-    await _prefs.setDouble(_kRm(lift, u), rm);
-    final list = _rawHistory(lift, u)..add({'rm': rm, 'ts': DateTime.now().toIso8601String()});
+  ///
+  /// En ejercicios sin barra se guardan también las repeticiones y, si se
+  /// indican, las rondas. Con peso 0 (peso corporal) no se toca el último RM.
+  Future<void> saveRm(String lift, WeightUnit u, double rm, {int? reps, int? rounds}) async {
+    if (rm > 0) await _prefs.setDouble(_kRm(lift, u), rm);
+    final list = _rawHistory(lift, u)
+      ..add({
+        'rm': rm,
+        'ts': DateTime.now().toIso8601String(),
+        if (reps != null) 'reps': reps,
+        if (rounds != null) 'rounds': rounds,
+      });
     await _prefs.setString(_kHistory(lift, u), jsonEncode(list));
   }
 
@@ -265,7 +279,16 @@ class AppStorage {
     for (final e in _rawHistory(lift, u)) {
       final rm = e['rm'];
       final ts = DateTime.tryParse('${e['ts']}');
-      if (rm is num && ts != null) out.add(RmEntry(rm.toDouble(), ts));
+      if (rm is num && ts != null) {
+        out.add(
+          RmEntry(
+            rm.toDouble(),
+            ts,
+            reps: (e['reps'] as num?)?.toInt(),
+            rounds: (e['rounds'] as num?)?.toInt(),
+          ),
+        );
+      }
     }
     out.sort((a, b) => b.ts.compareTo(a.ts));
     return out;

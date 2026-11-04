@@ -311,7 +311,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noCalculatorHint =>
-      'No plate calculator for this exercise: just save your 1RM and keep its history.';
+      'No barbell for this exercise: log the weight, reps and rounds, and keep its history.';
 
   @override
   String get iCloudSyncTitle => 'iCloud backup';
@@ -782,5 +782,90 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String athleteDeleteTitle(String name) {
     return 'Delete $name and their results?';
+  }
+
+  @override
+  String get keyboardDone => 'Done';
+
+  @override
+  String get optional => 'Optional';
+
+  @override
+  String get progressIntroTitle => 'What is this tab for?';
+
+  @override
+  String get progressIntroBody =>
+      'It shows how you are improving. It fills in by itself with the workouts you finish in the Train tab: days trained, records and a chart for each exercise.';
+
+  @override
+  String get progressGoTrain => 'Go to Train';
+
+  @override
+  String get progressConsistencyTitle => 'Consistency';
+
+  @override
+  String get progressConsistencyHelp =>
+      'Weeks in a row with at least one workout, and how many you did.';
+
+  @override
+  String get progressCalendarTitle => 'Calendar';
+
+  @override
+  String get progressCalendarHelp =>
+      'Colored days are days you trained. Tap one to see that workout.';
+
+  @override
+  String get progressRecordsHelp => 'Your best mark in each exercise. Tap one to see its chart.';
+
+  @override
+  String e1rmExample(String weight, String result) {
+    return 'Example: $weight for 5 reps ≈ 1RM of $result';
+  }
+
+  @override
+  String get simpleWeightLabel => 'Weight';
+
+  @override
+  String get simpleWeightHelp => 'Leave empty for bodyweight';
+
+  @override
+  String get simpleRepsLabel => 'Reps done';
+
+  @override
+  String get simpleRoundsLabel => 'Rounds';
+
+  @override
+  String simpleLastEntry(String entry) {
+    return 'Last: $entry';
+  }
+
+  @override
+  String get saveSetButton => 'Save';
+
+  @override
+  String get saveSetInvalidSnack => 'Enter the reps done (or a weight).';
+
+  @override
+  String saveSetOkSnack(String movementName) {
+    return 'Saved for $movementName.';
+  }
+
+  @override
+  String get bodyweight => 'Bodyweight';
+
+  @override
+  String setsRepsLine(String weight, int reps) {
+    return '$weight × $reps reps';
+  }
+
+  @override
+  String roundsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rounds',
+      one: '1 round',
+    );
+    return '$_temp0';
   }
 }

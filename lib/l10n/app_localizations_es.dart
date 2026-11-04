@@ -311,7 +311,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noCalculatorHint =>
-      'Este ejercicio no usa calculadora de discos: guarda tu RM y lleva su historial.';
+      'Este ejercicio no usa barra: anota el peso, las repeticiones y las rondas, y lleva su historial.';
 
   @override
   String get iCloudSyncTitle => 'Respaldo en iCloud';
@@ -784,5 +784,91 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String athleteDeleteTitle(String name) {
     return '¿Eliminar a $name y sus resultados?';
+  }
+
+  @override
+  String get keyboardDone => 'Listo';
+
+  @override
+  String get optional => 'Opcional';
+
+  @override
+  String get progressIntroTitle => '¿Para qué sirve esta pestaña?';
+
+  @override
+  String get progressIntroBody =>
+      'Muestra cómo vas mejorando. Se llena sola con los entrenamientos que terminas en la pestaña Entrenar: días entrenados, récords y un gráfico por ejercicio.';
+
+  @override
+  String get progressGoTrain => 'Ir a Entrenar';
+
+  @override
+  String get progressConsistencyTitle => 'Constancia';
+
+  @override
+  String get progressConsistencyHelp =>
+      'Semanas seguidas con al menos un entrenamiento, y cuántos llevas.';
+
+  @override
+  String get progressCalendarTitle => 'Calendario';
+
+  @override
+  String get progressCalendarHelp =>
+      'Los días de color son los que entrenaste. Toca uno para ver ese entrenamiento.';
+
+  @override
+  String get progressRecordsHelp =>
+      'Tu mejor marca en cada ejercicio. Toca uno para ver su gráfico.';
+
+  @override
+  String e1rmExample(String weight, String result) {
+    return 'Ejemplo: $weight a 5 repeticiones ≈ RM de $result';
+  }
+
+  @override
+  String get simpleWeightLabel => 'Peso';
+
+  @override
+  String get simpleWeightHelp => 'Déjalo vacío si es peso corporal';
+
+  @override
+  String get simpleRepsLabel => 'Repeticiones hechas';
+
+  @override
+  String get simpleRoundsLabel => 'Rondas';
+
+  @override
+  String simpleLastEntry(String entry) {
+    return 'Último: $entry';
+  }
+
+  @override
+  String get saveSetButton => 'Guardar';
+
+  @override
+  String get saveSetInvalidSnack => 'Ingresa las repeticiones hechas (o un peso).';
+
+  @override
+  String saveSetOkSnack(String movementName) {
+    return 'Guardado para $movementName.';
+  }
+
+  @override
+  String get bodyweight => 'Peso corporal';
+
+  @override
+  String setsRepsLine(String weight, int reps) {
+    return '$weight × $reps reps';
+  }
+
+  @override
+  String roundsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rondas',
+      one: '1 ronda',
+    );
+    return '$_temp0';
   }
 }

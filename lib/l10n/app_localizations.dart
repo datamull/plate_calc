@@ -631,7 +631,7 @@ abstract class AppLocalizations {
   /// No description provided for @noCalculatorHint.
   ///
   /// In en, this message translates to:
-  /// **'No plate calculator for this exercise: just save your 1RM and keep its history.'**
+  /// **'No barbell for this exercise: log the weight, reps and rounds, and keep its history.'**
   String get noCalculatorHint;
 
   /// No description provided for @iCloudSyncTitle.
@@ -1431,6 +1431,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete {name} and their results?'**
   String athleteDeleteTitle(String name);
+
+  /// No description provided for @keyboardDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get keyboardDone;
+
+  /// No description provided for @optional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get optional;
+
+  /// No description provided for @progressIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is this tab for?'**
+  String get progressIntroTitle;
+
+  /// No description provided for @progressIntroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It shows how you are improving. It fills in by itself with the workouts you finish in the Train tab: days trained, records and a chart for each exercise.'**
+  String get progressIntroBody;
+
+  /// No description provided for @progressGoTrain.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Train'**
+  String get progressGoTrain;
+
+  /// No description provided for @progressConsistencyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Consistency'**
+  String get progressConsistencyTitle;
+
+  /// No description provided for @progressConsistencyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks in a row with at least one workout, and how many you did.'**
+  String get progressConsistencyHelp;
+
+  /// No description provided for @progressCalendarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get progressCalendarTitle;
+
+  /// No description provided for @progressCalendarHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored days are days you trained. Tap one to see that workout.'**
+  String get progressCalendarHelp;
+
+  /// No description provided for @progressRecordsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Your best mark in each exercise. Tap one to see its chart.'**
+  String get progressRecordsHelp;
+
+  /// No description provided for @e1rmExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: {weight} for 5 reps ≈ 1RM of {result}'**
+  String e1rmExample(String weight, String result);
+
+  /// No description provided for @simpleWeightLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get simpleWeightLabel;
+
+  /// No description provided for @simpleWeightHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for bodyweight'**
+  String get simpleWeightHelp;
+
+  /// No description provided for @simpleRepsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reps done'**
+  String get simpleRepsLabel;
+
+  /// No description provided for @simpleRoundsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rounds'**
+  String get simpleRoundsLabel;
+
+  /// No description provided for @simpleLastEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Last: {entry}'**
+  String simpleLastEntry(String entry);
+
+  /// No description provided for @saveSetButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveSetButton;
+
+  /// No description provided for @saveSetInvalidSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the reps done (or a weight).'**
+  String get saveSetInvalidSnack;
+
+  /// No description provided for @saveSetOkSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved for {movementName}.'**
+  String saveSetOkSnack(String movementName);
+
+  /// No description provided for @bodyweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Bodyweight'**
+  String get bodyweight;
+
+  /// No description provided for @setsRepsLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{weight} × {reps} reps'**
+  String setsRepsLine(String weight, int reps);
+
+  /// No description provided for @roundsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 round} other{{count} rounds}}'**
+  String roundsCount(int count);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

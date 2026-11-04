@@ -5,6 +5,15 @@ import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../utils/format.dart';
 
+/// Texto de un registro: "RM: 100 kg" con barra, o "20 kg × 12 · 3 rondas"
+/// en ejercicios sin barra (con peso 0 = peso corporal).
+String rmEntryText(AppLocalizations loc, RmEntry e, String unit) {
+  if (e.reps == null) return loc.historyRowRm(fmtWeight(e.rm), unit);
+  final weight = e.rm > 0 ? '${fmtWeight(e.rm)} $unit' : loc.bodyweight;
+  final base = loc.setsRepsLine(weight, e.reps!);
+  return e.rounds == null ? base : '$base · ${loc.roundsCount(e.rounds!)}';
+}
+
 Future<void> showRmHistorySheet(
   BuildContext context, {
   required AppStorage storage,
@@ -126,7 +135,7 @@ class _RmHistorySheetState extends State<_RmHistorySheet> {
                       onDismissed: (_) => _delete(e),
                       child: ListTile(
                         leading: const Icon(Icons.history),
-                        title: Text(loc.historyRowRm(fmtWeight(e.rm), u)),
+                        title: Text(rmEntryText(loc, e, u)),
                         subtitle: Text(fmtDateTime(e.ts)),
                         trailing: IconButton(
                           tooltip: loc.deleteRecordTooltip,

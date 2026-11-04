@@ -208,7 +208,7 @@
   "groupCore": "Core",
   "exerciseCount": "{count, plural, =1{1 exercise} other{{count} exercises}}",
   "barbellSwitch": "Uses an Olympic barbell (plate calculator)",
-  "noCalculatorHint": "No plate calculator for this exercise: just save your 1RM and keep its history.",
+  "noCalculatorHint": "No barbell for this exercise: log the weight, reps and rounds, and keep its history.",
   "iCloudSyncTitle": "iCloud backup",
   "iCloudSyncOn": "Your data is saved to iCloud and restored automatically on a new iPhone with the same Apple ID.",
   "iCloudSyncOff": "iCloud is not available. Sign in to iCloud in Settings to back up your data.",
@@ -544,6 +544,69 @@
     "placeholders": {
       "name": {
         "type": "String"
+      }
+    }
+  },
+  "keyboardDone": "Done",
+  "optional": "Optional",
+  "progressIntroTitle": "What is this tab for?",
+  "progressIntroBody": "It shows how you are improving. It fills in by itself with the workouts you finish in the Train tab: days trained, records and a chart for each exercise.",
+  "progressGoTrain": "Go to Train",
+  "progressConsistencyTitle": "Consistency",
+  "progressConsistencyHelp": "Weeks in a row with at least one workout, and how many you did.",
+  "progressCalendarTitle": "Calendar",
+  "progressCalendarHelp": "Colored days are days you trained. Tap one to see that workout.",
+  "progressRecordsHelp": "Your best mark in each exercise. Tap one to see its chart.",
+  "e1rmExample": "Example: {weight} for 5 reps ≈ 1RM of {result}",
+  "@e1rmExample": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
+  "simpleWeightLabel": "Weight",
+  "simpleWeightHelp": "Leave empty for bodyweight",
+  "simpleRepsLabel": "Reps done",
+  "simpleRoundsLabel": "Rounds",
+  "simpleLastEntry": "Last: {entry}",
+  "@simpleLastEntry": {
+    "placeholders": {
+      "entry": {
+        "type": "String"
+      }
+    }
+  },
+  "saveSetButton": "Save",
+  "saveSetInvalidSnack": "Enter the reps done (or a weight).",
+  "saveSetOkSnack": "Saved for {movementName}.",
+  "@saveSetOkSnack": {
+    "placeholders": {
+      "movementName": {
+        "type": "String"
+      }
+    }
+  },
+  "bodyweight": "Bodyweight",
+  "setsRepsLine": "{weight} × {reps} reps",
+  "@setsRepsLine": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "roundsCount": "{count, plural, =1{1 round} other{{count} rounds}}",
+  "@roundsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   }

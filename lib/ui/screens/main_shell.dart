@@ -32,12 +32,24 @@ class _MainShellState extends State<MainShell> {
     final key = ValueKey('$_tab-$_visit');
     final body = switch (_tab) {
       1 => TrainScreen(key: key, store: _store),
-      2 => ProgressScreen(key: key, store: _store),
+      2 => ProgressScreen(
+        key: key,
+        store: _store,
+        onGoTrain: () => setState(() {
+          _tab = 1;
+          _visit++;
+        }),
+      ),
       3 => CoachScreen(key: key, store: _store),
       _ => CategoryScreen(key: key, storage: widget.storage, onOpenSettings: widget.onOpenSettings),
     };
     return Scaffold(
-      body: body,
+      // Tocar fuera de un campo cierra el teclado.
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: body,
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() {

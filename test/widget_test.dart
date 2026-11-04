@@ -168,18 +168,31 @@ void main() {
       expect(find.text(e), findsOneWidget);
     }
 
-    // Sin barra: solo RM e historial.
+    // Sin barra: peso, repeticiones y rondas (opcional).
     await tester.tap(find.text('Dumbbell Press'));
     await tester.pumpAndSettle();
     expect(find.text('Calcular distribución de discos'), findsNothing);
-    await tester.enterText(find.byType(TextField), '30');
+    await tester.enterText(find.widgetWithText(TextField, 'Peso'), '30');
+    await tester.enterText(find.widgetWithText(TextField, 'Repeticiones hechas'), '12');
+    await tester.enterText(find.widgetWithText(TextField, 'Rondas'), '3');
     await tester.tap(find.byIcon(Icons.save_outlined));
     await tester.pumpAndSettle();
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getDouble('rm_Dumbbell Press_kg'), 30);
+    expect(find.text('Último: 30 kg × 12 reps · 3 rondas'), findsOneWidget);
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
-    expect(find.text('RM: 30 kg'), findsOneWidget);
+    expect(find.text('30 kg × 12 reps · 3 rondas'), findsOneWidget);
+
+    // Peso corporal: solo repeticiones, sin rondas.
+    await tester.tap(find.text('Chest Fly'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Repeticiones hechas'), '15');
+    await tester.tap(find.byIcon(Icons.save_outlined));
+    await tester.pumpAndSettle();
+    expect(find.text('Último: Peso corporal × 15 reps'), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
 
     // Con barra: calculadora de discos.
     await tester.tap(find.text('Bench Press'));

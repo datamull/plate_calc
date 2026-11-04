@@ -45,7 +45,19 @@ LiftPose liftPoseFor(String name) {
     return LiftPose.clean;
   }
   if (has(['curl', 'biceps', 'bicep'])) return LiftPose.curl;
-  if (has(['crunch', 'leg raise', 'ab wheel', 'abs', 'abdom', 'plank', 'plancha', 'sit-up', 'situp', 'russian twist', 'gainage'])) {
+  if (has([
+    'crunch',
+    'leg raise',
+    'ab wheel',
+    'abs',
+    'abdom',
+    'plank',
+    'plancha',
+    'sit-up',
+    'situp',
+    'russian twist',
+    'gainage',
+  ])) {
     return LiftPose.core;
   }
   if (has(['row', 'remo', 'rowing', 'tirage'])) return LiftPose.row;
@@ -305,10 +317,7 @@ Future<({LiftPose? pose})?> showLiftIconPicker(
             padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: selected ? AppColors.blue : Colors.transparent,
-                width: 2,
-              ),
+              border: Border.all(color: selected ? AppColors.blue : Colors.transparent, width: 2),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -346,18 +355,13 @@ Future<({LiftPose? pose})?> showLiftIconPicker(
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                 ),
-                children: [
-                  for (final p in LiftPose.values) option(pose: p, label: p.label),
-                ],
+                children: [for (final p in LiftPose.values) option(pose: p, label: p.label)],
               ),
               const SizedBox(height: 8),
               Center(
                 child: TextButton.icon(
                   onPressed: () => Navigator.of(ctx).pop((pose: null)),
-                  icon: Icon(
-                    current == null ? Icons.check_circle : Icons.auto_awesome,
-                    size: 18,
-                  ),
+                  icon: Icon(current == null ? Icons.check_circle : Icons.auto_awesome, size: 18),
                   label: Text(loc.iconAuto),
                 ),
               ),

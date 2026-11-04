@@ -218,9 +218,7 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
             const SizedBox(height: 12),
             Text(
               loc.noCalculatorHint,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 20),
             GlassButton(onPressed: _saveRm, prominent: true, label: loc.saveRmTooltip),

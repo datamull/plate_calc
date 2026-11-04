@@ -83,18 +83,18 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           // El respaldo en iCloud solo existe en iPhone; en Android los datos
           // se respaldan con la copia de seguridad de Google.
           if (defaultTargetPlatform == TargetPlatform.iOS) ...[
-          const SizedBox(height: 24),
-          Text(loc.iCloudSyncTitle, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(
-              widget.cloud?.available == true ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
+            const SizedBox(height: 24),
+            Text(loc.iCloudSyncTitle, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                widget.cloud?.available == true
+                    ? Icons.cloud_done_outlined
+                    : Icons.cloud_off_outlined,
+              ),
+              title: Text(widget.cloud?.available == true ? loc.iCloudSyncOn : loc.iCloudSyncOff),
             ),
-            title: Text(
-              widget.cloud?.available == true ? loc.iCloudSyncOn : loc.iCloudSyncOff,
-            ),
-          ),
           ],
         ],
       ),

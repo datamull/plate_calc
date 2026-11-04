@@ -219,5 +219,332 @@
         "type": "int"
       }
     }
+  },
+  "tabCalc": "Calculator",
+  "tabTrain": "Train",
+  "tabProgress": "Progress",
+  "tabCoach": "Coach",
+  "ok": "OK",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "save": "Save",
+  "rename": "Rename",
+  "workoutStartFree": "Start a workout",
+  "workoutResume": "Resume workout in progress",
+  "workoutFree": "Workout",
+  "workoutAddExercise": "Add exercise",
+  "workoutRemoveExercise": "Remove exercise",
+  "workoutAddSet": "Add set",
+  "workoutReps": "Reps",
+  "workoutPlates": "Plates for this set",
+  "workoutSetDone": "Set done",
+  "workoutNotes": "Notes",
+  "workoutFinish": "Finish workout",
+  "workoutDiscard": "Discard workout",
+  "workoutDiscardTitle": "Discard this workout?",
+  "workoutNoSetsTitle": "No sets done",
+  "workoutNoSetsBody": "Mark sets as done with the circle to save them.",
+  "workoutDeleteTitle": "Delete this workout?",
+  "workoutPercentOfRm": "{percent}% of 1RM",
+  "@workoutPercentOfRm": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "restLabel": "Rest",
+  "restSkip": "Skip",
+  "restDefault": "Rest time between sets",
+  "summaryTitle": "Workout saved 💪",
+  "summaryTitlePr": "New personal record! 🏆",
+  "summaryStats": "{sets} sets · {volume} {unit} lifted",
+  "@summaryStats": {
+    "placeholders": {
+      "sets": {
+        "type": "int"
+      },
+      "volume": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "prHeaviest": "heaviest ever, {weight} {unit}",
+  "@prHeaviest": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "prEstimated": "best estimated 1RM, {weight} {unit}",
+  "@prEstimated": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "sendToCoach": "Send to coach",
+  "athleteNameTitle": "Your name",
+  "athleteNameHint": "So your coach knows it is you",
+  "resultShareTitle": "Your result",
+  "resultShareSubtitle": "Show this QR to {coach} or send the code by message.",
+  "@resultShareSubtitle": {
+    "placeholders": {
+      "coach": {
+        "type": "String"
+      }
+    }
+  },
+  "draftReplaceTitle": "Workout in progress",
+  "draftReplaceBody": "You have an unfinished workout. Start a new one and discard it?",
+  "setsCount": "{count, plural, =1{1 set} other{{count} sets}}",
+  "@setsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "myPlans": "My plans",
+  "myPlansEmpty": "Create a routine, use a program below or import one from your coach.",
+  "planCreate": "Create routine",
+  "importPlanShort": "Coach plan",
+  "importPlanTitle": "Import plan from coach",
+  "importPlanDone": "Plan \"{name}\" added",
+  "@importPlanDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importInvalid": "That code is not valid. Check that it was copied complete.",
+  "templatesTitle": "Percentage programs",
+  "historyTitle": "History",
+  "historyWorkoutsEmpty": "Your finished workouts will appear here.",
+  "planUntitled": "Untitled plan",
+  "planFromCoach": "Coach {coach}",
+  "@planFromCoach": {
+    "placeholders": {
+      "coach": {
+        "type": "String"
+      }
+    }
+  },
+  "planProgress": "{done} of {total} days done",
+  "@planProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "planDaysCount": "{count, plural, =1{1 day} other{{count} days}}",
+  "@planDaysCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "planShare": "Share with QR",
+  "planShareTitle": "Share \"{name}\"",
+  "@planShareTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "planShareSubtitle": "Your athletes scan it in Plate Calc → Train → Coach plan. Weights are calculated with each one's 1RM.",
+  "planStartNext": "Start: {day}",
+  "@planStartNext": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "planStartDay": "Start this day",
+  "planNoRm": "no 1RM saved",
+  "planDeleteTitle": "Delete \"{name}\"?",
+  "@planDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "planWeekDay": "Week {week} · Day {day}",
+  "@planWeekDay": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "planDayDefault": "Day {n}",
+  "@planDayDefault": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "planOlyName": "Weightlifting · 4 weeks",
+  "planOlyNotes": "3 days a week. Snatch, clean & jerk and squats by % of your 1RM.",
+  "planStrengthName": "Strength 5/3/1 · 4 weeks",
+  "planStrengthNotes": "4 days a week: squat, bench, deadlift and press. Week 4 is a deload.",
+  "planEditorTitle": "Routine",
+  "planNameLabel": "Name",
+  "planNameHint": "E.g. Monday WOD, Squat cycle",
+  "planNotesLabel": "Notes for athletes (optional)",
+  "planNameRequired": "Give it a name",
+  "planNeedsExercise": "Add at least one exercise",
+  "planAddExercise": "Add exercise",
+  "planAddDay": "Add day",
+  "planDayName": "Day name",
+  "planDayDuplicate": "Duplicate",
+  "planSets": "Sets",
+  "planLoadPercent": "% 1RM",
+  "planLoadWeight": "Weight",
+  "planLoadFree": "Free",
+  "planPercentLabel": "Percentage of 1RM",
+  "planWeightLabel": "Fixed weight",
+  "pickExerciseHint": "Search or type a new exercise",
+  "pickExerciseNew": "Use \"{name}\"",
+  "@pickExerciseNew": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "shareCopyCode": "Copy code",
+  "shareCopied": "Code copied. Paste it in WhatsApp, an email…",
+  "shareHowTo": "The other person opens Plate Calc and scans the QR or pastes the code.",
+  "shareScanQr": "Scan QR",
+  "sharePasteLabel": "Or paste the code",
+  "sharePaste": "Paste",
+  "shareImport": "Import",
+  "shareCameraError": "Cannot open the camera. Allow camera access for Plate Calc in Settings, or paste the code.",
+  "statStreak": "weeks in a row",
+  "statThisMonth": "this month",
+  "statTotal": "workouts",
+  "e1rmCalcTitle": "Estimated 1RM",
+  "e1rmCalcHelp": "Weight and reps of a hard set (Epley formula).",
+  "e1rmWeight": "Weight",
+  "e1rmResult": "≈ {weight} {unit}",
+  "@e1rmResult": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "e1rmShort": "e1RM {weight} {unit}",
+  "@e1rmShort": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "recordsTitle": "Personal records",
+  "recordsEmpty": "Finish a workout to see your records and charts.",
+  "recordHeaviest": "Max {weight} {unit}",
+  "@recordHeaviest": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "currentRm": "Saved 1RM: {weight} {unit}",
+  "@currentRm": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "metricE1rm": "Est. 1RM",
+  "metricHeaviest": "Max",
+  "metricVolume": "Volume",
+  "chartNeedsMore": "You need at least 2 workouts with this exercise to see the chart.",
+  "coachProfile": "Coach profile",
+  "coachNameLabel": "Your name",
+  "coachBoxLabel": "Box or gym",
+  "coachSetupTitle": "Set up your coach profile",
+  "coachSetupSubtitle": "Name and box appear on the plans you share",
+  "coachDefaultName": "Coach",
+  "coachHowItWorks": "1. Create a plan or WOD with % of 1RM.\n2. Share it with a QR: each athlete gets their own weights.\n3. After training, they send you their result with another QR.",
+  "coachPlansTitle": "Plans for your box",
+  "coachCreatePlan": "Create plan or WOD",
+  "coachAthletesTitle": "Athletes",
+  "coachAthletesEmpty": "When an athlete sends you a result, they will appear here.",
+  "importResultTitle": "Receive athlete result",
+  "importResultDone": "Result from {name} saved",
+  "@importResultDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importResultDuplicate": "You already had this result",
+  "resultsCount": "{count, plural, =1{1 workout} other{{count} workouts}}",
+  "@resultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lastWorkout": "last {date}",
+  "@lastWorkout": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "athleteDeleteTitle": "Delete {name} and their results?",
+  "@athleteDeleteTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

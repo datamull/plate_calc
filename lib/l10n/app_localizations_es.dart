@@ -326,4 +326,463 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get iCloudRestored => 'Datos recuperados de iCloud';
+
+  @override
+  String get tabCalc => 'Calculadora';
+
+  @override
+  String get tabTrain => 'Entrenar';
+
+  @override
+  String get tabProgress => 'Progreso';
+
+  @override
+  String get tabCoach => 'Coach';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String get edit => 'Editar';
+
+  @override
+  String get save => 'Guardar';
+
+  @override
+  String get rename => 'Cambiar nombre';
+
+  @override
+  String get workoutStartFree => 'Empezar entrenamiento';
+
+  @override
+  String get workoutResume => 'Seguir entrenamiento en curso';
+
+  @override
+  String get workoutFree => 'Entrenamiento';
+
+  @override
+  String get workoutAddExercise => 'Agregar ejercicio';
+
+  @override
+  String get workoutRemoveExercise => 'Quitar ejercicio';
+
+  @override
+  String get workoutAddSet => 'Agregar serie';
+
+  @override
+  String get workoutReps => 'Reps';
+
+  @override
+  String get workoutPlates => 'Discos para esta serie';
+
+  @override
+  String get workoutSetDone => 'Serie hecha';
+
+  @override
+  String get workoutNotes => 'Notas';
+
+  @override
+  String get workoutFinish => 'Terminar entrenamiento';
+
+  @override
+  String get workoutDiscard => 'Descartar entrenamiento';
+
+  @override
+  String get workoutDiscardTitle => '¿Descartar este entrenamiento?';
+
+  @override
+  String get workoutNoSetsTitle => 'No hay series hechas';
+
+  @override
+  String get workoutNoSetsBody => 'Marca las series hechas con el círculo para guardarlas.';
+
+  @override
+  String get workoutDeleteTitle => '¿Eliminar este entrenamiento?';
+
+  @override
+  String workoutPercentOfRm(String percent) {
+    return '$percent% del RM';
+  }
+
+  @override
+  String get restLabel => 'Descanso';
+
+  @override
+  String get restSkip => 'Saltar';
+
+  @override
+  String get restDefault => 'Descanso entre series';
+
+  @override
+  String get summaryTitle => 'Entrenamiento guardado 💪';
+
+  @override
+  String get summaryTitlePr => '¡Nuevo récord personal! 🏆';
+
+  @override
+  String summaryStats(int sets, String volume, String unit) {
+    return '$sets series · $volume $unit levantados';
+  }
+
+  @override
+  String prHeaviest(String weight, String unit) {
+    return 'más pesado hasta ahora, $weight $unit';
+  }
+
+  @override
+  String prEstimated(String weight, String unit) {
+    return 'mejor RM estimado, $weight $unit';
+  }
+
+  @override
+  String get sendToCoach => 'Enviar al coach';
+
+  @override
+  String get athleteNameTitle => 'Tu nombre';
+
+  @override
+  String get athleteNameHint => 'Para que tu coach sepa que eres tú';
+
+  @override
+  String get resultShareTitle => 'Tu resultado';
+
+  @override
+  String resultShareSubtitle(String coach) {
+    return 'Muéstrale este QR a $coach o mándale el código por mensaje.';
+  }
+
+  @override
+  String get draftReplaceTitle => 'Entrenamiento en curso';
+
+  @override
+  String get draftReplaceBody =>
+      'Tienes un entrenamiento sin terminar. ¿Empezar uno nuevo y descartarlo?';
+
+  @override
+  String setsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count series',
+      one: '1 serie',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get myPlans => 'Mis planes';
+
+  @override
+  String get myPlansEmpty => 'Crea una rutina, usa un programa de abajo o importa el de tu coach.';
+
+  @override
+  String get planCreate => 'Crear rutina';
+
+  @override
+  String get importPlanShort => 'Plan del coach';
+
+  @override
+  String get importPlanTitle => 'Importar plan del coach';
+
+  @override
+  String importPlanDone(String name) {
+    return 'Plan \"$name\" agregado';
+  }
+
+  @override
+  String get importInvalid => 'Ese código no es válido. Revisa que se haya copiado completo.';
+
+  @override
+  String get templatesTitle => 'Programas por porcentaje';
+
+  @override
+  String get historyTitle => 'Historial';
+
+  @override
+  String get historyWorkoutsEmpty => 'Aquí aparecerán tus entrenamientos terminados.';
+
+  @override
+  String get planUntitled => 'Plan sin nombre';
+
+  @override
+  String planFromCoach(String coach) {
+    return 'Coach $coach';
+  }
+
+  @override
+  String planProgress(int done, int total) {
+    return '$done de $total días hechos';
+  }
+
+  @override
+  String planDaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días',
+      one: '1 día',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get planShare => 'Compartir con QR';
+
+  @override
+  String planShareTitle(String name) {
+    return 'Compartir \"$name\"';
+  }
+
+  @override
+  String get planShareSubtitle =>
+      'Tus alumnos lo escanean en Plate Calc → Entrenar → Plan del coach. Los pesos se calculan con el RM de cada uno.';
+
+  @override
+  String planStartNext(String day) {
+    return 'Empezar: $day';
+  }
+
+  @override
+  String get planStartDay => 'Empezar este día';
+
+  @override
+  String get planNoRm => 'sin RM guardado';
+
+  @override
+  String planDeleteTitle(String name) {
+    return '¿Eliminar \"$name\"?';
+  }
+
+  @override
+  String planWeekDay(int week, String day) {
+    return 'Semana $week · Día $day';
+  }
+
+  @override
+  String planDayDefault(int n) {
+    return 'Día $n';
+  }
+
+  @override
+  String get planOlyName => 'Halterofilia · 4 semanas';
+
+  @override
+  String get planOlyNotes => '3 días por semana. Arranque, envión y sentadillas por % de tu RM.';
+
+  @override
+  String get planStrengthName => 'Fuerza 5/3/1 · 4 semanas';
+
+  @override
+  String get planStrengthNotes =>
+      '4 días por semana: sentadilla, banca, peso muerto y press. La semana 4 es de descarga.';
+
+  @override
+  String get planEditorTitle => 'Rutina';
+
+  @override
+  String get planNameLabel => 'Nombre';
+
+  @override
+  String get planNameHint => 'Ej.: WOD lunes, Ciclo de sentadilla';
+
+  @override
+  String get planNotesLabel => 'Notas para los alumnos (opcional)';
+
+  @override
+  String get planNameRequired => 'Ponle un nombre';
+
+  @override
+  String get planNeedsExercise => 'Agrega al menos un ejercicio';
+
+  @override
+  String get planAddExercise => 'Agregar ejercicio';
+
+  @override
+  String get planAddDay => 'Agregar día';
+
+  @override
+  String get planDayName => 'Nombre del día';
+
+  @override
+  String get planDayDuplicate => 'Duplicar';
+
+  @override
+  String get planSets => 'Series';
+
+  @override
+  String get planLoadPercent => '% RM';
+
+  @override
+  String get planLoadWeight => 'Peso';
+
+  @override
+  String get planLoadFree => 'Libre';
+
+  @override
+  String get planPercentLabel => 'Porcentaje del RM';
+
+  @override
+  String get planWeightLabel => 'Peso fijo';
+
+  @override
+  String get pickExerciseHint => 'Busca o escribe un ejercicio nuevo';
+
+  @override
+  String pickExerciseNew(String name) {
+    return 'Usar \"$name\"';
+  }
+
+  @override
+  String get shareCopyCode => 'Copiar código';
+
+  @override
+  String get shareCopied => 'Código copiado. Pégalo en WhatsApp, un correo…';
+
+  @override
+  String get shareHowTo => 'La otra persona abre Plate Calc y escanea el QR o pega el código.';
+
+  @override
+  String get shareScanQr => 'Escanear QR';
+
+  @override
+  String get sharePasteLabel => 'O pega el código';
+
+  @override
+  String get sharePaste => 'Pegar';
+
+  @override
+  String get shareImport => 'Importar';
+
+  @override
+  String get shareCameraError =>
+      'No se puede abrir la cámara. Permite el acceso a la cámara para Plate Calc en Ajustes, o pega el código.';
+
+  @override
+  String get statStreak => 'semanas seguidas';
+
+  @override
+  String get statThisMonth => 'este mes';
+
+  @override
+  String get statTotal => 'entrenamientos';
+
+  @override
+  String get e1rmCalcTitle => 'RM estimado';
+
+  @override
+  String get e1rmCalcHelp => 'Peso y repeticiones de una serie exigente (fórmula de Epley).';
+
+  @override
+  String get e1rmWeight => 'Peso';
+
+  @override
+  String e1rmResult(String weight, String unit) {
+    return '≈ $weight $unit';
+  }
+
+  @override
+  String e1rmShort(String weight, String unit) {
+    return 'RMe $weight $unit';
+  }
+
+  @override
+  String get recordsTitle => 'Récords personales';
+
+  @override
+  String get recordsEmpty => 'Termina un entrenamiento para ver tus récords y gráficos.';
+
+  @override
+  String recordHeaviest(String weight, String unit) {
+    return 'Máx. $weight $unit';
+  }
+
+  @override
+  String currentRm(String weight, String unit) {
+    return 'RM guardado: $weight $unit';
+  }
+
+  @override
+  String get metricE1rm => 'RM est.';
+
+  @override
+  String get metricHeaviest => 'Máximo';
+
+  @override
+  String get metricVolume => 'Volumen';
+
+  @override
+  String get chartNeedsMore =>
+      'Necesitas al menos 2 entrenamientos con este ejercicio para ver el gráfico.';
+
+  @override
+  String get coachProfile => 'Perfil de coach';
+
+  @override
+  String get coachNameLabel => 'Tu nombre';
+
+  @override
+  String get coachBoxLabel => 'Box o gimnasio';
+
+  @override
+  String get coachSetupTitle => 'Configura tu perfil de coach';
+
+  @override
+  String get coachSetupSubtitle => 'Tu nombre y box salen en los planes que compartes';
+
+  @override
+  String get coachDefaultName => 'Coach';
+
+  @override
+  String get coachHowItWorks =>
+      '1. Crea un plan o WOD con % del RM.\n2. Compártelo con un QR: cada alumno ve sus propios pesos.\n3. Después de entrenar, te mandan su resultado con otro QR.';
+
+  @override
+  String get coachPlansTitle => 'Planes para tu box';
+
+  @override
+  String get coachCreatePlan => 'Crear plan o WOD';
+
+  @override
+  String get coachAthletesTitle => 'Alumnos';
+
+  @override
+  String get coachAthletesEmpty => 'Cuando un alumno te mande un resultado, aparecerá aquí.';
+
+  @override
+  String get importResultTitle => 'Recibir resultado de alumno';
+
+  @override
+  String importResultDone(String name) {
+    return 'Resultado de $name guardado';
+  }
+
+  @override
+  String get importResultDuplicate => 'Ya tenías este resultado';
+
+  @override
+  String resultsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entrenamientos',
+      one: '1 entrenamiento',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lastWorkout(String date) {
+    return 'último $date';
+  }
+
+  @override
+  String athleteDeleteTitle(String name) {
+    return '¿Eliminar a $name y sus resultados?';
+  }
 }

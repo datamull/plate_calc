@@ -101,14 +101,11 @@ void main() {
 
   test('una copia más nueva de otro iPhone reemplaza los datos', () async {
     final fake = FakeICloud();
-    final (storage, sync, _) = await setUpSync(
-      {
-        'rm_Clean_kg': 90.0,
-        'cloud_local_updated_at': DateTime.utc(2026, 10, 1).toIso8601String(),
-        'cloud_last_hash': 'x',
-      },
-      cloud: fake,
-    );
+    final (storage, sync, _) = await setUpSync({
+      'rm_Clean_kg': 90.0,
+      'cloud_local_updated_at': DateTime.utc(2026, 10, 1).toIso8601String(),
+      'cloud_last_hash': 'x',
+    }, cloud: fake);
     fake.store[CloudSync.backupKey] = backupWith({'rm_Clean_kg': 95.0}, DateTime.utc(2026, 10, 2));
     expect(await sync.start(), isTrue);
     sync.dispose();

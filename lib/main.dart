@@ -5,7 +5,7 @@ import 'services/app_storage.dart';
 import 'services/cloud_sync.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/screens/app_settings_screen.dart';
-import 'ui/screens/category_screen.dart';
+import 'ui/screens/main_shell.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,7 +74,7 @@ class _PlateCalcAppState extends State<PlateCalcApp> {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(
-        builder: (context) => CategoryScreen(
+        builder: (context) => MainShell(
           storage: widget.storage,
           onOpenSettings: () => Navigator.of(context).push(
             MaterialPageRoute<void>(

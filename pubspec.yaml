@@ -5,7 +5,7 @@ publish_to: 'none'
 # version: <nombre visible>+<número de build>
 # En iOS el nombre es CFBundleShortVersionString y el build es CFBundleVersion.
 # Codemagic reemplaza el número de build automáticamente (ver codemagic.yaml).
-version: 2.2.0+2
+version: 3.0.0+1
 
 environment:
   sdk: ^3.9.2
@@ -16,6 +16,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any # versión fijada por flutter_localizations
+  mobile_scanner: ^7.5.0
+  qr_flutter: ^4.1.0
   shared_preferences: ^2.2.3
 
 dev_dependencies:

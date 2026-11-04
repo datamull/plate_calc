@@ -55,6 +55,7 @@ class AppStorage {
         k.startsWith('history_') ||
         k.startsWith('inventory_settings_') ||
         k.startsWith('gym_') ||
+        k.startsWith('training_') ||
         k == _kCustomLifts ||
         k == _kHiddenBaseLifts,
   );
@@ -99,6 +100,25 @@ class AppStorage {
     await _prefs.setString('cloud_local_updated_at', updatedAt);
     await _prefs.setString('cloud_last_hash', hash);
   }
+
+  // ── Datos genéricos (entrenamientos, planes, coach) ───────────────────────
+  Object? readJson(String key) {
+    final raw = _prefs.getString(key);
+    if (raw == null) return null;
+    try {
+      return jsonDecode(raw);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> writeJson(String key, Object? value) =>
+      value == null ? _prefs.remove(key) : _prefs.setString(key, jsonEncode(value));
+
+  int? readInt(String key) => _prefs.getInt(key);
+  Future<void> writeInt(String key, int value) => _prefs.setInt(key, value);
+  String? readString(String key) => _prefs.getString(key);
+  Future<void> writeString(String key, String value) => _prefs.setString(key, value);
 
   // ── Idioma ────────────────────────────────────────────────────────────────
   String? get localeCode => _prefs.getString(_kLocale);
@@ -164,7 +184,10 @@ class AppStorage {
       return true;
     }
     if (gymExercises(group).any((l) => _same(l, n))) return false;
-    await _prefs.setStringList(_kGymCustom(group), [...?_prefs.getStringList(_kGymCustom(group)), n]);
+    await _prefs.setStringList(_kGymCustom(group), [
+      ...?_prefs.getStringList(_kGymCustom(group)),
+      n,
+    ]);
     if (barbell) {
       final list = {...?_prefs.getStringList(_kGymBarbell), n}.toList();
       await _prefs.setStringList(_kGymBarbell, list);
@@ -183,7 +206,8 @@ class AppStorage {
         ..removeWhere((l) => _same(l, name));
       await _prefs.setStringList(_kGymCustom(group), custom);
     }
-    final stillUsed = lifts.contains(name) ||
+    final stillUsed =
+        lifts.contains(name) ||
         Defaults.gymGroups.keys.any((g) => g != group && gymExercises(g).contains(name));
     if (!stillUsed) await _removeLiftData(name);
   }
@@ -220,9 +244,8 @@ class AppStorage {
   /// o null si se elige automáticamente según el nombre.
   String? liftIcon(String lift) => _prefs.getString(_kLiftIcon(lift));
 
-  Future<void> setLiftIcon(String lift, String? pose) => pose == null
-      ? _prefs.remove(_kLiftIcon(lift))
-      : _prefs.setString(_kLiftIcon(lift), pose);
+  Future<void> setLiftIcon(String lift, String? pose) =>
+      pose == null ? _prefs.remove(_kLiftIcon(lift)) : _prefs.setString(_kLiftIcon(lift), pose);
 
   static bool _same(String a, String b) => a.trim().toLowerCase() == b.trim().toLowerCase();
 

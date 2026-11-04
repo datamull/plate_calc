@@ -1,5 +1,13 @@
 # Cambios
 
+## 3.0.0 (beta en TestFlight)
+
+- Nuevas pestañas: Calculadora, Entrenar, Progreso y Coach.
+- Entrenar: registro de sesiones con series, peso, repeticiones y RPE; temporizador de descanso; calculadora de discos por serie; entrenamiento en curso se guarda solo.
+- Rutinas propias y programas por porcentaje (Halterofilia 4 semanas, Fuerza 5/3/1) que calculan los pesos con el RM de cada persona.
+- Progreso: racha de semanas, calendario, RM estimado (Epley), récords personales automáticos y gráficos de RM estimado, máximo y volumen por ejercicio. Un single más pesado actualiza el RM.
+- Coach: perfil de coach y box, planes/WOD compartidos por QR o código; los alumnos devuelven su resultado con otro QR y el coach ve el historial y las marcas de cada uno.
+
 ## 2.2.0
 
 ### Nuevo

@@ -116,10 +116,7 @@ class CloudSync with WidgetsBindingObserver {
     if (!shouldRestore) return false;
 
     await storage.importAll(decodeData(data));
-    await storage.setCloudState(
-      updatedAt: cloudAt.toUtc().toIso8601String(),
-      hash: _hash(data),
-    );
+    await storage.setCloudState(updatedAt: cloudAt.toUtc().toIso8601String(), hash: _hash(data));
     return true;
   }
 

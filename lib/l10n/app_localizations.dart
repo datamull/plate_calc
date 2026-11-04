@@ -657,6 +657,780 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Data restored from iCloud'**
   String get iCloudRestored;
+
+  /// No description provided for @tabCalc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculator'**
+  String get tabCalc;
+
+  /// No description provided for @tabTrain.
+  ///
+  /// In en, this message translates to:
+  /// **'Train'**
+  String get tabTrain;
+
+  /// No description provided for @tabProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get tabProgress;
+
+  /// No description provided for @tabCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach'**
+  String get tabCoach;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @rename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get rename;
+
+  /// No description provided for @workoutStartFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a workout'**
+  String get workoutStartFree;
+
+  /// No description provided for @workoutResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume workout in progress'**
+  String get workoutResume;
+
+  /// No description provided for @workoutFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout'**
+  String get workoutFree;
+
+  /// No description provided for @workoutAddExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Add exercise'**
+  String get workoutAddExercise;
+
+  /// No description provided for @workoutRemoveExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove exercise'**
+  String get workoutRemoveExercise;
+
+  /// No description provided for @workoutAddSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add set'**
+  String get workoutAddSet;
+
+  /// No description provided for @workoutReps.
+  ///
+  /// In en, this message translates to:
+  /// **'Reps'**
+  String get workoutReps;
+
+  /// No description provided for @workoutPlates.
+  ///
+  /// In en, this message translates to:
+  /// **'Plates for this set'**
+  String get workoutPlates;
+
+  /// No description provided for @workoutSetDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Set done'**
+  String get workoutSetDone;
+
+  /// No description provided for @workoutNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get workoutNotes;
+
+  /// No description provided for @workoutFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish workout'**
+  String get workoutFinish;
+
+  /// No description provided for @workoutDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard workout'**
+  String get workoutDiscard;
+
+  /// No description provided for @workoutDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this workout?'**
+  String get workoutDiscardTitle;
+
+  /// No description provided for @workoutNoSetsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No sets done'**
+  String get workoutNoSetsTitle;
+
+  /// No description provided for @workoutNoSetsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark sets as done with the circle to save them.'**
+  String get workoutNoSetsBody;
+
+  /// No description provided for @workoutDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this workout?'**
+  String get workoutDeleteTitle;
+
+  /// No description provided for @workoutPercentOfRm.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% of 1RM'**
+  String workoutPercentOfRm(String percent);
+
+  /// No description provided for @restLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest'**
+  String get restLabel;
+
+  /// No description provided for @restSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get restSkip;
+
+  /// No description provided for @restDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest time between sets'**
+  String get restDefault;
+
+  /// No description provided for @summaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout saved 💪'**
+  String get summaryTitle;
+
+  /// No description provided for @summaryTitlePr.
+  ///
+  /// In en, this message translates to:
+  /// **'New personal record! 🏆'**
+  String get summaryTitlePr;
+
+  /// No description provided for @summaryStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{sets} sets · {volume} {unit} lifted'**
+  String summaryStats(int sets, String volume, String unit);
+
+  /// No description provided for @prHeaviest.
+  ///
+  /// In en, this message translates to:
+  /// **'heaviest ever, {weight} {unit}'**
+  String prHeaviest(String weight, String unit);
+
+  /// No description provided for @prEstimated.
+  ///
+  /// In en, this message translates to:
+  /// **'best estimated 1RM, {weight} {unit}'**
+  String prEstimated(String weight, String unit);
+
+  /// No description provided for @sendToCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to coach'**
+  String get sendToCoach;
+
+  /// No description provided for @athleteNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get athleteNameTitle;
+
+  /// No description provided for @athleteNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'So your coach knows it is you'**
+  String get athleteNameHint;
+
+  /// No description provided for @resultShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your result'**
+  String get resultShareTitle;
+
+  /// No description provided for @resultShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this QR to {coach} or send the code by message.'**
+  String resultShareSubtitle(String coach);
+
+  /// No description provided for @draftReplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout in progress'**
+  String get draftReplaceTitle;
+
+  /// No description provided for @draftReplaceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have an unfinished workout. Start a new one and discard it?'**
+  String get draftReplaceBody;
+
+  /// No description provided for @setsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 set} other{{count} sets}}'**
+  String setsCount(int count);
+
+  /// No description provided for @myPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'My plans'**
+  String get myPlans;
+
+  /// No description provided for @myPlansEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a routine, use a program below or import one from your coach.'**
+  String get myPlansEmpty;
+
+  /// No description provided for @planCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create routine'**
+  String get planCreate;
+
+  /// No description provided for @importPlanShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach plan'**
+  String get importPlanShort;
+
+  /// No description provided for @importPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import plan from coach'**
+  String get importPlanTitle;
+
+  /// No description provided for @importPlanDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan \"{name}\" added'**
+  String importPlanDone(String name);
+
+  /// No description provided for @importInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'That code is not valid. Check that it was copied complete.'**
+  String get importInvalid;
+
+  /// No description provided for @templatesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Percentage programs'**
+  String get templatesTitle;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyTitle;
+
+  /// No description provided for @historyWorkoutsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your finished workouts will appear here.'**
+  String get historyWorkoutsEmpty;
+
+  /// No description provided for @planUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled plan'**
+  String get planUntitled;
+
+  /// No description provided for @planFromCoach.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach {coach}'**
+  String planFromCoach(String coach);
+
+  /// No description provided for @planProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} days done'**
+  String planProgress(int done, int total);
+
+  /// No description provided for @planDaysCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String planDaysCount(int count);
+
+  /// No description provided for @planShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with QR'**
+  String get planShare;
+
+  /// No description provided for @planShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share \"{name}\"'**
+  String planShareTitle(String name);
+
+  /// No description provided for @planShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your athletes scan it in Plate Calc → Train → Coach plan. Weights are calculated with each one\'s 1RM.'**
+  String get planShareSubtitle;
+
+  /// No description provided for @planStartNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Start: {day}'**
+  String planStartNext(String day);
+
+  /// No description provided for @planStartDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Start this day'**
+  String get planStartDay;
+
+  /// No description provided for @planNoRm.
+  ///
+  /// In en, this message translates to:
+  /// **'no 1RM saved'**
+  String get planNoRm;
+
+  /// No description provided for @planDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"?'**
+  String planDeleteTitle(String name);
+
+  /// No description provided for @planWeekDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week} · Day {day}'**
+  String planWeekDay(int week, String day);
+
+  /// No description provided for @planDayDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {n}'**
+  String planDayDefault(int n);
+
+  /// No description provided for @planOlyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Weightlifting · 4 weeks'**
+  String get planOlyName;
+
+  /// No description provided for @planOlyNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days a week. Snatch, clean & jerk and squats by % of your 1RM.'**
+  String get planOlyNotes;
+
+  /// No description provided for @planStrengthName.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength 5/3/1 · 4 weeks'**
+  String get planStrengthName;
+
+  /// No description provided for @planStrengthNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'4 days a week: squat, bench, deadlift and press. Week 4 is a deload.'**
+  String get planStrengthNotes;
+
+  /// No description provided for @planEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine'**
+  String get planEditorTitle;
+
+  /// No description provided for @planNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get planNameLabel;
+
+  /// No description provided for @planNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g. Monday WOD, Squat cycle'**
+  String get planNameHint;
+
+  /// No description provided for @planNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes for athletes (optional)'**
+  String get planNotesLabel;
+
+  /// No description provided for @planNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Give it a name'**
+  String get planNameRequired;
+
+  /// No description provided for @planNeedsExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one exercise'**
+  String get planNeedsExercise;
+
+  /// No description provided for @planAddExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Add exercise'**
+  String get planAddExercise;
+
+  /// No description provided for @planAddDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Add day'**
+  String get planAddDay;
+
+  /// No description provided for @planDayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Day name'**
+  String get planDayName;
+
+  /// No description provided for @planDayDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate'**
+  String get planDayDuplicate;
+
+  /// No description provided for @planSets.
+  ///
+  /// In en, this message translates to:
+  /// **'Sets'**
+  String get planSets;
+
+  /// No description provided for @planLoadPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'% 1RM'**
+  String get planLoadPercent;
+
+  /// No description provided for @planLoadWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get planLoadWeight;
+
+  /// No description provided for @planLoadFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get planLoadFree;
+
+  /// No description provided for @planPercentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Percentage of 1RM'**
+  String get planPercentLabel;
+
+  /// No description provided for @planWeightLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed weight'**
+  String get planWeightLabel;
+
+  /// No description provided for @pickExerciseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search or type a new exercise'**
+  String get pickExerciseHint;
+
+  /// No description provided for @pickExerciseNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Use \"{name}\"'**
+  String pickExerciseNew(String name);
+
+  /// No description provided for @shareCopyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy code'**
+  String get shareCopyCode;
+
+  /// No description provided for @shareCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied. Paste it in WhatsApp, an email…'**
+  String get shareCopied;
+
+  /// No description provided for @shareHowTo.
+  ///
+  /// In en, this message translates to:
+  /// **'The other person opens Plate Calc and scans the QR or pastes the code.'**
+  String get shareHowTo;
+
+  /// No description provided for @shareScanQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get shareScanQr;
+
+  /// No description provided for @sharePasteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Or paste the code'**
+  String get sharePasteLabel;
+
+  /// No description provided for @sharePaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get sharePaste;
+
+  /// No description provided for @shareImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get shareImport;
+
+  /// No description provided for @shareCameraError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot open the camera. Allow camera access for Plate Calc in Settings, or paste the code.'**
+  String get shareCameraError;
+
+  /// No description provided for @statStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'weeks in a row'**
+  String get statStreak;
+
+  /// No description provided for @statThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'this month'**
+  String get statThisMonth;
+
+  /// No description provided for @statTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'workouts'**
+  String get statTotal;
+
+  /// No description provided for @e1rmCalcTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated 1RM'**
+  String get e1rmCalcTitle;
+
+  /// No description provided for @e1rmCalcHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight and reps of a hard set (Epley formula).'**
+  String get e1rmCalcHelp;
+
+  /// No description provided for @e1rmWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get e1rmWeight;
+
+  /// No description provided for @e1rmResult.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {weight} {unit}'**
+  String e1rmResult(String weight, String unit);
+
+  /// No description provided for @e1rmShort.
+  ///
+  /// In en, this message translates to:
+  /// **'e1RM {weight} {unit}'**
+  String e1rmShort(String weight, String unit);
+
+  /// No description provided for @recordsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal records'**
+  String get recordsTitle;
+
+  /// No description provided for @recordsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish a workout to see your records and charts.'**
+  String get recordsEmpty;
+
+  /// No description provided for @recordHeaviest.
+  ///
+  /// In en, this message translates to:
+  /// **'Max {weight} {unit}'**
+  String recordHeaviest(String weight, String unit);
+
+  /// No description provided for @currentRm.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved 1RM: {weight} {unit}'**
+  String currentRm(String weight, String unit);
+
+  /// No description provided for @metricE1rm.
+  ///
+  /// In en, this message translates to:
+  /// **'Est. 1RM'**
+  String get metricE1rm;
+
+  /// No description provided for @metricHeaviest.
+  ///
+  /// In en, this message translates to:
+  /// **'Max'**
+  String get metricHeaviest;
+
+  /// No description provided for @metricVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get metricVolume;
+
+  /// No description provided for @chartNeedsMore.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least 2 workouts with this exercise to see the chart.'**
+  String get chartNeedsMore;
+
+  /// No description provided for @coachProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach profile'**
+  String get coachProfile;
+
+  /// No description provided for @coachNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get coachNameLabel;
+
+  /// No description provided for @coachBoxLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Box or gym'**
+  String get coachBoxLabel;
+
+  /// No description provided for @coachSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your coach profile'**
+  String get coachSetupTitle;
+
+  /// No description provided for @coachSetupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name and box appear on the plans you share'**
+  String get coachSetupSubtitle;
+
+  /// No description provided for @coachDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Coach'**
+  String get coachDefaultName;
+
+  /// No description provided for @coachHowItWorks.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Create a plan or WOD with % of 1RM.\n2. Share it with a QR: each athlete gets their own weights.\n3. After training, they send you their result with another QR.'**
+  String get coachHowItWorks;
+
+  /// No description provided for @coachPlansTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plans for your box'**
+  String get coachPlansTitle;
+
+  /// No description provided for @coachCreatePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Create plan or WOD'**
+  String get coachCreatePlan;
+
+  /// No description provided for @coachAthletesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Athletes'**
+  String get coachAthletesTitle;
+
+  /// No description provided for @coachAthletesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'When an athlete sends you a result, they will appear here.'**
+  String get coachAthletesEmpty;
+
+  /// No description provided for @importResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive athlete result'**
+  String get importResultTitle;
+
+  /// No description provided for @importResultDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Result from {name} saved'**
+  String importResultDone(String name);
+
+  /// No description provided for @importResultDuplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'You already had this result'**
+  String get importResultDuplicate;
+
+  /// No description provided for @resultsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 workout} other{{count} workouts}}'**
+  String resultsCount(int count);
+
+  /// No description provided for @lastWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'last {date}'**
+  String lastWorkout(String date);
+
+  /// No description provided for @athleteDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name} and their results?'**
+  String athleteDeleteTitle(String name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

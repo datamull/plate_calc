@@ -911,4 +911,96 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get workoutFinishShort => 'Terminar';
+
+  @override
+  String get styleCrossfit => 'CrossFit';
+
+  @override
+  String get styleHaltero => 'Halterofilia';
+
+  @override
+  String get styleGym => 'Gym';
+
+  @override
+  String get styleCrossfitDesc => 'WOD diario: AMRAP, EMOM, For Time';
+
+  @override
+  String get styleHalteroDesc => 'Arranque, envión y sentadillas por % del RM';
+
+  @override
+  String get styleGymDesc => 'Push / Pull / Legs';
+
+  @override
+  String get stylesTitle => '¿Qué entrenas?';
+
+  @override
+  String get stylesFirstTitle => 'Un entrenamiento cada día';
+
+  @override
+  String get stylesFirstBody =>
+      'Elige qué entrenas y cada día tendrás una sesión nueva, con tus pesos según tu RM.';
+
+  @override
+  String get stylesChoose => 'Elegir';
+
+  @override
+  String get todayStart => 'Empezar';
+
+  @override
+  String get todayDone => 'Hecho';
+
+  @override
+  String get crossfitOfficialWod => 'WOD oficial de CrossFit.com';
+
+  @override
+  String get wodGo => 'Empezar';
+
+  @override
+  String get wodPause => 'Pausa';
+
+  @override
+  String get wodContinue => 'Seguir';
+
+  @override
+  String get wodRound => 'Ronda';
+
+  @override
+  String get wodScoreTitle => 'Tu resultado';
+
+  @override
+  String get wodScoreTime => 'Tiempo (mm:ss)';
+
+  @override
+  String get wodScoreRounds => 'Rondas';
+
+  @override
+  String get wodScoreReps => '+ reps';
+
+  @override
+  String wodSaved(String score) {
+    return 'Guardado: $score';
+  }
+
+  @override
+  String get wodResultsTitle => 'Resultados de WOD';
+
+  @override
+  String get progressEmpty => 'Termina tu primer entrenamiento para ver aquí tu progreso.';
+
+  @override
+  String get statThisWeek => 'esta semana';
+
+  @override
+  String get chartThisWeek => 'Esta semana';
+
+  @override
+  String chartWeeksAgo(int n) {
+    return 'Hace $n sem';
+  }
+
+  @override
+  String get metricE1rmLong => 'Mejor RM estimado';
+
+  @override
+  String get metricHeaviestLong => 'Peso máximo';
 }

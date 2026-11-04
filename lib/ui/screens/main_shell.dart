@@ -6,13 +6,10 @@ import '../../services/training_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import 'category_screen.dart';
-import 'coach_screen.dart';
-import 'progress_screen.dart';
-import 'train_screen.dart';
+import 'training_home.dart';
 
-/// Pestañas principales. Las tres primeras son la parte de entrenamiento
-/// (Hoy, Progreso, Box); la calculadora de discos (Discos) va aparte, a la
-/// derecha y separada por una línea, porque es una herramienta.
+/// Dos pestañas: Discos (la calculadora, lo central; la app abre aquí) y
+/// Entrenar (entrenamiento del día, historial y progreso).
 class MainShell extends StatefulWidget {
   const MainShell({super.key, required this.storage, this.onOpenSettings});
 
@@ -40,10 +37,8 @@ class _MainShellState extends State<MainShell> {
     final loc = AppLocalizations.of(context);
     final key = ValueKey('$_tab-$_visit');
     final body = switch (_tab) {
-      1 => ProgressScreen(key: key, store: _store, onGoTrain: () => _go(0)),
-      2 => CoachScreen(key: key, store: _store),
-      3 => CategoryScreen(key: key, storage: widget.storage, onOpenSettings: widget.onOpenSettings),
-      _ => TrainScreen(key: key, store: _store, onOpenSettings: widget.onOpenSettings),
+      1 => TrainingHome(key: key, store: _store),
+      _ => CategoryScreen(key: key, storage: widget.storage, onOpenSettings: widget.onOpenSettings),
     };
     return Scaffold(
       // Tocar fuera de un campo cierra el teclado.
@@ -55,12 +50,10 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: _TabBar(
         selected: _tab,
         onSelect: _go,
-        training: [
-          (Icons.today_outlined, Icons.today, loc.tabToday),
-          (Icons.insights_outlined, Icons.insights, loc.tabProgress),
-          (Icons.groups_outlined, Icons.groups, loc.tabBox),
+        items: [
+          (Icons.calculate_outlined, Icons.calculate, loc.tabPlates),
+          (Icons.fitness_center_outlined, Icons.fitness_center, loc.tabTrain),
         ],
-        tool: (Icons.calculate_outlined, Icons.calculate, loc.tabPlates),
       ),
     );
   }
@@ -69,17 +62,11 @@ class _MainShellState extends State<MainShell> {
 typedef _Item = (IconData icon, IconData selectedIcon, String label);
 
 class _TabBar extends StatelessWidget {
-  const _TabBar({
-    required this.selected,
-    required this.onSelect,
-    required this.training,
-    required this.tool,
-  });
+  const _TabBar({required this.selected, required this.onSelect, required this.items});
 
   final int selected;
   final ValueChanged<int> onSelect;
-  final List<_Item> training;
-  final _Item tool;
+  final List<_Item> items;
 
   @override
   Widget build(BuildContext context) {
@@ -96,19 +83,10 @@ class _TabBar extends StatelessWidget {
             height: 62,
             child: Row(
               children: [
-                for (var i = 0; i < training.length; i++)
+                for (var i = 0; i < items.length; i++)
                   Expanded(
-                    child: _TabItem(item: training[i], on: selected == i, onTap: () => onSelect(i)),
+                    child: _TabItem(item: items[i], on: selected == i, onTap: () => onSelect(i)),
                   ),
-                // Separación visual: la calculadora es una herramienta aparte.
-                Container(width: 1, height: 30, color: Ds.hairline(context)),
-                Expanded(
-                  child: _TabItem(
-                    item: tool,
-                    on: selected == training.length,
-                    onTap: () => onSelect(training.length),
-                  ),
-                ),
               ],
             ),
           ),

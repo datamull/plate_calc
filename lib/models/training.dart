@@ -66,6 +66,8 @@ class Workout {
     this.dayIndex,
     this.coach,
     this.durationSec = 0,
+    this.score,
+    this.style,
   }) : exercises = exercises ?? [];
 
   final String id;
@@ -84,6 +86,12 @@ class Workout {
   final String? coach;
   int durationSec;
 
+  /// Resultado de un WOD tal como se anota ("12:45", "8 + 14", "95 kg").
+  String? score;
+
+  /// Estilo del entrenamiento del día: 'crossfit', 'haltero' o 'gym'.
+  final String? style;
+
   Iterable<WorkSet> get doneSets => exercises.expand((e) => e.sets).where((s) => s.done);
 
   Map<String, dynamic> toJson() => {
@@ -98,6 +106,8 @@ class Workout {
     if (dayIndex != null) 'di': dayIndex,
     if (coach != null) 'c': coach,
     if (durationSec > 0) 'dur': durationSec,
+    if (score != null && score!.isNotEmpty) 'sc': score,
+    if (style != null) 'st': style,
   };
 
   static Workout? fromJson(Object? raw) {
@@ -120,6 +130,8 @@ class Workout {
       dayIndex: (j['di'] as num?)?.toInt(),
       coach: j['c'] as String?,
       durationSec: (j['dur'] as num?)?.toInt() ?? 0,
+      score: j['sc'] as String?,
+      style: j['st'] as String?,
     );
   }
 }

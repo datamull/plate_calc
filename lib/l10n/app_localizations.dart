@@ -1641,6 +1641,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Finish'**
   String get workoutFinishShort;
+
+  /// No description provided for @styleCrossfit.
+  ///
+  /// In en, this message translates to:
+  /// **'CrossFit'**
+  String get styleCrossfit;
+
+  /// No description provided for @styleHaltero.
+  ///
+  /// In en, this message translates to:
+  /// **'Weightlifting'**
+  String get styleHaltero;
+
+  /// No description provided for @styleGym.
+  ///
+  /// In en, this message translates to:
+  /// **'Gym'**
+  String get styleGym;
+
+  /// No description provided for @styleCrossfitDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily WOD: AMRAP, EMOM, For Time'**
+  String get styleCrossfitDesc;
+
+  /// No description provided for @styleHalteroDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Snatch, clean & jerk and squats by % of 1RM'**
+  String get styleHalteroDesc;
+
+  /// No description provided for @styleGymDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Push / Pull / Legs'**
+  String get styleGymDesc;
+
+  /// No description provided for @stylesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you train?'**
+  String get stylesTitle;
+
+  /// No description provided for @stylesFirstTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A workout every day'**
+  String get stylesFirstTitle;
+
+  /// No description provided for @stylesFirstBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose what you train and you will get a new session every day, with your weights from your 1RM.'**
+  String get stylesFirstBody;
+
+  /// No description provided for @stylesChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get stylesChoose;
+
+  /// No description provided for @todayStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get todayStart;
+
+  /// No description provided for @todayDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get todayDone;
+
+  /// No description provided for @crossfitOfficialWod.
+  ///
+  /// In en, this message translates to:
+  /// **'CrossFit.com official WOD'**
+  String get crossfitOfficialWod;
+
+  /// No description provided for @wodGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get wodGo;
+
+  /// No description provided for @wodPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get wodPause;
+
+  /// No description provided for @wodContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get wodContinue;
+
+  /// No description provided for @wodRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Round'**
+  String get wodRound;
+
+  /// No description provided for @wodScoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your result'**
+  String get wodScoreTitle;
+
+  /// No description provided for @wodScoreTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Time (mm:ss)'**
+  String get wodScoreTime;
+
+  /// No description provided for @wodScoreRounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Rounds'**
+  String get wodScoreRounds;
+
+  /// No description provided for @wodScoreReps.
+  ///
+  /// In en, this message translates to:
+  /// **'+ reps'**
+  String get wodScoreReps;
+
+  /// No description provided for @wodSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved: {score}'**
+  String wodSaved(String score);
+
+  /// No description provided for @wodResultsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WOD results'**
+  String get wodResultsTitle;
+
+  /// No description provided for @progressEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish your first workout to see your progress here.'**
+  String get progressEmpty;
+
+  /// No description provided for @statThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'this week'**
+  String get statThisWeek;
+
+  /// No description provided for @chartThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get chartThisWeek;
+
+  /// No description provided for @chartWeeksAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} wk ago'**
+  String chartWeeksAgo(int n);
+
+  /// No description provided for @metricE1rmLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Best estimated 1RM'**
+  String get metricE1rmLong;
+
+  /// No description provided for @metricHeaviestLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Heaviest lift'**
+  String get metricHeaviestLong;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

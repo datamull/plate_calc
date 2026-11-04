@@ -1,41 +1,37 @@
 import 'dart:math' as math;
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../../data/daily_library.dart';
 import '../../l10n/app_localizations.dart';
 import '../../l10n/lift_names.dart';
+import '../../models/training.dart';
 import '../../models/weight_unit.dart';
 import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
-import '../widgets/training_widgets.dart';
+import 'training_home.dart';
 import 'workout_detail_screen.dart';
 
-/// Pestaña Progreso: racha, calendario, RM estimado y récords por ejercicio.
-class ProgressScreen extends StatefulWidget {
-  const ProgressScreen({super.key, required this.store, this.onGoTrain});
+/// Progreso: constancia (12 semanas), un gráfico por ejercicio y récords.
+/// Poco texto: números grandes y gráficos con ejes legibles.
+class ProgressView extends StatefulWidget {
+  const ProgressView({super.key, required this.store});
 
   final TrainingStore store;
 
-  /// Lleva a la pestaña Entrenar (se muestra si aún no hay entrenamientos).
-  final VoidCallback? onGoTrain;
-
   @override
-  State<ProgressScreen> createState() => _ProgressScreenState();
+  State<ProgressView> createState() => _ProgressViewState();
 }
 
-class _ProgressScreenState extends State<ProgressScreen> {
-  DateTime _month = DateTime(DateTime.now().year, DateTime.now().month);
-  final _calcWeight = TextEditingController();
-  final _calcReps = TextEditingController();
+enum _Metric { estimated, heaviest }
 
-  @override
-  void dispose() {
-    _calcWeight.dispose();
-    _calcReps.dispose();
-    super.dispose();
-  }
+class _ProgressViewState extends State<ProgressView> {
+  String? _lift;
+  _Metric _metric = _Metric.estimated;
 
   @override
   Widget build(BuildContext context) {
@@ -43,381 +39,573 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final store = widget.store;
     final unit = store.storage.listUnit;
     final workouts = store.workouts;
-    final now = DateTime.now();
-    final thisMonth = workouts
-        .where((w) => w.date.toLocal().year == now.year && w.date.toLocal().month == now.month)
-        .length;
-    final lifts = trainedLifts(workouts);
 
-    final w = parseNumber(_calcWeight.text) ?? 0;
-    final r = int.tryParse(_calcReps.text.trim()) ?? 0;
-    final est = estimate1Rm(w, r);
-
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: ListView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          padding: const EdgeInsets.only(bottom: 32),
-          children: [
-            DsLargeHeader(title: loc.tabProgress),
-            if (workouts.isEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(Ds.gutter, 8, Ds.gutter, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(loc.progressIntroTitle, style: Ds.title(context)),
-                    const SizedBox(height: 6),
-                    Text(loc.progressIntroBody, style: Ds.secondary(context)),
-                  ],
-                ),
-              ),
-              if (widget.onGoTrain != null)
-                DsPrimaryButton(
-                  label: loc.progressGoTrain,
-                  icon: Icons.today,
-                  onPressed: widget.onGoTrain,
-                ),
+    if (workouts.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.insights, size: 48, color: Ds.muted(context)),
+              const SizedBox(height: 12),
+              Text(loc.progressEmpty, textAlign: TextAlign.center, style: Ds.secondary(context)),
             ],
-            DsSection(loc.progressConsistencyTitle, help: loc.progressConsistencyHelp),
-            const SizedBox(height: 4),
-            DsStatStrip(
-              stats: [
-                ('${weekStreak(workouts)}', loc.statStreak),
-                ('$thisMonth', loc.statThisMonth),
-                ('${workouts.length}', loc.statTotal),
+          ),
+        ),
+      );
+    }
+
+    final lifts = trainedLifts(workouts);
+    final lift = lifts.contains(_lift) ? _lift : lifts.firstOrNull;
+    final wods = workouts.where((w) => w.score?.isNotEmpty == true).take(5).toList();
+
+    return ListView(
+      padding: const EdgeInsets.only(top: 8, bottom: 32),
+      children: [
+        _ConsistencyCard(workouts: workouts),
+        if (lift != null) ...[
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                for (final l in lifts)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(liftDisplayName(l)),
+                      selected: l == lift,
+                      showCheckmark: false,
+                      selectedColor: AppColors.blue.withValues(alpha: 0.18),
+                      labelStyle: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: l == lift ? AppColors.blue : Ds.muted(context),
+                      ),
+                      side: BorderSide.none,
+                      shape: const StadiumBorder(),
+                      onSelected: (_) => setState(() => _lift = l),
+                    ),
+                  ),
               ],
             ),
-            DsSection(loc.recordsTitle, help: loc.progressRecordsHelp),
-            if (lifts.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
-                child: Text(loc.recordsEmpty, style: Ds.secondary(context)),
-              ),
-            for (final lift in lifts)
-              Builder(
-                builder: (context) {
-                  final hist = liftHistory(workouts, lift, unit);
-                  final heavy = hist.map((s) => s.heaviest).fold(0.0, math.max);
-                  final best = hist.map((s) => s.best1Rm).fold(0.0, math.max);
-                  return DsRow(
-                    title: liftDisplayName(lift),
-                    subtitle:
-                        '${loc.recordHeaviest(fmtWeight(heavy), unit.label)} · '
-                        '${loc.e1rmShort(fmtWeight(best, maxDecimals: 1), unit.label)}',
-                    trailing: hist.length < 2
-                        ? null
-                        : SizedBox(
-                            width: 64,
-                            height: 28,
-                            child: _Sparkline([for (final s in hist) s.best1Rm]),
-                          ),
-                    divider: lift != lifts.last,
+          ),
+          const SizedBox(height: 12),
+          _LiftChartCard(
+            history: liftHistory(workouts, lift, unit),
+            unit: unit,
+            metric: _metric,
+            onMetric: (m) => setState(() => _metric = m),
+          ),
+        ],
+        if (lifts.isNotEmpty) ...[
+          DsSection(loc.recordsTitle),
+          DsBlock(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            child: Column(
+              children: [
+                for (final l in lifts)
+                  _RecordRow(
+                    lift: l,
+                    history: liftHistory(workouts, l, unit),
+                    unit: unit,
+                    last: l == lifts.last,
+                  ),
+              ],
+            ),
+          ),
+        ],
+        if (wods.isNotEmpty) ...[
+          DsSection(loc.wodResultsTitle),
+          DsBlock(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            child: Column(
+              children: [
+                for (final w in wods)
+                  InkWell(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                        builder: (_) => LiftProgressScreen(store: store, lift: lift, unit: unit),
+                        builder: (_) => WorkoutDetailScreen(store: store, workoutId: w.id),
                       ),
                     ),
-                  );
-                },
-              ),
-            DsSection(loc.progressCalendarTitle, help: loc.progressCalendarHelp),
-            _Calendar(
-              month: _month,
-              trained: trainedDays(workouts),
-              onMonth: (m) => setState(() => _month = m),
-              onDay: (day) {
-                final match = workouts.where((x) {
-                  final d = x.date.toLocal();
-                  return d.year == day.year && d.month == day.month && d.day == day.day;
-                });
-                if (match.isEmpty) return;
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => WorkoutDetailScreen(store: store, workoutId: match.first.id),
-                  ),
-                );
-              },
-            ),
-            DsSection(loc.e1rmCalcTitle, help: loc.e1rmCalcHelp),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _calcWeight,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelText: loc.e1rmWeight,
-                        suffixText: unit.label,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        border: w == wods.last
+                            ? null
+                            : Border(bottom: BorderSide(color: Ds.hairline(context))),
                       ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: _calcReps,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.done,
-                      decoration: InputDecoration(labelText: loc.workoutReps),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(Ds.gutter, 14, Ds.gutter, 0),
-              child: Text(
-                est > 0
-                    ? loc.e1rmResult(fmtWeight(est, maxDecimals: 1), unit.label)
-                    : loc.e1rmExample(
-                        unit == WeightUnit.kg ? '100 kg' : '225 lb',
-                        unit == WeightUnit.kg ? '117 kg' : '263 lb',
-                      ),
-                style: est > 0 ? Ds.display(context) : Ds.secondary(context),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Mini gráfico de tendencia para la fila de cada récord.
-class _Sparkline extends StatelessWidget {
-  const _Sparkline(this.values);
-
-  final List<double> values;
-
-  @override
-  Widget build(BuildContext context) => CustomPaint(painter: _SparkPainter(values, AppColors.blue));
-}
-
-class _SparkPainter extends CustomPainter {
-  _SparkPainter(this.values, this.color);
-
-  final List<double> values;
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (values.length < 2) return;
-    final lo = values.reduce(math.min);
-    final hi = values.reduce(math.max);
-    final span = (hi - lo).abs() < 0.001 ? 1.0 : hi - lo;
-    final path = Path();
-    for (var i = 0; i < values.length; i++) {
-      final x = i * size.width / (values.length - 1);
-      final y = size.height - (values[i] - lo) / span * size.height;
-      i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
-    }
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = color
-        ..strokeWidth = 2
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_SparkPainter old) => old.values != values;
-}
-
-class _Calendar extends StatelessWidget {
-  const _Calendar({
-    required this.month,
-    required this.trained,
-    required this.onMonth,
-    required this.onDay,
-  });
-
-  final DateTime month;
-  final Set<DateTime> trained;
-  final ValueChanged<DateTime> onMonth;
-  final ValueChanged<DateTime> onDay;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final ml = MaterialLocalizations.of(context);
-    final first = DateTime(month.year, month.month);
-    final days = DateTime(month.year, month.month + 1, 0).day;
-    final offset = first.weekday - 1; // lunes = 0
-    // narrowWeekdays empieza en domingo; se rota para empezar en lunes.
-    final names = [...ml.narrowWeekdays.skip(1), ml.narrowWeekdays.first];
-    final today = DateTime.now();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Ds.gutter - 12),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left),
-                  onPressed: () => onMonth(DateTime(month.year, month.month - 1)),
-                ),
-                Expanded(
-                  child: Text(
-                    ml.formatMonthYear(first),
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.chevron_right),
-                  onPressed: () => onMonth(DateTime(month.year, month.month + 1)),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                for (final n in names)
-                  Expanded(
-                    child: Text(n, textAlign: TextAlign.center, style: theme.textTheme.bodySmall),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            for (var week = 0; week * 7 < offset + days; week++)
-              Row(
-                children: [
-                  for (var c = 0; c < 7; c++)
-                    Expanded(
-                      child: Builder(
-                        builder: (context) {
-                          final n = week * 7 + c - offset + 1;
-                          if (n < 1 || n > days) return const SizedBox(height: 38);
-                          final date = DateTime(month.year, month.month, n);
-                          final on = trained.contains(date);
-                          final isToday =
-                              date.year == today.year &&
-                              date.month == today.month &&
-                              date.day == today.day;
-                          return InkWell(
-                            customBorder: const CircleBorder(),
-                            onTap: on ? () => onDay(date) : null,
-                            child: Container(
-                              height: 38,
-                              margin: const EdgeInsets.all(2),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: on ? AppColors.blue : null,
-                                border: isToday
-                                    ? Border.all(color: theme.colorScheme.primary, width: 1.5)
-                                    : null,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: styleColor(
+                                TrainingStyle.parse(w.style) ?? TrainingStyle.crossfit,
                               ),
-                              child: Text(
-                                '$n',
-                                style: TextStyle(
-                                  color: on ? Colors.white : null,
-                                  fontWeight: on ? FontWeight.w700 : null,
-                                ),
-                              ),
+                              shape: BoxShape.circle,
                             ),
-                          );
-                        },
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              w.title,
+                              style: Ds.body(context).copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Text(
+                            w.score!,
+                            style: Ds.body(
+                              context,
+                            ).copyWith(fontWeight: FontWeight.w800, fontFeatures: Ds.tabular),
+                          ),
+                        ],
                       ),
                     ),
-                ],
-              ),
-          ],
-        ),
-      ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
 
-enum _Metric { estimated, heaviest, volume }
+/// Racha + barras de entrenamientos por semana (últimas 12).
+class _ConsistencyCard extends StatelessWidget {
+  const _ConsistencyCard({required this.workouts});
 
-/// Progreso de un ejercicio: gráfico y sesiones.
-class LiftProgressScreen extends StatefulWidget {
-  const LiftProgressScreen({
-    super.key,
-    required this.store,
-    required this.lift,
-    required this.unit,
-  });
-
-  final TrainingStore store;
-  final String lift;
-  final WeightUnit unit;
-
-  @override
-  State<LiftProgressScreen> createState() => _LiftProgressScreenState();
-}
-
-class _LiftProgressScreenState extends State<LiftProgressScreen> {
-  _Metric _metric = _Metric.estimated;
+  final List<Workout> workouts;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final u = widget.unit.label;
-    final hist = liftHistory(widget.store.workouts, widget.lift, widget.unit);
-    final values = [
-      for (final s in hist)
-        switch (_metric) {
-          _Metric.estimated => s.best1Rm,
-          _Metric.heaviest => s.heaviest,
-          _Metric.volume => s.volume,
-        },
-    ];
-    final rm = widget.store.storage.lastRm(widget.lift, widget.unit);
+    final now = DateTime.now();
+    final monday = DateTime(now.year, now.month, now.day - (now.weekday - 1));
+    final counts = List<int>.filled(12, 0);
+    for (final w in workouts) {
+      final d = w.date.toLocal();
+      final day = DateTime(d.year, d.month, d.day);
+      final weeksAgo =
+          (DateTime.utc(monday.year, monday.month, monday.day)
+                      .difference(DateTime.utc(day.year, day.month, day.day - (day.weekday - 1)))
+                      .inDays /
+                  7)
+              .round();
+      if (weeksAgo >= 0 && weeksAgo < 12) counts[11 - weeksAgo]++;
+    }
+    final maxY = math.max(3, counts.reduce(math.max)).toDouble();
+    final streak = weekStreak(workouts);
+    final thisWeek = counts.last;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(liftDisplayName(widget.lift))),
-      body: ListView(
-        padding: const EdgeInsets.all(12),
+    return DsBlock(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (rm != null) Text(loc.currentRm(fmtWeight(rm), u), style: theme.textTheme.titleMedium),
-          const SizedBox(height: 12),
-          SegmentedButton<_Metric>(
-            segments: [
-              ButtonSegment(value: _Metric.estimated, label: Text(loc.metricE1rm)),
-              ButtonSegment(value: _Metric.heaviest, label: Text(loc.metricHeaviest)),
-              ButtonSegment(value: _Metric.volume, label: Text(loc.metricVolume)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: _BigNumber(
+                  value: '$streak',
+                  label: loc.statStreak,
+                  icon: Icons.local_fire_department,
+                  color: const Color(0xFFFF7A3D),
+                ),
+              ),
+              Expanded(
+                child: _BigNumber(
+                  value: '$thisWeek',
+                  label: loc.statThisWeek,
+                  icon: Icons.bolt,
+                  color: AppColors.blue,
+                ),
+              ),
             ],
-            selected: {_metric},
-            showSelectedIcon: false,
-            onSelectionChanged: (s) => setState(() => _metric = s.first),
           ),
-          const SizedBox(height: 16),
-          if (values.length < 2)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text(loc.chartNeedsMore, textAlign: TextAlign.center),
-            )
-          else
-            SimpleLineChart(
-              values: values,
-              labels: [for (final s in hist) shortDate(s.date)],
-              color: _metric == _Metric.volume ? AppColors.purple : AppColors.blue,
-            ),
-          const SizedBox(height: 16),
-          for (final s in hist.reversed)
-            ListTile(
-              dense: true,
-              title: Text(fmtDateTime(s.date)),
-              subtitle: Text(
-                '${loc.recordHeaviest(fmtWeight(s.heaviest), u)} · '
-                '${loc.e1rmShort(fmtWeight(s.best1Rm, maxDecimals: 1), u)} · '
-                '${loc.metricVolume}: ${fmtWeight(s.volume, maxDecimals: 0)} $u',
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 80,
+            child: BarChart(
+              BarChartData(
+                maxY: maxY,
+                alignment: BarChartAlignment.spaceBetween,
+                gridData: const FlGridData(show: false),
+                borderData: FlBorderData(show: false),
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => const Color(0xFF2A303B),
+                    getTooltipItem: (g, _, rod, _) => BarTooltipItem(
+                      '${rod.toY.toInt()}',
+                      const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                ),
+                titlesData: const FlTitlesData(
+                  leftTitles: AxisTitles(),
+                  rightTitles: AxisTitles(),
+                  topTitles: AxisTitles(),
+                  bottomTitles: AxisTitles(),
+                ),
+                barGroups: [
+                  for (var i = 0; i < 12; i++)
+                    BarChartGroupData(
+                      x: i,
+                      barRods: [
+                        BarChartRodData(
+                          toY: counts[i] == 0 ? 0.08 : counts[i].toDouble(),
+                          width: 14,
+                          borderRadius: BorderRadius.circular(5),
+                          color: counts[i] == 0
+                              ? Ds.hairline(context)
+                              : (i == 11 ? AppColors.blue : AppColors.blue.withValues(alpha: 0.45)),
+                        ),
+                      ],
+                    ),
+                ],
               ),
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(loc.chartWeeksAgo(11), style: Ds.secondary(context).copyWith(fontSize: 12)),
+              const Spacer(),
+              Text(loc.chartThisWeek, style: Ds.secondary(context).copyWith(fontSize: 12)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BigNumber extends StatelessWidget {
+  const _BigNumber({
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+
+  final String value;
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(value, style: Ds.display(context).copyWith(fontSize: 40)),
+            const SizedBox(width: 6),
+            Icon(icon, color: color, size: 26),
+          ],
+        ),
+        Text(label, style: Ds.secondary(context)),
+      ],
+    );
+  }
+}
+
+/// Gráfico de un ejercicio: número grande arriba, cambio y línea con fechas.
+class _LiftChartCard extends StatelessWidget {
+  const _LiftChartCard({
+    required this.history,
+    required this.unit,
+    required this.metric,
+    required this.onMetric,
+  });
+
+  final List<LiftSession> history;
+  final WeightUnit unit;
+  final _Metric metric;
+  final ValueChanged<_Metric> onMetric;
+
+  double _v(LiftSession s) => metric == _Metric.estimated ? s.best1Rm : s.heaviest;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
+    final values = [for (final s in history) _v(s)];
+    final best = values.isEmpty ? 0.0 : values.reduce(math.max);
+    final change = values.length < 2 ? null : values.last - values.first;
+
+    return DsBlock(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      metric == _Metric.estimated ? loc.metricE1rmLong : loc.metricHeaviestLong,
+                      style: Ds.secondary(context),
+                    ),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: fmtWeight(best, maxDecimals: 1),
+                            style: Ds.display(context),
+                          ),
+                          TextSpan(text: ' ${unit.label}', style: Ds.secondary(context)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (change != null)
+                DsPill(
+                  '${change >= 0 ? '+' : ''}${fmtWeight(change, maxDecimals: 1)} ${unit.label}',
+                  color: change >= 0 ? Ds.done : const Color(0xFFE5484D),
+                ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          if (history.length < 2)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 28),
+              child: Center(
+                child: Text(
+                  loc.chartNeedsMore,
+                  textAlign: TextAlign.center,
+                  style: Ds.secondary(context),
+                ),
+              ),
+            )
+          else
+            SizedBox(height: 200, child: _line(context, values, locale)),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _MetricChip(
+                label: loc.metricE1rm,
+                on: metric == _Metric.estimated,
+                onTap: () => onMetric(_Metric.estimated),
+              ),
+              const SizedBox(width: 8),
+              _MetricChip(
+                label: loc.metricHeaviest,
+                on: metric == _Metric.heaviest,
+                onTap: () => onMetric(_Metric.heaviest),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _line(BuildContext context, List<double> values, String locale) {
+    final lo = values.reduce(math.min);
+    final hi = values.reduce(math.max);
+    final pad = math.max((hi - lo) * 0.25, unit == WeightUnit.kg ? 2.5 : 5);
+    final minY = (lo - pad).floorToDouble();
+    final maxY = (hi + pad).ceilToDouble();
+    final step = ((maxY - minY) / 3).ceilToDouble();
+    final n = values.length;
+    final labelEvery = math.max(1, (n / 3).ceil());
+    final dateFmt = DateFormat.MMMd(locale);
+    final gridColor = Ds.hairline(context);
+
+    return LineChart(
+      LineChartData(
+        minY: minY,
+        maxY: maxY,
+        minX: 0,
+        maxX: (n - 1).toDouble(),
+        gridData: FlGridData(
+          drawVerticalLine: false,
+          horizontalInterval: step,
+          getDrawingHorizontalLine: (_) => FlLine(color: gridColor, strokeWidth: 1),
+        ),
+        borderData: FlBorderData(show: false),
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(),
+          rightTitles: const AxisTitles(),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              interval: step,
+              getTitlesWidget: (v, meta) {
+                if (v == meta.max || v == meta.min) return const SizedBox();
+                return SideTitleWidget(
+                  meta: meta,
+                  child: Text(
+                    fmtWeight(v, maxDecimals: 0),
+                    style: Ds.secondary(context).copyWith(fontSize: 12, fontFeatures: Ds.tabular),
+                  ),
+                );
+              },
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 28,
+              interval: 1,
+              getTitlesWidget: (v, meta) {
+                final i = v.toInt();
+                if (v != i || (i % labelEvery != 0 && i != n - 1)) return const SizedBox();
+                if (i != n - 1 && n - 1 - i < labelEvery) return const SizedBox();
+                return SideTitleWidget(
+                  meta: meta,
+                  child: Text(
+                    dateFmt.format(history[i].date.toLocal()),
+                    style: Ds.secondary(context).copyWith(fontSize: 12),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        lineTouchData: LineTouchData(
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipColor: (_) => const Color(0xFF2A303B),
+            getTooltipItems: (spots) => [
+              for (final s in spots)
+                LineTooltipItem(
+                  '${fmtWeight(s.y, maxDecimals: 1)} ${unit.label}\n',
+                  const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                  children: [
+                    TextSpan(
+                      text: dateFmt.format(history[s.x.toInt()].date.toLocal()),
+                      style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+        lineBarsData: [
+          LineChartBarData(
+            spots: [for (var i = 0; i < n; i++) FlSpot(i.toDouble(), values[i])],
+            isCurved: true,
+            preventCurveOverShooting: true,
+            color: AppColors.blue,
+            barWidth: 3,
+            dotData: FlDotData(
+              getDotPainter: (spot, _, _, i) => FlDotCirclePainter(
+                radius: i == n - 1 ? 5 : 3,
+                color: AppColors.blue,
+                strokeWidth: i == n - 1 ? 3 : 0,
+                strokeColor: DsBlock.color(context),
+              ),
+            ),
+            belowBarData: BarAreaData(
+              show: true,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.blue.withValues(alpha: 0.25),
+                  AppColors.blue.withValues(alpha: 0),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetricChip extends StatelessWidget {
+  const _MetricChip({required this.label, required this.on, required this.onTap});
+
+  final String label;
+  final bool on;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: on ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: on ? Colors.transparent : Ds.hairline(context)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+            color: on ? DsBlock.color(context) : Ds.muted(context),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecordRow extends StatelessWidget {
+  const _RecordRow({
+    required this.lift,
+    required this.history,
+    required this.unit,
+    required this.last,
+  });
+
+  final String lift;
+  final List<LiftSession> history;
+  final WeightUnit unit;
+  final bool last;
+
+  @override
+  Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
+    final best = history.reduce((a, b) => b.heaviest > a.heaviest ? b : a);
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        border: last ? null : Border(bottom: BorderSide(color: Ds.hairline(context))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  liftDisplayName(lift),
+                  style: Ds.body(context).copyWith(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  DateFormat.yMMMd(locale).format(best.date.toLocal()),
+                  style: Ds.secondary(context),
+                ),
+              ],
+            ),
+          ),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: fmtWeight(best.heaviest),
+                  style: Ds.title(context).copyWith(fontFeatures: Ds.tabular),
+                ),
+                TextSpan(text: ' ${unit.label}', style: Ds.secondary(context)),
+              ],
+            ),
+          ),
         ],
       ),
     );

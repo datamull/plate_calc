@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plate_calc/main.dart';
+import 'package:plate_calc/models/training.dart';
+import 'package:plate_calc/models/weight_unit.dart';
 import 'package:plate_calc/services/app_storage.dart';
+import 'package:plate_calc/services/training_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Las pantallas nuevas no se desbordan en un iPhone chico (375 × 667).
-const _oly = {
-  'es': 'Halterofilia · 4 semanas',
-  'en': 'Weightlifting · 4 weeks',
-  'fr': 'Haltérophilie · 4 semaines',
-};
-
+/// Las pantallas de entrenamiento no se desbordan en un iPhone chico
+/// (375 × 667) en ningún idioma ni estilo.
 void main() {
   for (final lang in ['es', 'en', 'fr']) {
-    testWidgets('pantallas de entrenamiento en teléfono chico ($lang)', (tester) async {
+    testWidgets('entrenar en teléfono chico ($lang)', (tester) async {
       tester.view.physicalSize = const Size(750, 1334);
       tester.view.devicePixelRatio = 2;
       addTearDown(tester.view.reset);
@@ -21,40 +19,46 @@ void main() {
         'app_locale': lang,
         'lifts_units': 'lb',
         'rm_Snatch_lb': 225.0,
+        'rm_Clean_lb': 275.0,
+        'rm_Front Squat_lb': 285.0,
         'rm_Back Squat_lb': 315.0,
+        'training_styles': '["crossfit","haltero","gym"]',
       });
       final storage = await AppStorage.load();
+      final store = TrainingStore(storage);
+      for (var i = 0; i < 4; i++) {
+        await store.saveWorkout(
+          Workout(
+            id: 'w$i',
+            date: DateTime.now().subtract(Duration(days: i * 5)),
+            unit: WeightUnit.lb,
+            title: 'Session $i',
+            exercises: [
+              ExerciseLog(
+                lift: 'Snatch',
+                sets: [WorkSet(weight: 150.0 + i * 5, reps: 2, done: true)],
+              ),
+            ],
+          ),
+        );
+      }
       await tester.pumpWidget(PlateCalcApp(storage: storage));
       await tester.pumpAndSettle();
 
-      // Las 4 pestañas (por ícono, sirve en cualquier idioma).
-      for (final icon in [
-        Icons.insights_outlined,
-        Icons.groups_outlined,
-        Icons.calculate_outlined,
-        Icons.today_outlined,
-      ]) {
-        await tester.tap(find.byIcon(icon));
+      await tester.tap(find.byIcon(Icons.fitness_center_outlined));
+      await tester.pumpAndSettle();
+      for (final chip in find.byType(ChoiceChip).evaluate().toList()) {
+        await tester.tap(find.byWidget(chip.widget));
         await tester.pumpAndSettle();
       }
-
-      // Programa → pizarra en Hoy → empezar → pantalla de registro.
-      final tpl = find.text(_oly[lang]!);
-      await tester.scrollUntilVisible(tpl, 200, scrollable: find.byType(Scrollable).first);
-      await tester.ensureVisible(tpl);
-      await tester.pumpAndSettle();
-      await tester.tap(tpl);
-      await tester.pumpAndSettle();
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
-      final start = find.byIcon(Icons.play_arrow_rounded);
-      await tester.ensureVisible(start);
-      await tester.pumpAndSettle();
-      await tester.tap(start);
-      await tester.pumpAndSettle();
-      expect(find.byType(TextFormField), findsWidgets);
-      await tester.tap(find.byIcon(Icons.radio_button_unchecked).first);
-      await tester.pump();
+      final segments = find.descendant(
+        of: find.byType(GestureDetector),
+        matching: find.byType(AnimatedContainer),
+      );
+      for (final i in [1, 2, 0]) {
+        await tester.tap(segments.at(i));
+        await tester.pumpAndSettle();
+      }
       expect(tester.takeException(), isNull);
     });
   }

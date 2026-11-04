@@ -622,5 +622,48 @@
   "seeAll": "See all",
   "colSet": "SET",
   "colPrevious": "PREVIOUS",
-  "workoutFinishShort": "Finish"
+  "workoutFinishShort": "Finish",
+  "styleCrossfit": "CrossFit",
+  "styleHaltero": "Weightlifting",
+  "styleGym": "Gym",
+  "styleCrossfitDesc": "Daily WOD: AMRAP, EMOM, For Time",
+  "styleHalteroDesc": "Snatch, clean & jerk and squats by % of 1RM",
+  "styleGymDesc": "Push / Pull / Legs",
+  "stylesTitle": "What do you train?",
+  "stylesFirstTitle": "A workout every day",
+  "stylesFirstBody": "Choose what you train and you will get a new session every day, with your weights from your 1RM.",
+  "stylesChoose": "Choose",
+  "todayStart": "Start",
+  "todayDone": "Done",
+  "crossfitOfficialWod": "CrossFit.com official WOD",
+  "wodGo": "Start",
+  "wodPause": "Pause",
+  "wodContinue": "Continue",
+  "wodRound": "Round",
+  "wodScoreTitle": "Your result",
+  "wodScoreTime": "Time (mm:ss)",
+  "wodScoreRounds": "Rounds",
+  "wodScoreReps": "+ reps",
+  "wodSaved": "Saved: {score}",
+  "@wodSaved": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "wodResultsTitle": "WOD results",
+  "progressEmpty": "Finish your first workout to see your progress here.",
+  "statThisWeek": "this week",
+  "chartThisWeek": "This week",
+  "chartWeeksAgo": "{n} wk ago",
+  "@chartWeeksAgo": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "metricE1rmLong": "Best estimated 1RM",
+  "metricHeaviestLong": "Heaviest lift"
 }

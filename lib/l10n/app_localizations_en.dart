@@ -908,4 +908,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workoutFinishShort => 'Finish';
+
+  @override
+  String get styleCrossfit => 'CrossFit';
+
+  @override
+  String get styleHaltero => 'Weightlifting';
+
+  @override
+  String get styleGym => 'Gym';
+
+  @override
+  String get styleCrossfitDesc => 'Daily WOD: AMRAP, EMOM, For Time';
+
+  @override
+  String get styleHalteroDesc => 'Snatch, clean & jerk and squats by % of 1RM';
+
+  @override
+  String get styleGymDesc => 'Push / Pull / Legs';
+
+  @override
+  String get stylesTitle => 'What do you train?';
+
+  @override
+  String get stylesFirstTitle => 'A workout every day';
+
+  @override
+  String get stylesFirstBody =>
+      'Choose what you train and you will get a new session every day, with your weights from your 1RM.';
+
+  @override
+  String get stylesChoose => 'Choose';
+
+  @override
+  String get todayStart => 'Start';
+
+  @override
+  String get todayDone => 'Done';
+
+  @override
+  String get crossfitOfficialWod => 'CrossFit.com official WOD';
+
+  @override
+  String get wodGo => 'Start';
+
+  @override
+  String get wodPause => 'Pause';
+
+  @override
+  String get wodContinue => 'Continue';
+
+  @override
+  String get wodRound => 'Round';
+
+  @override
+  String get wodScoreTitle => 'Your result';
+
+  @override
+  String get wodScoreTime => 'Time (mm:ss)';
+
+  @override
+  String get wodScoreRounds => 'Rounds';
+
+  @override
+  String get wodScoreReps => '+ reps';
+
+  @override
+  String wodSaved(String score) {
+    return 'Saved: $score';
+  }
+
+  @override
+  String get wodResultsTitle => 'WOD results';
+
+  @override
+  String get progressEmpty => 'Finish your first workout to see your progress here.';
+
+  @override
+  String get statThisWeek => 'this week';
+
+  @override
+  String get chartThisWeek => 'This week';
+
+  @override
+  String chartWeeksAgo(int n) {
+    return '$n wk ago';
+  }
+
+  @override
+  String get metricE1rmLong => 'Best estimated 1RM';
+
+  @override
+  String get metricHeaviestLong => 'Heaviest lift';
 }

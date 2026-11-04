@@ -5,6 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../../services/app_storage.dart';
 import '../../services/lift_collection.dart';
 import '../theme/app_theme.dart';
+import '../widgets/ds.dart';
 import '../widgets/lift_icon.dart';
 import 'rm_list_screen.dart';
 
@@ -20,41 +21,43 @@ class CategoryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Plate Calc'),
-        actions: [
-          IconButton(
-            tooltip: loc.settingsTooltip,
-            icon: const Icon(Icons.settings),
-            onPressed: onOpenSettings,
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _BigCard(
-            title: loc.categoryHaltero,
-            subtitle: loc.categoryHalteroSubtitle,
-            pose: LiftPose.snatch,
-            accent: AppColors.blue,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => RmListScreen(storage: storage, collection: HalteroLifts(storage)),
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 24),
+          children: [
+            DsLargeHeader(
+              title: 'Plate Calc',
+              trailing: IconButton(
+                tooltip: loc.settingsTooltip,
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: onOpenSettings,
               ),
             ),
-          ),
-          const SizedBox(height: 14),
-          _BigCard(
-            title: loc.categoryGym,
-            subtitle: loc.categoryGymSubtitle,
-            pose: LiftPose.bench,
-            accent: AppColors.purple,
-            onTap: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute<void>(builder: (_) => GymGroupsScreen(storage: storage))),
-          ),
-        ],
+            const SizedBox(height: 12),
+            _BigCard(
+              title: loc.categoryHaltero,
+              subtitle: loc.categoryHalteroSubtitle,
+              pose: LiftPose.snatch,
+              accent: AppColors.blue,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => RmListScreen(storage: storage, collection: HalteroLifts(storage)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            _BigCard(
+              title: loc.categoryGym,
+              subtitle: loc.categoryGymSubtitle,
+              pose: LiftPose.bench,
+              accent: AppColors.purple,
+              onTap: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute<void>(builder: (_) => GymGroupsScreen(storage: storage))),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -162,48 +165,42 @@ class _BigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: accent.withValues(alpha: 0.5)),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [accent.withValues(alpha: 0.18), Colors.transparent],
-            ),
-          ),
-          child: Row(
-            children: [
-              LiftIcon(liftName: title, pose: pose, size: 96),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Material(
+        color: DsBlock.color(context),
+        borderRadius: BorderRadius.circular(24),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 22, 16, 22),
+            child: Row(
+              children: [
+                LiftIcon(liftName: title, pose: pose, size: 88),
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: accent,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      Text(title, style: Ds.title(context).copyWith(fontSize: 24)),
+                      const SizedBox(height: 4),
+                      Text(subtitle, style: Ds.secondary(context)),
+                    ],
+                  ),
                 ),
-              ),
-              Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
-            ],
+                Icon(Icons.chevron_right, color: Ds.muted(context)),
+              ],
+            ),
           ),
         ),
       ),

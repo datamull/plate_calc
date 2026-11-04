@@ -237,3 +237,120 @@ class DsPrimaryButton extends StatelessWidget {
     );
   }
 }
+
+/// Bloque redondeado sobre el fondo (estilo "inset grouped" de iOS).
+class DsBlock extends StatelessWidget {
+  const DsBlock({super.key, required this.child, this.padding = const EdgeInsets.all(20)});
+
+  final Widget child;
+  final EdgeInsets padding;
+
+  static Color color(BuildContext c) =>
+      Theme.of(c).brightness == Brightness.dark ? const Color(0xFF171B23) : Colors.white;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: padding,
+      decoration: BoxDecoration(color: color(context), borderRadius: BorderRadius.circular(24)),
+      child: child,
+    );
+  }
+}
+
+/// Selector segmentado tipo píldora (Hoy · Historial · Progreso).
+class DsSegmented extends StatelessWidget {
+  const DsSegmented({
+    super.key,
+    required this.labels,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final List<String> labels;
+  final int selected;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xFF171B23) : const Color(0xFFE4E7EE),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          for (var i = 0; i < labels.length; i++)
+            Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => onChanged(i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: i == selected
+                        ? (dark ? const Color(0xFF2A303B) : Colors.white)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: i == selected && !dark
+                        ? const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Text(
+                    labels[i],
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: i == selected ? FontWeight.w700 : FontWeight.w500,
+                      color: i == selected
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Ds.muted(context),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Etiqueta pequeña con fondo de color suave.
+class DsPill extends StatelessWidget {
+  const DsPill(this.text, {super.key, this.color = AppColors.blue});
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}

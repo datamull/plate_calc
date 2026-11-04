@@ -2,6 +2,12 @@
 
 ## 3.0.0 (beta en TestFlight)
 
+- La app abre en la calculadora. Barra inferior: Discos | Entrenar. Box/coach desactivado por ahora.
+- Entrenar: Hoy · Historial · Progreso.
+- Entrenamiento del día de una biblioteca propia (CrossFit, Halterofilia, Gym), uno nuevo cada día, con tus pesos según tu RM. Cada usuario elige qué estilos ver.
+- WOD con reloj (AMRAP, EMOM, For Time) y registro del resultado; enlace al WOD oficial de CrossFit.com.
+- Progreso rehecho: racha y barras de 12 semanas, gráfico por ejercicio con fechas y valores al tocar, récords y resultados de WOD.
+
 - Rediseño (referencias: Strong, Hevy y SugarWOD): barra inferior Hoy · Progreso · Box | Discos, con la calculadora separada.
 - Hoy: pizarra con la próxima sesión del plan y los pesos calculados con tu RM, semana con días entrenados, planes y recientes.
 - Registro tipo tabla (SERIE · ANTERIOR · KG · REPS · RPE): columna con lo que hiciste la última vez, fila verde al marcar la serie y botón Terminar arriba.

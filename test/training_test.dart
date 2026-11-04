@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plate_calc/data/daily_library.dart';
 import 'package:plate_calc/main.dart';
 import 'package:plate_calc/models/training.dart';
 import 'package:plate_calc/models/weight_unit.dart';
@@ -131,58 +132,49 @@ void main() {
     expect(store.athletes, ['Seba']);
   });
 
-  testWidgets('registrar un entrenamiento libre y verlo en Progreso', (tester) async {
-    SharedPreferences.setMockInitialValues({'app_locale': 'es', 'lifts_units': 'kg'});
-    final storage = await AppStorage.load();
-    await tester.pumpWidget(PlateCalcApp(storage: storage));
-    await tester.pumpAndSettle();
-
-    // La app abre en Hoy; sin plan activo ofrece entrenamiento libre.
-    await tester.tap(find.text('Empezar entrenamiento'));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text('Agregar ejercicio'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Snatch'));
-    await tester.pumpAndSettle();
-
-    final fields = find.byType(TextFormField);
-    await tester.enterText(fields.at(0), '60'); // peso
-    await tester.enterText(fields.at(1), '3'); // reps
-    await tester.tap(find.byTooltip('Serie hecha'));
-    await tester.pump();
-    expect(find.textContaining('Descanso'), findsOneWidget);
-
-    await tester.scrollUntilVisible(
-      find.text('Terminar entrenamiento'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(find.text('Terminar entrenamiento'));
-    await tester.pumpAndSettle();
-    expect(find.text('Entrenamiento guardado 💪'), findsOneWidget);
-    await tester.tap(find.text('OK'));
-    await tester.pumpAndSettle();
-
-    // Aparece en Recientes de Hoy con el ejercicio hecho.
-    await tester.scrollUntilVisible(
-      find.text('Snatch'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    expect(find.text('Snatch'), findsOneWidget);
-
-    await tester.tap(find.text('Progreso'));
-    await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('Máx. 60 kg · RMe 66 kg'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    expect(find.text('Máx. 60 kg · RMe 66 kg'), findsOneWidget);
+  test('entrenamiento del día: rota por fecha y es igual para todos ese día', () {
+    final d1 = dailyFor(TrainingStyle.crossfit, DateTime(2026, 11, 4, 8));
+    final d1b = dailyFor(TrainingStyle.crossfit, DateTime(2026, 11, 4, 22));
+    final d2 = dailyFor(TrainingStyle.crossfit, DateTime(2026, 11, 5));
+    expect(d1.id, d1b.id);
+    expect(d1.id, isNot(d2.id));
+    // Cubre todo el año sin errores y con fechas antes del inicio.
+    for (var i = -30; i < 400; i++) {
+      for (final s in TrainingStyle.values) {
+        dailyFor(s, DateTime(2026, 1, 1).add(Duration(days: i)));
+      }
+    }
   });
 
-  testWidgets('programa por porcentaje muestra los pesos con el RM', (tester) async {
+  test('pesos del día salen del RM del movimiento base', () async {
+    final store = await makeStore({'rm_Front Squat_kg': 100.0, 'rm_Snatch_kg': 80.0});
+    const thruster = DailyItem('Thruster', reps: '21-15-9', percent: 45, rmOf: 'Front Squat');
+    expect(store.dailyWeight(thruster, WeightUnit.kg), 45);
+    expect(store.dailyWeight(const DailyItem('Pull-Up', reps: '21'), WeightUnit.kg), isNull);
+
+    final hs = halteroLibrary.first;
+    final w = store.startDaily(hs, WeightUnit.kg);
+    expect(w.style, 'haltero');
+    expect(w.exercises.first.lift, 'Snatch');
+    expect(w.exercises.first.sets.length, 5);
+    expect(w.exercises.first.sets.first.weight, 56); // 70% de 80
+    expect(w.exercises.first.sets.first.reps, 2);
+
+    // "5-5-3-3-1-1" se convierte en 6 series.
+    final levis = crossfitLibrary.firstWhere((d) => d.id == 'cf_levis');
+    final lw = store.startDaily(levis, WeightUnit.kg);
+    expect(lw.exercises.first.sets.map((s) => s.reps), [5, 5, 3, 3, 1, 1]);
+  });
+
+  test('guardar resultado de WOD marca el día como hecho', () async {
+    final store = await makeStore();
+    final wod = dailyFor(TrainingStyle.crossfit, DateTime.now());
+    expect(store.dailyDone(wod, DateTime.now()), isNull);
+    await store.saveWodResult(wod, WeightUnit.kg, score: '12:45');
+    expect(store.dailyDone(wod, DateTime.now())!.score, '12:45');
+  });
+
+  testWidgets('abre en la calculadora; Entrenar pide estilos y muestra el día', (tester) async {
     SharedPreferences.setMockInitialValues({
       'app_locale': 'es',
       'lifts_units': 'kg',
@@ -192,77 +184,100 @@ void main() {
     await tester.pumpWidget(PlateCalcApp(storage: storage));
     await tester.pumpAndSettle();
 
+    // Lo central es la calculadora.
+    expect(find.text('Haltero'), findsOneWidget);
+
+    await tester.tap(find.text('Entrenar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Un entrenamiento cada día'), findsOneWidget);
+
+    await tester.tap(find.text('Elegir'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Halterofilia'));
+    await tester.pump();
+    await tester.tap(find.text('Listo'));
+    await tester.pumpAndSettle();
+
+    final hs = dailyFor(TrainingStyle.haltero, DateTime.now());
+    expect(find.text(hs.name), findsOneWidget);
+    final snatch = hs.items.where((i) => i.lift == 'Snatch').firstOrNull;
+    if (snatch != null) {
+      final kg = (100 * snatch.percent! / 100).round();
+      expect(find.text('$kg kg'), findsWidgets);
+    }
+
+    // Empezar → registrar una serie → terminar → queda "Hecho".
+    await tester.tap(find.text('Empezar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Serie hecha').first);
+    await tester.pump();
+    await tester.tap(find.text('Terminar').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hecho'), findsOneWidget);
+
+    // Historial y Progreso lo muestran.
+    await tester.tap(find.text('Historial'));
+    await tester.pumpAndSettle();
+    expect(find.text(hs.name), findsOneWidget);
+    await tester.tap(find.text('Progreso'));
+    await tester.pumpAndSettle();
+    expect(find.text('semanas seguidas'), findsOneWidget);
     await tester.scrollUntilVisible(
-      find.text('Halterofilia · 4 semanas'),
+      find.text('Récords personales'.toUpperCase()),
       200,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: find
+          .byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down)
+          .last,
     );
-    await tester.ensureVisible(find.text('Halterofilia · 4 semanas'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Halterofilia · 4 semanas'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Empezar: Semana 1 · Día A'), findsOneWidget);
-    expect(find.text('• Snatch 5×2 · 70% (70 kg)'), findsOneWidget);
-    expect(find.text('• Back Squat 5×3 · 75% (sin RM guardado)'), findsOneWidget);
-
-    // Al volver, Hoy muestra la pizarra con el peso calculado.
-    await tester.tap(find.byType(BackButton));
-    await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('Próxima sesión'.toUpperCase()),
-      -200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    expect(find.text('Semana 1 · Día A'), findsOneWidget);
-    expect(find.text('5 × 2 · 70%'), findsOneWidget);
-    expect(find.text('70 kg', findRichText: true), findsOneWidget);
+    expect(find.text('Récords personales'.toUpperCase()), findsOneWidget);
   });
 
-  testWidgets('pestaña Box abre y explica cómo funciona', (tester) async {
-    SharedPreferences.setMockInitialValues({'app_locale': 'es'});
+  testWidgets('WOD con reloj: terminar y anotar el resultado', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'app_locale': 'es',
+      'lifts_units': 'kg',
+      'training_styles': '["crossfit"]',
+    });
     final storage = await AppStorage.load();
     await tester.pumpWidget(PlateCalcApp(storage: storage));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Box'));
+    await tester.tap(find.text('Entrenar'));
     await tester.pumpAndSettle();
-    expect(find.text('Configura tu perfil de coach'), findsOneWidget);
-    expect(find.text('Crear plan o WOD'), findsOneWidget);
+
+    final wod = dailyFor(TrainingStyle.crossfit, DateTime.now());
+    expect(find.text(wod.name), findsOneWidget);
+    expect(find.text('WOD oficial de CrossFit.com'), findsOneWidget);
+    if (wod.format == WodFormat.sets) return; // día de cargas: se registra por series
+
+    await tester.tap(find.text('Empezar'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Terminar'));
+    await tester.pumpAndSettle();
+    final field = find.byType(TextField).first;
+    await tester.enterText(field, '7');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Hecho ·'), findsOneWidget);
   });
 
-  testWidgets('el teclado numérico se cierra con "Listo" y se puede cambiar de pestaña', (
-    tester,
-  ) async {
+  testWidgets('el teclado numérico se cierra con "Listo"', (tester) async {
     SharedPreferences.setMockInitialValues({'app_locale': 'es', 'lifts_units': 'kg'});
     final storage = await AppStorage.load();
     await tester.pumpWidget(PlateCalcApp(storage: storage));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Progreso'));
+    await tester.tap(find.text('Haltero'));
     await tester.pumpAndSettle();
-
-    // Pestaña vacía: explica para qué sirve.
-    expect(find.text('¿Para qué sirve esta pestaña?'), findsOneWidget);
-
-    await tester.scrollUntilVisible(
-      find.widgetWithText(TextField, 'Peso'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(find.widgetWithText(TextField, 'Peso'));
-    // Simula el teclado abierto (300 px).
+    await tester.tap(find.text('Snatch'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(TextField).first);
     tester.view.viewInsets = const FakeViewPadding(bottom: 900);
     addTearDown(tester.view.resetViewInsets);
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('keyboard-done')), findsOneWidget);
-
     await tester.tap(find.byKey(const ValueKey('keyboard-done')));
     await tester.pumpAndSettle();
     expect(FocusManager.instance.primaryFocus?.context?.widget is EditableText, isFalse);
-
-    tester.view.resetViewInsets();
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Hoy'));
-    await tester.pumpAndSettle();
-    expect(find.text('Empezar entrenamiento'), findsOneWidget);
   });
 }

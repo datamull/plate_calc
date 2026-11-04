@@ -140,7 +140,7 @@ void main() {
 
   testWidgets('ajustes: cambiar idioma y guardar inventario', (tester) async {
     await pumpApp(tester, {'app_locale': 'es'});
-    await tester.tap(find.byIcon(Icons.settings));
+    await tester.tap(find.byIcon(Icons.settings_outlined));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Inglés'));

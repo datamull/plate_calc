@@ -914,4 +914,96 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get workoutFinishShort => 'Terminer';
+
+  @override
+  String get styleCrossfit => 'CrossFit';
+
+  @override
+  String get styleHaltero => 'Haltérophilie';
+
+  @override
+  String get styleGym => 'Gym';
+
+  @override
+  String get styleCrossfitDesc => 'WOD du jour : AMRAP, EMOM, For Time';
+
+  @override
+  String get styleHalteroDesc => 'Arraché, épaulé-jeté et squats en % du 1RM';
+
+  @override
+  String get styleGymDesc => 'Push / Pull / Legs';
+
+  @override
+  String get stylesTitle => 'Qu’est-ce que tu entraînes ?';
+
+  @override
+  String get stylesFirstTitle => 'Un entraînement chaque jour';
+
+  @override
+  String get stylesFirstBody =>
+      'Choisis ce que tu entraînes et tu auras une séance chaque jour, avec tes charges selon ton 1RM.';
+
+  @override
+  String get stylesChoose => 'Choisir';
+
+  @override
+  String get todayStart => 'Commencer';
+
+  @override
+  String get todayDone => 'Fait';
+
+  @override
+  String get crossfitOfficialWod => 'WOD officiel de CrossFit.com';
+
+  @override
+  String get wodGo => 'Démarrer';
+
+  @override
+  String get wodPause => 'Pause';
+
+  @override
+  String get wodContinue => 'Reprendre';
+
+  @override
+  String get wodRound => 'Tour';
+
+  @override
+  String get wodScoreTitle => 'Ton résultat';
+
+  @override
+  String get wodScoreTime => 'Temps (mm:ss)';
+
+  @override
+  String get wodScoreRounds => 'Tours';
+
+  @override
+  String get wodScoreReps => '+ reps';
+
+  @override
+  String wodSaved(String score) {
+    return 'Enregistré : $score';
+  }
+
+  @override
+  String get wodResultsTitle => 'Résultats de WOD';
+
+  @override
+  String get progressEmpty => 'Termine ton premier entraînement pour voir ton progrès ici.';
+
+  @override
+  String get statThisWeek => 'cette semaine';
+
+  @override
+  String get chartThisWeek => 'Cette semaine';
+
+  @override
+  String chartWeeksAgo(int n) {
+    return 'Il y a $n sem';
+  }
+
+  @override
+  String get metricE1rmLong => 'Meilleur 1RM estimé';
+
+  @override
+  String get metricHeaviestLong => 'Charge maximale';
 }

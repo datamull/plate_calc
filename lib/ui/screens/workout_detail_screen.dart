@@ -6,7 +6,6 @@ import '../../models/training.dart';
 import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../widgets/training_widgets.dart';
-import 'workout_screen.dart';
 
 /// Texto de una serie: "80 kg × 3 @8".
 String setText(WorkSet s, String unit) =>
@@ -79,11 +78,6 @@ class WorkoutDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(w.title.isEmpty ? loc.workoutFree : w.title),
         actions: [
-          IconButton(
-            tooltip: loc.sendToCoach,
-            icon: const Icon(Icons.send),
-            onPressed: () => shareResultWithCoach(context, store, w),
-          ),
           IconButton(
             tooltip: loc.delete,
             icon: const Icon(Icons.delete_outline),

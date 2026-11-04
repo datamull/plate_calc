@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io' show gzip;
 import 'dart:math' as math;
 
+import '../data/daily_library.dart';
 import '../data/defaults.dart';
 import '../models/training.dart';
 import '../models/weight_unit.dart';
@@ -24,6 +25,7 @@ class TrainingStore {
   static const _kCoachBox = 'training_coach_box';
   static const _kAthleteName = 'training_athlete_name';
   static const _kRest = 'training_rest';
+  static const _kStyles = 'training_styles';
 
   // ── Entrenamientos ────────────────────────────────────────────────────────
   /// Del más reciente al más antiguo.
@@ -53,6 +55,93 @@ class TrainingStore {
 
   int get restSeconds => storage.readInt(_kRest) ?? 90;
   Future<void> setRestSeconds(int s) => storage.writeInt(_kRest, s);
+
+  // ── Estilos y entrenamiento del día ─────────────────────────────────────────
+  /// Estilos que el usuario eligió ver. Vacío = aún no eligió.
+  List<TrainingStyle> get styles {
+    final raw = storage.readJson(_kStyles);
+    if (raw is! List) return [];
+    return raw.map((e) => TrainingStyle.parse('$e')).whereType<TrainingStyle>().toList();
+  }
+
+  Future<void> setStyles(List<TrainingStyle> v) => storage.writeJson(_kStyles, [
+    for (final s in TrainingStyle.values)
+      if (v.contains(s)) s.name,
+  ]);
+
+  /// Tu peso para un movimiento del día (% de tu RM), o null sin RM.
+  double? dailyWeight(DailyItem item, WeightUnit unit) {
+    if (item.percent == null) return null;
+    final rm = storage.lastRm(item.rmLift, unit);
+    if (rm == null || rm <= 0) return null;
+    return roundLoad(rm * item.percent! / 100, unit);
+  }
+
+  static String dailyKey(DailyWorkout d, DateTime day) =>
+      'daily_${d.id}_${day.year}${day.month.toString().padLeft(2, '0')}${day.day.toString().padLeft(2, '0')}';
+
+  /// El entrenamiento guardado para ese día y WOD, si ya se hizo.
+  Workout? dailyDone(DailyWorkout d, DateTime day) {
+    final key = dailyKey(d, day);
+    return workouts.where((w) => w.planId == key).firstOrNull;
+  }
+
+  /// Entrenamiento de series (halterofilia, gym o WOD de cargas) listo para
+  /// registrar, con los pesos calculados.
+  Workout startDaily(DailyWorkout d, WeightUnit unit, {DateTime? day}) {
+    final today = day ?? DateTime.now();
+    return Workout(
+      id: newId(),
+      date: DateTime.now(),
+      unit: unit,
+      title: d.name,
+      style: d.style.name,
+      planId: dailyKey(d, today),
+      exercises: [
+        for (final item in d.items)
+          ExerciseLog(
+            lift: item.lift,
+            percent: item.percent,
+            sets: [
+              for (var i = 0; i < (item.sets ?? _setsFromReps(item.reps).length); i++)
+                WorkSet(
+                  reps: item.repsPerSet ?? _setsFromReps(item.reps)[i],
+                  weight: dailyWeight(item, unit) ?? 0,
+                ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  /// "5-5-3-3-1" → [5, 5, 3, 3, 1].
+  static List<int> _setsFromReps(String reps) {
+    final parts = reps.split('-').map((p) => int.tryParse(p.trim())).whereType<int>().toList();
+    return parts.isEmpty ? [1] : parts;
+  }
+
+  /// Guarda el resultado de un WOD (tiempo o rondas).
+  Future<Workout> saveWodResult(
+    DailyWorkout d,
+    WeightUnit unit, {
+    required String score,
+    int durationSec = 0,
+    String notes = '',
+  }) async {
+    final w = Workout(
+      id: newId(),
+      date: DateTime.now(),
+      unit: unit,
+      title: d.name,
+      style: d.style.name,
+      planId: dailyKey(d, DateTime.now()),
+      score: score,
+      notes: notes,
+      durationSec: durationSec,
+    );
+    await saveWorkout(w);
+    return w;
+  }
 
   // ── Planes ────────────────────────────────────────────────────────────────
   List<Plan> get plans {

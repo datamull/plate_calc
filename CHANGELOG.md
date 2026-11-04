@@ -2,6 +2,9 @@
 
 ## 3.0.0 (beta en TestFlight)
 
+- Botón "Otro" para cambiar el entrenamiento del día por otro del mismo estilo.
+- Foto de la pizarra: se lee el texto en el teléfono (ML Kit, sin internet), se reconocen formato, repeticiones, movimientos y pesos, se revisa y se empieza. Requiere iOS 15.5 o más.
+
 - La app abre en la calculadora. Barra inferior: Discos | Entrenar. Box/coach desactivado por ahora.
 - Entrenar: Hoy · Historial · Progreso.
 - Entrenamiento del día de una biblioteca propia (CrossFit, Halterofilia, Gym), uno nuevo cada día, con tus pesos según tu RM. Cada usuario elige qué estilos ver.

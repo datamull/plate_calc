@@ -665,5 +665,16 @@
     }
   },
   "metricE1rmLong": "Best estimated 1RM",
-  "metricHeaviestLong": "Heaviest lift"
+  "metricHeaviestLong": "Heaviest lift",
+  "todayOther": "Other",
+  "scanButton": "Photo of the whiteboard",
+  "scanCamera": "Take photo",
+  "scanGallery": "Choose from photos",
+  "scanReading": "Reading the whiteboard…",
+  "scanNothing": "No exercises found. Try again with more light and the whole board in the photo.",
+  "scanPermission": "Cannot open the camera. Allow access for Plate Calc in Settings.",
+  "scanTitle": "Whiteboard",
+  "scanDefaultName": "Whiteboard WOD",
+  "scanCheck": "Check it before you start: change the format or remove anything misread.",
+  "scanRetake": "Take another photo"
 }

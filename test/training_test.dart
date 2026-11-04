@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plate_calc/data/daily_library.dart';
+import 'package:plate_calc/l10n/app_localizations.dart';
 import 'package:plate_calc/main.dart';
+import 'package:plate_calc/services/board_parser.dart';
+import 'package:plate_calc/ui/screens/board_scan.dart';
 import 'package:plate_calc/models/training.dart';
 import 'package:plate_calc/models/weight_unit.dart';
 import 'package:plate_calc/services/app_storage.dart';
@@ -248,7 +251,21 @@ void main() {
 
     final wod = dailyFor(TrainingStyle.crossfit, DateTime.now());
     expect(find.text(wod.name), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('WOD oficial de CrossFit.com'),
+      200,
+      scrollable: find
+          .byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down)
+          .last,
+    );
     expect(find.text('WOD oficial de CrossFit.com'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Empezar'),
+      -200,
+      scrollable: find
+          .byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down)
+          .last,
+    );
     if (wod.format == WodFormat.sets) return; // día de cargas: se registra por series
 
     await tester.tap(find.text('Empezar'));
@@ -279,5 +296,60 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('keyboard-done')));
     await tester.pumpAndSettle();
     expect(FocusManager.instance.primaryFocus?.context?.widget is EditableText, isFalse);
+  });
+
+  testWidgets('botón Otro cambia el entrenamiento del día', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'app_locale': 'es',
+      'lifts_units': 'kg',
+      'training_styles': '["crossfit"]',
+    });
+    final storage = await AppStorage.load();
+    await tester.pumpWidget(PlateCalcApp(storage: storage));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Entrenar'));
+    await tester.pumpAndSettle();
+
+    final today = DateTime.now();
+    final first = dailyFor(TrainingStyle.crossfit, today);
+    final second = dailyFor(TrainingStyle.crossfit, today, offset: 1);
+    expect(first.id, isNot(second.id));
+    expect(find.text(first.name), findsOneWidget);
+    await tester.tap(find.text('Otro'));
+    await tester.pumpAndSettle();
+    expect(find.text(second.name), findsOneWidget);
+    expect(find.text('Foto de la pizarra'), findsOneWidget);
+  });
+
+  testWidgets('revisión de la pizarra: corregir formato y empezar', (tester) async {
+    SharedPreferences.setMockInitialValues({'app_locale': 'es', 'lifts_units': 'kg'});
+    final storage = await AppStorage.load();
+    final store = TrainingStore(storage);
+    final wod = BoardParser.parse('Chipper\n21 Burpees\n15 Wall balls 9/6 kg', fallbackName: 'WOD');
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('es'),
+        home: ScanReviewScreen(store: store, wod: wod, imagePath: '/no/existe.jpg'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Burpee'), findsOneWidget);
+    expect(find.text('Wall Ball'), findsOneWidget);
+
+    // AMRAP sin minutos no deja empezar; con minutos sí.
+    await tester.tap(find.text('AMRAP'));
+    await tester.pumpAndSettle();
+    final start = find.widgetWithText(FilledButton, 'Empezar');
+    expect(tester.widget<FilledButton>(start).onPressed, isNull);
+    await tester.enterText(find.widgetWithText(TextField, 'Min'), '12');
+    await tester.pumpAndSettle();
+    expect(tester.widget<FilledButton>(start).onPressed, isNotNull);
+
+    // Quitar una fila mal leída.
+    await tester.tap(find.byTooltip('Eliminar').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Burpee'), findsNothing);
   });
 }

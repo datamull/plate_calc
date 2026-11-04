@@ -395,5 +395,16 @@
   "chartThisWeek": "Cette semaine",
   "chartWeeksAgo": "Il y a {n} sem",
   "metricE1rmLong": "Meilleur 1RM estimé",
-  "metricHeaviestLong": "Charge maximale"
+  "metricHeaviestLong": "Charge maximale",
+  "todayOther": "Autre",
+  "scanButton": "Photo du tableau",
+  "scanCamera": "Prendre une photo",
+  "scanGallery": "Choisir dans les photos",
+  "scanReading": "Lecture du tableau…",
+  "scanNothing": "Aucun exercice trouvé. Réessaie avec plus de lumière et tout le tableau dans la photo.",
+  "scanPermission": "Impossible d'ouvrir la caméra. Autorise l'accès pour Plate Calc dans Réglages.",
+  "scanTitle": "Tableau",
+  "scanDefaultName": "WOD du tableau",
+  "scanCheck": "Vérifie avant de commencer : change le format ou retire ce qui a été mal lu.",
+  "scanRetake": "Prendre une autre photo"
 }

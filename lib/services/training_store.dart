@@ -69,6 +69,16 @@ class TrainingStore {
       if (v.contains(s)) s.name,
   ]);
 
+  static String _dayStamp(DateTime d) =>
+      '${d.year}${d.month.toString().padLeft(2, '0')}${d.day.toString().padLeft(2, '0')}';
+
+  /// Cuántas veces se pidió "otro" entrenamiento hoy para ese estilo.
+  int dailyOffset(TrainingStyle style, DateTime day) =>
+      storage.readInt('training_offset_${style.name}_${_dayStamp(day)}') ?? 0;
+
+  Future<void> setDailyOffset(TrainingStyle style, DateTime day, int v) =>
+      storage.writeInt('training_offset_${style.name}_${_dayStamp(day)}', v);
+
   /// Tu peso para un movimiento del día (% de tu RM), o null sin RM.
   double? dailyWeight(DailyItem item, WeightUnit unit) {
     if (item.percent == null) return null;

@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Plate Calc reads a photo of a whiteboard to load the workout.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Plate Calc uses the camera to scan your coach's plan QR codes and your athletes' result QR codes.</string>
+	<string>Plate Calc uses the camera to photograph a whiteboard and read the workout.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

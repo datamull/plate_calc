@@ -1006,4 +1006,40 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get metricHeaviestLong => 'Charge maximale';
+
+  @override
+  String get todayOther => 'Autre';
+
+  @override
+  String get scanButton => 'Photo du tableau';
+
+  @override
+  String get scanCamera => 'Prendre une photo';
+
+  @override
+  String get scanGallery => 'Choisir dans les photos';
+
+  @override
+  String get scanReading => 'Lecture du tableau…';
+
+  @override
+  String get scanNothing =>
+      'Aucun exercice trouvé. Réessaie avec plus de lumière et tout le tableau dans la photo.';
+
+  @override
+  String get scanPermission =>
+      'Impossible d\'ouvrir la caméra. Autorise l\'accès pour Plate Calc dans Réglages.';
+
+  @override
+  String get scanTitle => 'Tableau';
+
+  @override
+  String get scanDefaultName => 'WOD du tableau';
+
+  @override
+  String get scanCheck =>
+      'Vérifie avant de commencer : change le format ou retire ce qui a été mal lu.';
+
+  @override
+  String get scanRetake => 'Prendre une autre photo';
 }

@@ -395,5 +395,16 @@
   "chartThisWeek": "Esta semana",
   "chartWeeksAgo": "Hace {n} sem",
   "metricE1rmLong": "Mejor RM estimado",
-  "metricHeaviestLong": "Peso máximo"
+  "metricHeaviestLong": "Peso máximo",
+  "todayOther": "Otro",
+  "scanButton": "Foto de la pizarra",
+  "scanCamera": "Tomar foto",
+  "scanGallery": "Elegir de las fotos",
+  "scanReading": "Leyendo la pizarra…",
+  "scanNothing": "No encontré ejercicios. Prueba de nuevo con más luz y la pizarra completa en la foto.",
+  "scanPermission": "No se puede abrir la cámara. Permite el acceso para Plate Calc en Ajustes.",
+  "scanTitle": "Pizarra",
+  "scanDefaultName": "WOD de la pizarra",
+  "scanCheck": "Revísalo antes de empezar: cambia el formato o quita lo que se haya leído mal.",
+  "scanRetake": "Tomar otra foto"
 }

@@ -117,13 +117,17 @@ int dayIndex(DateTime day) {
   ).difference(DateTime.utc(_epoch.year, _epoch.month, _epoch.day)).inDays;
 }
 
-DailyWorkout dailyFor(TrainingStyle style, DateTime day) {
+/// Entrenamiento del día. [offset] lo cambia por otro de la misma
+/// biblioteca (botón "Otro").
+DailyWorkout dailyFor(TrainingStyle style, DateTime day, {int offset = 0}) {
   final list = switch (style) {
     TrainingStyle.crossfit => crossfitLibrary,
     TrainingStyle.haltero => halteroLibrary,
     TrainingStyle.gym => gymLibrary,
   };
-  final i = dayIndex(day) % list.length;
+  // Saltos de 5 (primo con el largo de cada biblioteca) para recorrerlas
+  // todas y que "otro" no sea simplemente el de mañana.
+  final i = (dayIndex(day) + offset * 5) % list.length;
   return list[i < 0 ? i + list.length : i];
 }
 

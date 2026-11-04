@@ -1815,6 +1815,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Heaviest lift'**
   String get metricHeaviestLong;
+
+  /// No description provided for @todayOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get todayOther;
+
+  /// No description provided for @scanButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo of the whiteboard'**
+  String get scanButton;
+
+  /// No description provided for @scanCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get scanCamera;
+
+  /// No description provided for @scanGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from photos'**
+  String get scanGallery;
+
+  /// No description provided for @scanReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading the whiteboard…'**
+  String get scanReading;
+
+  /// No description provided for @scanNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises found. Try again with more light and the whole board in the photo.'**
+  String get scanNothing;
+
+  /// No description provided for @scanPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot open the camera. Allow access for Plate Calc in Settings.'**
+  String get scanPermission;
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Whiteboard'**
+  String get scanTitle;
+
+  /// No description provided for @scanDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Whiteboard WOD'**
+  String get scanDefaultName;
+
+  /// No description provided for @scanCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check it before you start: change the format or remove anything misread.'**
+  String get scanCheck;
+
+  /// No description provided for @scanRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Take another photo'**
+  String get scanRetake;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

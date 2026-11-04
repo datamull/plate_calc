@@ -1003,4 +1003,40 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get metricHeaviestLong => 'Peso máximo';
+
+  @override
+  String get todayOther => 'Otro';
+
+  @override
+  String get scanButton => 'Foto de la pizarra';
+
+  @override
+  String get scanCamera => 'Tomar foto';
+
+  @override
+  String get scanGallery => 'Elegir de las fotos';
+
+  @override
+  String get scanReading => 'Leyendo la pizarra…';
+
+  @override
+  String get scanNothing =>
+      'No encontré ejercicios. Prueba de nuevo con más luz y la pizarra completa en la foto.';
+
+  @override
+  String get scanPermission =>
+      'No se puede abrir la cámara. Permite el acceso para Plate Calc en Ajustes.';
+
+  @override
+  String get scanTitle => 'Pizarra';
+
+  @override
+  String get scanDefaultName => 'WOD de la pizarra';
+
+  @override
+  String get scanCheck =>
+      'Revísalo antes de empezar: cambia el formato o quita lo que se haya leído mal.';
+
+  @override
+  String get scanRetake => 'Tomar otra foto';
 }

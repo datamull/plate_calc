@@ -16,6 +16,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  google_mlkit_text_recognition: ^0.17.1
+  image_picker: ^1.2.4
   intl: any # versión fijada por flutter_localizations
   mobile_scanner: ^7.5.0
   qr_flutter: ^4.1.0

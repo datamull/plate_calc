@@ -11,6 +11,7 @@ import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
+import 'board_scan.dart';
 import 'progress_screen.dart';
 import 'wod_screen.dart';
 import 'workout_detail_screen.dart';
@@ -274,7 +275,8 @@ class _TodayViewState extends State<TodayView> {
 
     final style = styles.contains(_style) ? _style! : styles.first;
     final today = DateTime.now();
-    final wod = dailyFor(style, today);
+    final offset = _store.dailyOffset(style, today);
+    final wod = dailyFor(style, today, offset: offset);
     final done = _store.dailyDone(wod, today);
 
     return ListView(
@@ -313,14 +315,36 @@ class _TodayViewState extends State<TodayView> {
           ),
           const SizedBox(height: 12),
         ],
-        _WodCard(
+        WodCard(
           store: _store,
           wod: wod,
           done: done,
           onStart: () => _start(wod),
+          onOther: () async {
+            await _store.setDailyOffset(style, today, offset + 1);
+            if (mounted) setState(() {});
+          },
           onOpenDone: done == null
               ? null
               : () => _open(WorkoutDetailScreen(store: _store, workoutId: done.id)),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              side: BorderSide(color: Ds.hairline(context)),
+              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            icon: const Icon(Icons.photo_camera_outlined),
+            label: Text(loc.scanButton),
+            onPressed: () async {
+              await scanBoard(context, _store);
+              if (mounted) setState(() {});
+            },
+          ),
         ),
         if (style == TrainingStyle.crossfit) ...[
           const SizedBox(height: 8),
@@ -393,13 +417,16 @@ class _ResumeBanner extends StatelessWidget {
 }
 
 /// El entrenamiento del día como pizarra.
-class _WodCard extends StatelessWidget {
-  const _WodCard({
+class WodCard extends StatelessWidget {
+  const WodCard({
+    super.key,
     required this.store,
     required this.wod,
-    required this.done,
     required this.onStart,
-    required this.onOpenDone,
+    this.done,
+    this.onOpenDone,
+    this.onOther,
+    this.showDate = true,
   });
 
   final TrainingStore store;
@@ -407,6 +434,10 @@ class _WodCard extends StatelessWidget {
   final Workout? done;
   final VoidCallback onStart;
   final VoidCallback? onOpenDone;
+
+  /// Cambiar por otro entrenamiento (botón "Otro").
+  final VoidCallback? onOther;
+  final bool showDate;
 
   @override
   Widget build(BuildContext context) {
@@ -432,10 +463,9 @@ class _WodCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Text(wod.name, style: Ds.display(context)),
-          const SizedBox(height: 2),
-          Text(date, style: Ds.secondary(context)),
+          if (showDate) ...[const SizedBox(height: 2), Text(date, style: Ds.secondary(context))],
           const SizedBox(height: 10),
-          for (final item in wod.items) _ItemRow(item: item, store: store, unit: unit),
+          for (final item in wod.items) WodItemRow(item: item, store: store, unit: unit),
           const SizedBox(height: 18),
           if (done != null)
             Material(
@@ -469,16 +499,45 @@ class _WodCard extends StatelessWidget {
               ),
             )
           else
-            FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.blue,
-                minimumSize: const Size.fromHeight(56),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
-              ),
-              icon: const Icon(Icons.play_arrow_rounded),
-              label: Text(loc.todayStart),
-              onPressed: onStart,
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.blue,
+                      minimumSize: const Size.fromHeight(56),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+                    ),
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: Text(loc.todayStart),
+                    onPressed: onStart,
+                  ),
+                ),
+                if (onOther != null) ...[
+                  const SizedBox(width: 10),
+                  Tooltip(
+                    message: loc.todayOther,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(56, 56),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        side: BorderSide(color: Ds.hairline(context)),
+                      ),
+                      onPressed: onOther,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.shuffle_rounded, size: 20),
+                          const SizedBox(width: 6),
+                          Text(loc.todayOther, style: const TextStyle(fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
         ],
       ),
@@ -486,8 +545,8 @@ class _WodCard extends StatelessWidget {
   }
 }
 
-class _ItemRow extends StatelessWidget {
-  const _ItemRow({required this.item, required this.store, required this.unit});
+class WodItemRow extends StatelessWidget {
+  const WodItemRow({super.key, required this.item, required this.store, required this.unit});
 
   final DailyItem item;
   final TrainingStore store;

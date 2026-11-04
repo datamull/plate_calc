@@ -1000,4 +1000,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metricHeaviestLong => 'Heaviest lift';
+
+  @override
+  String get todayOther => 'Other';
+
+  @override
+  String get scanButton => 'Photo of the whiteboard';
+
+  @override
+  String get scanCamera => 'Take photo';
+
+  @override
+  String get scanGallery => 'Choose from photos';
+
+  @override
+  String get scanReading => 'Reading the whiteboard…';
+
+  @override
+  String get scanNothing =>
+      'No exercises found. Try again with more light and the whole board in the photo.';
+
+  @override
+  String get scanPermission => 'Cannot open the camera. Allow access for Plate Calc in Settings.';
+
+  @override
+  String get scanTitle => 'Whiteboard';
+
+  @override
+  String get scanDefaultName => 'Whiteboard WOD';
+
+  @override
+  String get scanCheck =>
+      'Check it before you start: change the format or remove anything misread.';
+
+  @override
+  String get scanRetake => 'Take another photo';
 }

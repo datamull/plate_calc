@@ -631,8 +631,38 @@ abstract class AppLocalizations {
   /// No description provided for @noCalculatorHint.
   ///
   /// In en, this message translates to:
-  /// **'No plate calculator for this exercise: just save your 1RM and keep its history.'**
+  /// **'No plate calculator for this exercise: save your 1RM and max reps, and keep their history.'**
   String get noCalculatorHint;
+
+  /// No description provided for @maxRepsField.
+  ///
+  /// In en, this message translates to:
+  /// **'Max reps'**
+  String get maxRepsField;
+
+  /// No description provided for @saveRecordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save record'**
+  String get saveRecordButton;
+
+  /// No description provided for @saveRecordInvalidSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an RM or max reps before saving.'**
+  String get saveRecordInvalidSnack;
+
+  /// No description provided for @saveRecordOkSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Record saved for {movementName}.'**
+  String saveRecordOkSnack(String movementName);
+
+  /// No description provided for @historyRowReps.
+  ///
+  /// In en, this message translates to:
+  /// **'{reps} reps'**
+  String historyRowReps(int reps);
 
   /// No description provided for @iCloudSyncTitle.
   ///

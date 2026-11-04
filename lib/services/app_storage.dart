@@ -7,9 +7,11 @@ import '../models/settings.dart';
 import '../models/weight_unit.dart';
 
 class RmEntry {
-  final double rm;
+  /// null si el registro solo tiene repeticiones (p. ej. peso corporal).
+  final double? rm;
   final DateTime ts;
-  const RmEntry(this.rm, this.ts);
+  final int? reps;
+  const RmEntry(this.rm, this.ts, {this.reps});
 }
 
 /// Único punto de acceso a los datos guardados.
@@ -42,6 +44,7 @@ class AppStorage {
   static String _kGymCustom(String group) => 'gym_custom_$group';
   static String _kGymHidden(String group) => 'gym_hidden_$group';
   static const _kGymBarbell = 'gym_barbell';
+  static String _kMaxReps(String lift) => 'max_reps_$lift';
 
   // ── Respaldo (iCloud) ─────────────────────────────────────────────────────
   /// Claves locales del respaldo que no se copian a la nube.
@@ -55,6 +58,7 @@ class AppStorage {
         k.startsWith('history_') ||
         k.startsWith('inventory_settings_') ||
         k.startsWith('gym_') ||
+        k.startsWith('max_reps_') ||
         k == _kCustomLifts ||
         k == _kHiddenBaseLifts,
   );
@@ -193,6 +197,7 @@ class AppStorage {
       await _prefs.remove(_kRm(name, u));
       await _prefs.remove(_kHistory(name, u));
     }
+    await _prefs.remove(_kMaxReps(name));
     await _prefs.remove(_kLiftIcon(name));
     final barbell = [...?_prefs.getStringList(_kGymBarbell)]..remove(name);
     await _prefs.setStringList(_kGymBarbell, barbell);
@@ -236,20 +241,43 @@ class AppStorage {
     await _prefs.setString(_kHistory(lift, u), jsonEncode(list));
   }
 
+  int? maxReps(String lift) => _prefs.getInt(_kMaxReps(lift));
+
+  /// Guarda RM y/o repeticiones máximas de un ejercicio sin barra, y los
+  /// agrega al historial. Un valor null conserva el último guardado.
+  Future<void> saveRecord(String lift, WeightUnit u, {double? rm, int? reps}) async {
+    if (rm != null) await _prefs.setDouble(_kRm(lift, u), rm);
+    if (reps != null) await _prefs.setInt(_kMaxReps(lift), reps);
+    final list = _rawHistory(lift, u)
+      ..add({
+        'rm': ?rm,
+        'reps': ?reps,
+        'ts': DateTime.now().toIso8601String(),
+      });
+    await _prefs.setString(_kHistory(lift, u), jsonEncode(list));
+  }
+
   /// Historial ordenado del más reciente al más antiguo.
   List<RmEntry> history(String lift, WeightUnit u) {
     final out = <RmEntry>[];
     for (final e in _rawHistory(lift, u)) {
       final rm = e['rm'];
+      final reps = e['reps'];
       final ts = DateTime.tryParse('${e['ts']}');
-      if (rm is num && ts != null) out.add(RmEntry(rm.toDouble(), ts));
+      if (ts == null || (rm is! num && reps is! num)) continue;
+      out.add(
+        RmEntry(rm is num ? rm.toDouble() : null, ts, reps: reps is num ? reps.toInt() : null),
+      );
     }
     out.sort((a, b) => b.ts.compareTo(a.ts));
     return out;
   }
 
   Future<void> deleteHistoryEntry(String lift, WeightUnit u, RmEntry entry) async {
-    final list = _rawHistory(lift, u)..removeWhere((e) => e['ts'] == entry.ts.toIso8601String());
+    // Solo uno: dos guardados en el mismo instante comparten la misma fecha.
+    final list = _rawHistory(lift, u);
+    final i = list.indexWhere((e) => e['ts'] == entry.ts.toIso8601String());
+    if (i >= 0) list.removeAt(i);
     await _prefs.setString(_kHistory(lift, u), jsonEncode(list));
   }
 

@@ -311,7 +311,26 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noCalculatorHint =>
-      'Este ejercicio no usa calculadora de discos: guarda tu RM y lleva su historial.';
+      'Este ejercicio no usa calculadora de discos: guarda tu RM y repeticiones máximas, y lleva su historial.';
+
+  @override
+  String get maxRepsField => 'Repeticiones máximas';
+
+  @override
+  String get saveRecordButton => 'Guardar récord';
+
+  @override
+  String get saveRecordInvalidSnack => 'Ingresa un RM o repeticiones máximas antes de guardar.';
+
+  @override
+  String saveRecordOkSnack(String movementName) {
+    return 'Récord guardado para $movementName.';
+  }
+
+  @override
+  String historyRowReps(int reps) {
+    return '$reps reps';
+  }
 
   @override
   String get iCloudSyncTitle => 'Respaldo en iCloud';

@@ -126,7 +126,12 @@ class _RmHistorySheetState extends State<_RmHistorySheet> {
                       onDismissed: (_) => _delete(e),
                       child: ListTile(
                         leading: const Icon(Icons.history),
-                        title: Text(loc.historyRowRm(fmtWeight(e.rm), u)),
+                        title: Text(
+                          [
+                            if (e.rm != null) loc.historyRowRm(fmtWeight(e.rm!), u),
+                            if (e.reps != null) loc.historyRowReps(e.reps!),
+                          ].join(' · '),
+                        ),
                         subtitle: Text(fmtDateTime(e.ts)),
                         trailing: IconButton(
                           tooltip: loc.deleteRecordTooltip,

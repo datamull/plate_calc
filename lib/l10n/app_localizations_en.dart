@@ -311,7 +311,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noCalculatorHint =>
-      'No plate calculator for this exercise: just save your 1RM and keep its history.';
+      'No plate calculator for this exercise: save your 1RM and max reps, and keep their history.';
+
+  @override
+  String get maxRepsField => 'Max reps';
+
+  @override
+  String get saveRecordButton => 'Save record';
+
+  @override
+  String get saveRecordInvalidSnack => 'Enter an RM or max reps before saving.';
+
+  @override
+  String saveRecordOkSnack(String movementName) {
+    return 'Record saved for $movementName.';
+  }
+
+  @override
+  String historyRowReps(int reps) {
+    return '$reps reps';
+  }
 
   @override
   String get iCloudSyncTitle => 'iCloud backup';

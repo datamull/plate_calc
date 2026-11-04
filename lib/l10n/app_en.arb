@@ -208,7 +208,22 @@
   "groupCore": "Core",
   "exerciseCount": "{count, plural, =1{1 exercise} other{{count} exercises}}",
   "barbellSwitch": "Uses an Olympic barbell (plate calculator)",
-  "noCalculatorHint": "No plate calculator for this exercise: just save your 1RM and keep its history.",
+  "noCalculatorHint": "No plate calculator for this exercise: save your 1RM and max reps, and keep their history.",
+  "maxRepsField": "Max reps",
+  "saveRecordButton": "Save record",
+  "saveRecordInvalidSnack": "Enter an RM or max reps before saving.",
+  "saveRecordOkSnack": "Record saved for {movementName}.",
+  "@saveRecordOkSnack": {
+    "placeholders": {
+      "movementName": { "type": "String" }
+    }
+  },
+  "historyRowReps": "{reps} reps",
+  "@historyRowReps": {
+    "placeholders": {
+      "reps": { "type": "int" }
+    }
+  },
   "iCloudSyncTitle": "iCloud backup",
   "iCloudSyncOn": "Your data is saved to iCloud and restored automatically on a new iPhone with the same Apple ID.",
   "iCloudSyncOff": "iCloud is not available. Sign in to iCloud in Settings to back up your data.",

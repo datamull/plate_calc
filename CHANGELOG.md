@@ -1,5 +1,11 @@
 # Cambios
 
+## Próxima versión
+
+### Nuevo
+- Gym: los ejercicios sin barra guardan también las repeticiones máximas,
+  con o sin RM, y se muestran en el historial.
+
 ## 2.2.0
 
 ### Nuevo

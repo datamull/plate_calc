@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../l10n/lift_names.dart';
@@ -11,7 +12,8 @@ import '../widgets/rm_history_sheet.dart';
 import 'unit_converter_screen.dart';
 
 /// Ejercicio sin barra olímpica (mancuernas, máquina, peso corporal): solo se
-/// guarda el RM y su historial, sin calculadora de discos.
+/// guardan el RM, las repeticiones máximas y su historial, sin calculadora de
+/// discos.
 class SimpleRmScreen extends StatefulWidget {
   const SimpleRmScreen({
     super.key,
@@ -36,6 +38,7 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
 
   late WeightUnit _unit;
   final _rmCtrl = TextEditingController();
+  final _repsCtrl = TextEditingController();
 
   // Igual que en la calculadora: al cambiar kg <-> lb se convierte desde el
   // valor original para no acumular redondeos.
@@ -48,11 +51,13 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
     super.initState();
     _loadUnit(widget.initialUnit);
     _rmCtrl.addListener(_onRmChanged);
+    _repsCtrl.text = _storage.maxReps(_lift)?.toString() ?? '';
   }
 
   @override
   void dispose() {
     _rmCtrl.dispose();
+    _repsCtrl.dispose();
     super.dispose();
   }
 
@@ -91,6 +96,7 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
   }
 
   double get _rm => parseNumber(_rmCtrl.text) ?? 0;
+  int get _reps => int.tryParse(_repsCtrl.text) ?? 0;
 
   LiftPose? get _iconPose => LiftPose.parse(_storage.liftIcon(_lift));
 
@@ -105,13 +111,18 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
     final loc = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     FocusManager.instance.primaryFocus?.unfocus();
-    if (_rm <= 0) {
-      messenger.showSnackBar(SnackBar(content: Text(loc.saveRmInvalidSnack)));
+    if (_rm <= 0 && _reps <= 0) {
+      messenger.showSnackBar(SnackBar(content: Text(loc.saveRecordInvalidSnack)));
       return;
     }
-    await _storage.saveRm(_lift, _unit, _rm);
+    await _storage.saveRecord(
+      _lift,
+      _unit,
+      rm: _rm > 0 ? _rm : null,
+      reps: _reps > 0 ? _reps : null,
+    );
     messenger.showSnackBar(
-      SnackBar(content: Text(loc.saveRmOkSnack(liftDisplayName(_lift), _unit.label))),
+      SnackBar(content: Text(loc.saveRecordOkSnack(liftDisplayName(_lift)))),
     );
   }
 
@@ -179,7 +190,7 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
             ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
           ),
           IconButton(
-            tooltip: loc.saveRmTooltip,
+            tooltip: loc.saveRecordButton,
             onPressed: _saveRm,
             icon: const Icon(Icons.save_outlined),
           ),
@@ -216,6 +227,14 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
               onSubmitted: (_) => _saveRm(),
             ),
             const SizedBox(height: 12),
+            TextField(
+              controller: _repsCtrl,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(labelText: loc.maxRepsField),
+              onSubmitted: (_) => _saveRm(),
+            ),
+            const SizedBox(height: 12),
             Text(
               loc.noCalculatorHint,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -223,7 +242,7 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            GlassButton(onPressed: _saveRm, prominent: true, label: loc.saveRmTooltip),
+            GlassButton(onPressed: _saveRm, prominent: true, label: loc.saveRecordButton),
             const SizedBox(height: 8),
             GlassButton(
               onPressed: () => showRmHistorySheet(

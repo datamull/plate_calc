@@ -13,6 +13,36 @@ Future<AppStorage> storageWith(Map<String, Object> values) async {
 }
 
 void main() {
+  group('repeticiones máximas', () {
+    test('guarda RM y repeticiones en el último valor y el historial', () async {
+      final s = await storageWith({});
+      await s.saveRecord('Curl', WeightUnit.kg, rm: 20, reps: 12);
+
+      expect(s.lastRm('Curl', WeightUnit.kg), 20);
+      expect(s.maxReps('Curl'), 12);
+      final e = s.history('Curl', WeightUnit.kg).single;
+      expect(e.rm, 20);
+      expect(e.reps, 12);
+    });
+
+    test('un registro solo de repeticiones conserva el RM anterior', () async {
+      final s = await storageWith({'rm_Curl_kg': 20.0});
+      await s.saveRecord('Curl', WeightUnit.kg, reps: 15);
+
+      expect(s.lastRm('Curl', WeightUnit.kg), 20);
+      final e = s.history('Curl', WeightUnit.kg).single;
+      expect(e.rm, isNull);
+      expect(e.reps, 15);
+    });
+
+    test('borrar el ejercicio borra sus repeticiones', () async {
+      final s = await storageWith({'gym_custom_arms': ['Curl X'], 'max_reps_Curl X': 10});
+      expect(s.hasUserData, isTrue);
+      await s.deleteGymExercise('arms', 'Curl X');
+      expect(s.maxReps('Curl X'), isNull);
+    });
+  });
+
   group('compatibilidad con datos de la v1', () {
     test('lee RM, historial, movimientos e inventario guardados por la v1', () async {
       final s = await storageWith({

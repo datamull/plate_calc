@@ -168,15 +168,17 @@ void main() {
       expect(find.text(e), findsOneWidget);
     }
 
-    // Sin barra: solo RM e historial.
+    // Sin barra: RM, repeticiones máximas e historial.
     await tester.tap(find.text('Dumbbell Press'));
     await tester.pumpAndSettle();
     expect(find.text('Calcular distribución de discos'), findsNothing);
-    await tester.enterText(find.byType(TextField), '30');
+    await tester.enterText(find.byType(TextField).first, '30');
+    await tester.enterText(find.widgetWithText(TextField, 'Repeticiones máximas'), '12');
     await tester.tap(find.byIcon(Icons.save_outlined));
     await tester.pumpAndSettle();
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getDouble('rm_Dumbbell Press_kg'), 30);
+    expect(prefs.getInt('max_reps_Dumbbell Press'), 12);
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('RM: 30 kg'), findsOneWidget);

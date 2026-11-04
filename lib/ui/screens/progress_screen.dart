@@ -273,9 +273,23 @@ class _ConsistencyCard extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Text(loc.chartWeeksAgo(11), style: Ds.secondary(context).copyWith(fontSize: 12)),
-              const Spacer(),
-              Text(loc.chartThisWeek, style: Ds.secondary(context).copyWith(fontSize: 12)),
+              Expanded(
+                child: Text(
+                  loc.chartWeeksAgo(11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Ds.secondary(context).copyWith(fontSize: 12),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  loc.chartThisWeek,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: Ds.secondary(context).copyWith(fontSize: 12),
+                ),
+              ),
             ],
           ),
         ],

@@ -7,6 +7,8 @@ import '../../l10n/lift_names.dart';
 import '../../models/training.dart';
 import '../../services/training_store.dart';
 import '../../utils/format.dart';
+import '../theme/app_theme.dart';
+import '../widgets/ds.dart';
 import '../widgets/share_code.dart';
 import '../widgets/training_widgets.dart';
 import 'plan_editor_screen.dart';
@@ -103,98 +105,104 @@ class _CoachScreenState extends State<CoachScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final myPlans = _store.plans.where((p) => !p.fromCoach && !p.id.startsWith('tpl_')).toList();
     final results = _store.results;
     final athletes = _store.athletes;
 
-    Widget header(String text) => Padding(
-      padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
-      child: Text(text, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+    Plan signed(Plan p) => Plan(
+      id: p.id,
+      name: p.name,
+      days: p.days,
+      notes: p.notes,
+      coach: _store.coachName.isEmpty ? loc.coachDefaultName : _store.coachName,
+      box: _store.coachBox.isEmpty ? null : _store.coachBox,
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(loc.tabCoach)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
-        children: [
-          Card(
-            child: ListTile(
-              leading: const CircleAvatar(child: Icon(Icons.sports)),
-              title: Text(_store.coachName.isEmpty ? loc.coachSetupTitle : _store.coachName),
-              subtitle: Text(_store.coachBox.isEmpty ? loc.coachSetupSubtitle : _store.coachBox),
-              trailing: const Icon(Icons.edit),
-              onTap: _editProfile,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 32),
+          children: [
+            DsLargeHeader(
+              eyebrow: _store.coachBox.isEmpty ? null : _store.coachBox,
+              title: loc.tabBox,
             ),
-          ),
-          Card(
-            color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
-            child: Padding(padding: const EdgeInsets.all(12), child: Text(loc.coachHowItWorks)),
-          ),
-          header(loc.coachPlansTitle),
-          for (final p in myPlans)
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.list_alt),
-                title: Text(p.name),
-                subtitle: Text(loc.planDaysCount(p.days.length)),
+            DsRow(
+              leading: CircleAvatar(
+                radius: 22,
+                backgroundColor: AppColors.blue.withValues(alpha: 0.15),
+                child: const Icon(Icons.sports, color: AppColors.blue),
+              ),
+              title: _store.coachName.isEmpty ? loc.coachSetupTitle : _store.coachName,
+              subtitle: _store.coachBox.isEmpty ? loc.coachSetupSubtitle : loc.coachProfile,
+              trailing: Icon(Icons.edit_outlined, color: Ds.muted(context), size: 20),
+              onTap: _editProfile,
+              divider: false,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(Ds.gutter, 8, Ds.gutter, 0),
+              child: Text(loc.coachHowItWorks, style: Ds.secondary(context)),
+            ),
+
+            DsSection(loc.coachPlansTitle),
+            for (final p in myPlans)
+              DsRow(
+                title: p.name,
+                subtitle: loc.planDaysCount(p.days.length),
                 trailing: IconButton(
                   tooltip: loc.planShare,
-                  icon: const Icon(Icons.qr_code),
+                  icon: const Icon(Icons.qr_code, color: AppColors.blue),
                   onPressed: () => showShareCodeSheet(
                     context,
                     title: loc.planShareTitle(p.name),
                     subtitle: loc.planShareSubtitle,
-                    code: ShareCode.encodePlan(
-                      Plan(
-                        id: p.id,
-                        name: p.name,
-                        days: p.days,
-                        notes: p.notes,
-                        coach: _store.coachName.isEmpty ? loc.coachDefaultName : _store.coachName,
-                        box: _store.coachBox.isEmpty ? null : _store.coachBox,
-                      ),
-                    ),
+                    code: ShareCode.encodePlan(signed(p)),
                   ),
                 ),
                 onTap: () => _open(PlanScreen(store: _store, planId: p.id)),
               ),
+            DsRow(
+              leading: const Icon(Icons.add, color: AppColors.blue),
+              title: loc.coachCreatePlan,
+              onTap: _newPlan,
+              divider: false,
             ),
-          FilledButton.tonalIcon(
-            icon: const Icon(Icons.add),
-            label: Text(loc.coachCreatePlan),
-            onPressed: _newPlan,
-          ),
-          header(loc.coachAthletesTitle),
-          FilledButton.tonalIcon(
-            icon: const Icon(Icons.qr_code_scanner),
-            label: Text(loc.importResultTitle),
-            onPressed: _importResult,
-          ),
-          const SizedBox(height: 8),
-          if (athletes.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(loc.coachAthletesEmpty),
+
+            DsSection(loc.coachAthletesTitle),
+            DsRow(
+              leading: const Icon(Icons.qr_code_scanner, color: AppColors.blue),
+              title: loc.importResultTitle,
+              onTap: _importResult,
             ),
-          for (final a in athletes)
-            Builder(
-              builder: (context) {
-                final mine = results.where((r) => r.athlete == a).toList();
-                return Card(
-                  child: ListTile(
-                    leading: CircleAvatar(child: Text(a.characters.first.toUpperCase())),
-                    title: Text(a),
-                    subtitle: Text(
-                      '${loc.resultsCount(mine.length)} · ${loc.lastWorkout(shortDate(mine.first.workout.date))}',
+            if (athletes.isEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(Ds.gutter, 12, Ds.gutter, 0),
+                child: Text(loc.coachAthletesEmpty, style: Ds.secondary(context)),
+              ),
+            for (final a in athletes)
+              Builder(
+                builder: (context) {
+                  final mine = results.where((r) => r.athlete == a).toList();
+                  return DsRow(
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Ds.hairline(context),
+                      child: Text(
+                        a.characters.first.toUpperCase(),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
                     ),
-                    trailing: const Icon(Icons.chevron_right),
+                    title: a,
+                    subtitle:
+                        '${loc.resultsCount(mine.length)} · ${loc.lastWorkout(shortDate(mine.first.workout.date))}',
+                    divider: a != athletes.last,
                     onTap: () => _open(AthleteScreen(store: _store, athlete: a)),
-                  ),
-                );
-              },
-            ),
-        ],
+                  );
+                },
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -10,11 +10,16 @@ Future<void> pumpApp(WidgetTester tester, Map<String, Object> prefs, {String? op
   final storage = await AppStorage.load();
   await tester.pumpWidget(PlateCalcApp(storage: storage));
   await tester.pumpAndSettle();
+  // La calculadora ahora es la pestaña Discos (la app abre en Hoy).
+  await tester.tap(find.text(_platesTab[prefs['app_locale']] ?? 'Plates'));
+  await tester.pumpAndSettle();
   if (open != null) {
     await tester.tap(find.text(open));
     await tester.pumpAndSettle();
   }
 }
+
+const _platesTab = {'es': 'Discos', 'fr': 'Disques', 'en': 'Plates'};
 
 /// Desplaza la lista de la pantalla actual hasta [text] y lo toca.
 Future<void> scrollAndTap(WidgetTester tester, String text) async {

@@ -9,6 +9,8 @@ import '../../models/training.dart';
 import '../../services/plate_calculator.dart';
 import '../../services/training_store.dart';
 import '../../utils/format.dart';
+import '../theme/app_theme.dart';
+import '../widgets/ds.dart';
 import '../widgets/result_sheet.dart';
 import '../widgets/share_code.dart';
 import '../widgets/training_widgets.dart';
@@ -175,22 +177,41 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     if (mounted) Navigator.of(context).pop(false);
   }
 
+  /// Series del último entrenamiento guardado con cada ejercicio (columna
+  /// "Anterior", como en Strong y Hevy).
+  late final Map<String, List<WorkSet>> _previous = () {
+    final out = <String, List<WorkSet>>{};
+    for (final w in _store.workouts) {
+      if (w.id == _w.id) continue;
+      for (final e in w.exercises) {
+        out.putIfAbsent(e.lift, () => e.sets);
+      }
+    }
+    return out;
+  }();
+
+  void _platesFor(ExerciseLog e) {
+    final next =
+        e.sets.where((s) => !s.done && s.weight > 0).firstOrNull ??
+        e.sets.lastWhere((s) => s.weight > 0, orElse: () => e.sets.first);
+    _showPlates(next);
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final title = _w.title.isEmpty ? loc.workoutFree : _w.title;
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, overflow: TextOverflow.ellipsis),
+            Text(title, overflow: TextOverflow.ellipsis, style: Ds.title(context)),
             Text(
-              '⏱ ${fmtDuration(_elapsed)}${_w.planName != null ? '  ·  ${_w.planName}' : ''}',
-              style: theme.textTheme.bodySmall,
-              overflow: TextOverflow.ellipsis,
+              fmtDuration(_elapsed),
+              style: Ds.secondary(context).copyWith(fontFeatures: Ds.tabular),
             ),
           ],
         ),
@@ -205,71 +226,96 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               PopupMenuItem(value: 'discard', child: Text(loc.workoutDiscard)),
             ],
           ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Ds.done,
+                minimumSize: const Size(0, 36),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: _finish,
+              child: Text(loc.workoutFinishShort),
+            ),
+          ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 120),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        padding: const EdgeInsets.only(bottom: 120),
         children: [
+          if (_w.planName != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(Ds.gutter, 4, Ds.gutter, 0),
+              child: Text(_w.planName!.toUpperCase(), style: Ds.label(context)),
+            ),
           for (final e in _w.exercises)
-            _ExerciseCard(
+            _ExerciseBlock(
               key: ObjectKey(e),
               log: e,
               store: _store,
               unitLabel: _w.unit.label,
+              previous: _previous[e.lift] ?? const [],
               onChanged: _changed,
               onToggle: _toggleDone,
-              onPlates: _store.isBarbell(e.lift) ? _showPlates : null,
+              onPlates: _store.isBarbell(e.lift) ? () => _platesFor(e) : null,
               onRemove: () {
                 _w.exercises.remove(e);
                 _changed();
               },
             ),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            icon: const Icon(Icons.add),
-            label: Text(loc.workoutAddExercise),
-            onPressed: _addExercise,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            initialValue: _w.notes,
-            minLines: 1,
-            maxLines: 4,
-            decoration: InputDecoration(
-              labelText: loc.workoutNotes,
-              border: const OutlineInputBorder(),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              icon: const Icon(Icons.add),
+              label: Text(loc.workoutAddExercise),
+              onPressed: _addExercise,
             ),
-            onChanged: (v) {
-              _w.notes = v;
-              _store.saveDraft(_w);
-            },
           ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            icon: const Icon(Icons.flag),
-            label: Text(loc.workoutFinish),
-            onPressed: _finish,
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
+            child: TextFormField(
+              initialValue: _w.notes,
+              minLines: 1,
+              maxLines: 4,
+              decoration: InputDecoration(labelText: loc.workoutNotes),
+              onChanged: (v) {
+                _w.notes = v;
+                _store.saveDraft(_w);
+              },
+            ),
           ),
+          const SizedBox(height: 24),
+          DsPrimaryButton(label: loc.workoutFinish, icon: Icons.flag_outlined, onPressed: _finish),
         ],
       ),
       bottomNavigationBar: _rest == null
           ? null
-          : SafeArea(
-              child: Material(
-                color: theme.colorScheme.primaryContainer,
+          : Material(
+              color: AppColors.blue,
+              child: SafeArea(
+                top: false,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.fromLTRB(Ds.gutter, 6, 8, 6),
                   child: Row(
                     children: [
-                      const Icon(Icons.timer_outlined),
-                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${loc.restLabel} ${fmtDuration(_rest!)}',
+                          '${loc.restLabel}  ${fmtDuration(_rest!)}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontFeatures: const [FontFeature.tabularFigures()],
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            fontFeatures: Ds.tabular,
                           ),
                         ),
                       ),
@@ -285,6 +331,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       ),
                       IconButton(
                         tooltip: loc.restSkip,
+                        color: Colors.white,
                         icon: const Icon(Icons.skip_next),
                         onPressed: () => setState(() => _rest = null),
                       ),
@@ -298,17 +345,26 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 }
 
 final _compact = TextButton.styleFrom(
+  foregroundColor: Colors.white,
   minimumSize: const Size(44, 40),
   padding: const EdgeInsets.symmetric(horizontal: 8),
   visualDensity: VisualDensity.compact,
+  textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
 );
 
-class _ExerciseCard extends StatelessWidget {
-  const _ExerciseCard({
+// Anchos de columna de la tabla de series.
+const _wSet = 44.0;
+const _wPrev = 64.0;
+const _wCheck = 44.0;
+
+/// Un ejercicio como tabla: SERIE · ANTERIOR · KG · REPS · RPE · ✓.
+class _ExerciseBlock extends StatelessWidget {
+  const _ExerciseBlock({
     super.key,
     required this.log,
     required this.store,
     required this.unitLabel,
+    required this.previous,
     required this.onChanged,
     required this.onToggle,
     required this.onPlates,
@@ -318,73 +374,116 @@ class _ExerciseCard extends StatelessWidget {
   final ExerciseLog log;
   final TrainingStore store;
   final String unitLabel;
+  final List<WorkSet> previous;
   final VoidCallback onChanged;
   final void Function(WorkSet) onToggle;
-  final void Function(WorkSet)? onPlates;
+  final VoidCallback? onPlates;
   final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    final label = Ds.label(context);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(Ds.gutter, 0, 4, 6),
+            child: Row(
               children: [
-                liftIconFor(store.storage, log.lift, size: 36),
-                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(liftDisplayName(log.lift), style: theme.textTheme.titleMedium),
+                      Text(
+                        liftDisplayName(log.lift),
+                        style: Ds.title(context).copyWith(color: AppColors.blue),
+                      ),
                       if (log.percent != null)
-                        Text(loc.workoutPercentOfRm(fmtWeight(log.percent!)), style: muted),
+                        Text(
+                          loc.workoutPercentOfRm(fmtWeight(log.percent!)),
+                          style: Ds.secondary(context),
+                        ),
                     ],
                   ),
                 ),
-                IconButton(
-                  tooltip: loc.workoutRemoveExercise,
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: onRemove,
+                if (onPlates != null)
+                  IconButton(
+                    tooltip: loc.workoutPlates,
+                    icon: const Icon(Icons.fitness_center, size: 20),
+                    onPressed: onPlates,
+                  ),
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_horiz, color: Ds.muted(context)),
+                  onSelected: (_) => onRemove(),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(value: 'remove', child: Text(loc.workoutRemoveExercise)),
+                  ],
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 6, right: 8),
-              child: Row(
-                children: [
-                  SizedBox(width: 28, child: Text('#', style: muted)),
-                  Expanded(flex: 3, child: Text(unitLabel, style: muted)),
-                  Expanded(flex: 2, child: Text(loc.workoutReps, style: muted)),
-                  Expanded(flex: 2, child: Text('RPE', style: muted)),
-                  const SizedBox(width: 88),
-                ],
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Ds.gutter - 8),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: _wSet,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(loc.colSet, style: label, maxLines: 1),
+                  ),
+                ),
+                SizedBox(
+                  width: _wPrev,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(loc.colPrevious, style: label, maxLines: 1),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text(unitLabel.toUpperCase(), style: label, textAlign: TextAlign.center),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    loc.workoutReps.toUpperCase(),
+                    style: label,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text('RPE', style: label, textAlign: TextAlign.center),
+                ),
+                const SizedBox(width: _wCheck),
+              ],
             ),
-            for (var i = 0; i < log.sets.length; i++)
-              _SetRow(
-                key: ObjectKey(log.sets[i]),
-                index: i + 1,
-                set: log.sets[i],
-                onChanged: onChanged,
-                onToggle: () => onToggle(log.sets[i]),
-                onPlates: onPlates == null ? null : () => onPlates!(log.sets[i]),
-                onRemove: log.sets.length > 1
-                    ? () {
-                        log.sets.removeAt(i);
-                        onChanged();
-                      }
-                    : null,
-              ),
-            TextButton.icon(
+          ),
+          const SizedBox(height: 4),
+          for (var i = 0; i < log.sets.length; i++)
+            _SetRow(
+              key: ObjectKey(log.sets[i]),
+              index: i + 1,
+              set: log.sets[i],
+              previous: i < previous.length ? previous[i] : null,
+              onChanged: onChanged,
+              onToggle: () => onToggle(log.sets[i]),
+              onRemove: log.sets.length > 1
+                  ? () {
+                      log.sets.removeAt(i);
+                      onChanged();
+                    }
+                  : null,
+            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Ds.gutter - 8),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(minimumSize: const Size.fromHeight(40)),
               icon: const Icon(Icons.add, size: 18),
               label: Text(loc.workoutAddSet),
               onPressed: () {
@@ -393,8 +492,8 @@ class _ExerciseCard extends StatelessWidget {
                 onChanged();
               },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -405,70 +504,110 @@ class _SetRow extends StatelessWidget {
     super.key,
     required this.index,
     required this.set,
+    required this.previous,
     required this.onChanged,
     required this.onToggle,
-    required this.onPlates,
     required this.onRemove,
   });
 
   final int index;
   final WorkSet set;
+  final WorkSet? previous;
   final VoidCallback onChanged;
   final VoidCallback onToggle;
-  final VoidCallback? onPlates;
   final VoidCallback? onRemove;
-
-  InputDecoration get _dec => const InputDecoration(
-    isDense: true,
-    contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-    border: OutlineInputBorder(),
-  );
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final row = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+    final fill = set.done ? Colors.transparent : scheme.onSurface.withValues(alpha: 0.06);
+
+    Widget field({
+      required String initial,
+      required TextInputType type,
+      required ValueChanged<String> onChanged,
+    }) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      child: TextFormField(
+        initialValue: initial,
+        keyboardType: type,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFeatures: Ds.tabular),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: true,
+          fillColor: fill,
+          contentPadding: const EdgeInsets.symmetric(vertical: 9),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        onChanged: onChanged,
+      ),
+    );
+
+    final prev = previous;
+    final row = AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      color: set.done ? Ds.done.withValues(alpha: 0.16) : Colors.transparent,
+      padding: const EdgeInsets.symmetric(horizontal: Ds.gutter - 8, vertical: 3),
       child: Row(
         children: [
-          SizedBox(width: 28, child: Text('$index')),
+          SizedBox(
+            width: _wSet,
+            child: Text(
+              '$index',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontFeatures: Ds.tabular),
+            ),
+          ),
+          SizedBox(
+            width: _wPrev,
+            child: Text(
+              prev == null || prev.reps == 0
+                  ? '—'
+                  : prev.weight > 0
+                  ? '${fmtWeight(prev.weight)}×${prev.reps}'
+                  : '×${prev.reps}',
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Ds.secondary(context).copyWith(fontFeatures: Ds.tabular),
+            ),
+          ),
           Expanded(
             flex: 3,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: TextFormField(
-                initialValue: set.weight > 0 ? fmtWeight(set.weight) : '',
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: _dec,
-                onChanged: (v) {
-                  set.weight = parseNumber(v) ?? 0;
-                  onChanged();
-                },
-              ),
+            child: field(
+              initial: set.weight > 0 ? fmtWeight(set.weight) : '',
+              type: const TextInputType.numberWithOptions(decimal: true),
+              onChanged: (v) {
+                set.weight = parseNumber(v) ?? 0;
+                onChanged();
+              },
             ),
           ),
           Expanded(
             flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: TextFormField(
-                initialValue: set.reps > 0 ? '${set.reps}' : '',
-                keyboardType: TextInputType.number,
-                decoration: _dec,
-                onChanged: (v) {
-                  set.reps = int.tryParse(v.trim()) ?? 0;
-                  onChanged();
-                },
-              ),
+            child: field(
+              initial: set.reps > 0 ? '${set.reps}' : '',
+              type: TextInputType.number,
+              onChanged: (v) {
+                set.reps = int.tryParse(v.trim()) ?? 0;
+                onChanged();
+              },
             ),
           ),
           Expanded(
             flex: 2,
-            child: TextFormField(
-              initialValue: set.rpe != null ? fmtWeight(set.rpe!) : '',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: _dec,
+            child: field(
+              initial: set.rpe != null ? fmtWeight(set.rpe!) : '',
+              type: const TextInputType.numberWithOptions(decimal: true),
               onChanged: (v) {
                 final r = parseNumber(v);
                 set.rpe = (r != null && r > 0 && r <= 10) ? r : null;
@@ -477,22 +616,12 @@ class _SetRow extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 44,
-            child: onPlates == null
-                ? null
-                : IconButton(
-                    tooltip: loc.workoutPlates,
-                    icon: const Icon(Icons.fitness_center, size: 20),
-                    onPressed: onPlates,
-                  ),
-          ),
-          SizedBox(
-            width: 44,
+            width: _wCheck,
             child: IconButton(
               tooltip: loc.workoutSetDone,
               icon: Icon(
                 set.done ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: set.done ? Colors.green : scheme.onSurfaceVariant,
+                color: set.done ? Ds.done : Ds.muted(context),
               ),
               onPressed: onToggle,
             ),
@@ -506,9 +635,9 @@ class _SetRow extends StatelessWidget {
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 16),
-        color: scheme.errorContainer,
-        child: const Icon(Icons.delete_outline),
+        padding: const EdgeInsets.only(right: Ds.gutter),
+        color: scheme.error,
+        child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
       onDismissed: (_) => onRemove!(),
       child: row,

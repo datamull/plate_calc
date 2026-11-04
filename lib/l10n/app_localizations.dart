@@ -1249,7 +1249,7 @@ abstract class AppLocalizations {
   /// No description provided for @statTotal.
   ///
   /// In en, this message translates to:
-  /// **'workouts'**
+  /// **'in total'**
   String get statTotal;
 
   /// No description provided for @e1rmCalcTitle.
@@ -1563,6 +1563,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 round} other{{count} rounds}}'**
   String roundsCount(int count);
+
+  /// No description provided for @tabToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get tabToday;
+
+  /// No description provided for @tabBox.
+  ///
+  /// In en, this message translates to:
+  /// **'Box'**
+  String get tabBox;
+
+  /// No description provided for @tabPlates.
+  ///
+  /// In en, this message translates to:
+  /// **'Plates'**
+  String get tabPlates;
+
+  /// No description provided for @todayInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get todayInProgress;
+
+  /// No description provided for @todayResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get todayResume;
+
+  /// No description provided for @todayNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next session'**
+  String get todayNext;
+
+  /// No description provided for @todayNoPlanBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No active plan. Pick a program below, create a routine or scan your coach’s plan.'**
+  String get todayNoPlanBody;
+
+  /// No description provided for @todayFreeWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Or start a free workout'**
+  String get todayFreeWorkout;
+
+  /// No description provided for @todayRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get todayRecent;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @colSet.
+  ///
+  /// In en, this message translates to:
+  /// **'SET'**
+  String get colSet;
+
+  /// No description provided for @colPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'PREVIOUS'**
+  String get colPrevious;
+
+  /// No description provided for @workoutFinishShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get workoutFinishShort;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

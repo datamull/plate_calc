@@ -448,7 +448,7 @@
   "shareCameraError": "Cannot open the camera. Allow camera access for Plate Calc in Settings, or paste the code.",
   "statStreak": "weeks in a row",
   "statThisMonth": "this month",
-  "statTotal": "workouts",
+  "statTotal": "in total",
   "e1rmCalcTitle": "Estimated 1RM",
   "e1rmCalcHelp": "Weight and reps of a hard set (Epley formula).",
   "e1rmWeight": "Weight",
@@ -609,5 +609,18 @@
         "type": "int"
       }
     }
-  }
+  },
+  "tabToday": "Today",
+  "tabBox": "Box",
+  "tabPlates": "Plates",
+  "todayInProgress": "In progress",
+  "todayResume": "Resume",
+  "todayNext": "Next session",
+  "todayNoPlanBody": "No active plan. Pick a program below, create a routine or scan your coach’s plan.",
+  "todayFreeWorkout": "Or start a free workout",
+  "todayRecent": "Recent",
+  "seeAll": "See all",
+  "colSet": "SET",
+  "colPrevious": "PREVIOUS",
+  "workoutFinishShort": "Finish"
 }

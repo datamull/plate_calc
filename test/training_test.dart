@@ -137,8 +137,7 @@ void main() {
     await tester.pumpWidget(PlateCalcApp(storage: storage));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Entrenar'));
-    await tester.pumpAndSettle();
+    // La app abre en Hoy; sin plan activo ofrece entrenamiento libre.
     await tester.tap(find.text('Empezar entrenamiento'));
     await tester.pumpAndSettle();
 
@@ -165,12 +164,13 @@ void main() {
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
 
+    // Aparece en Recientes de Hoy con el ejercicio hecho.
     await tester.scrollUntilVisible(
-      find.textContaining('1 serie'),
+      find.text('Snatch'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(find.textContaining('1 serie'), findsOneWidget);
+    expect(find.text('Snatch'), findsOneWidget);
 
     await tester.tap(find.text('Progreso'));
     await tester.pumpAndSettle();
@@ -192,27 +192,39 @@ void main() {
     await tester.pumpWidget(PlateCalcApp(storage: storage));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Entrenar'));
-    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Halterofilia · 4 semanas'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.ensureVisible(find.text('Halterofilia · 4 semanas'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Halterofilia · 4 semanas'));
     await tester.pumpAndSettle();
 
     expect(find.text('Empezar: Semana 1 · Día A'), findsOneWidget);
     expect(find.text('• Snatch 5×2 · 70% (70 kg)'), findsOneWidget);
     expect(find.text('• Back Squat 5×3 · 75% (sin RM guardado)'), findsOneWidget);
+
+    // Al volver, Hoy muestra la pizarra con el peso calculado.
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Próxima sesión'.toUpperCase()),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Semana 1 · Día A'), findsOneWidget);
+    expect(find.text('5 × 2 · 70%'), findsOneWidget);
+    expect(find.text('70 kg', findRichText: true), findsOneWidget);
   });
 
-  testWidgets('pestaña Coach abre y explica cómo funciona', (tester) async {
+  testWidgets('pestaña Box abre y explica cómo funciona', (tester) async {
     SharedPreferences.setMockInitialValues({'app_locale': 'es'});
     final storage = await AppStorage.load();
     await tester.pumpWidget(PlateCalcApp(storage: storage));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Coach'));
+    await tester.tap(find.text('Box'));
     await tester.pumpAndSettle();
     expect(find.text('Configura tu perfil de coach'), findsOneWidget);
     expect(find.text('Crear plan o WOD'), findsOneWidget);
@@ -249,7 +261,7 @@ void main() {
 
     tester.view.resetViewInsets();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Entrenar'));
+    await tester.tap(find.text('Hoy'));
     await tester.pumpAndSettle();
     expect(find.text('Empezar entrenamiento'), findsOneWidget);
   });

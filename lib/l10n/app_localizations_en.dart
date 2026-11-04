@@ -669,7 +669,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statThisMonth => 'this month';
 
   @override
-  String get statTotal => 'workouts';
+  String get statTotal => 'in total';
 
   @override
   String get e1rmCalcTitle => 'Estimated 1RM';
@@ -868,4 +868,44 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tabToday => 'Today';
+
+  @override
+  String get tabBox => 'Box';
+
+  @override
+  String get tabPlates => 'Plates';
+
+  @override
+  String get todayInProgress => 'In progress';
+
+  @override
+  String get todayResume => 'Resume';
+
+  @override
+  String get todayNext => 'Next session';
+
+  @override
+  String get todayNoPlanBody =>
+      'No active plan. Pick a program below, create a routine or scan your coach’s plan.';
+
+  @override
+  String get todayFreeWorkout => 'Or start a free workout';
+
+  @override
+  String get todayRecent => 'Recent';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String get colSet => 'SET';
+
+  @override
+  String get colPrevious => 'PREVIOUS';
+
+  @override
+  String get workoutFinishShort => 'Finish';
 }

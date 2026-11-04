@@ -8,6 +8,7 @@ import '../../models/weight_unit.dart';
 import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../theme/app_theme.dart';
+import '../widgets/ds.dart';
 import '../widgets/training_widgets.dart';
 import 'workout_detail_screen.dart';
 
@@ -39,7 +40,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final store = widget.store;
     final unit = store.storage.listUnit;
     final workouts = store.workouts;
@@ -53,201 +53,183 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final r = int.tryParse(_calcReps.text.trim()) ?? 0;
     final est = estimate1Rm(w, r);
 
-    Widget section(String title, String help) => Padding(
-      padding: const EdgeInsets.fromLTRB(4, 22, 4, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          Text(
-            help,
-            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-          ),
-        ],
-      ),
-    );
-
     return Scaffold(
-      appBar: AppBar(title: Text(loc.tabProgress)),
-      body: ListView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
-        children: [
-          if (workouts.isEmpty)
-            Card(
-              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: const EdgeInsets.only(bottom: 32),
+          children: [
+            DsLargeHeader(title: loc.tabProgress),
+            if (workouts.isEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(Ds.gutter, 8, Ds.gutter, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.show_chart),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            loc.progressIntroTitle,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(loc.progressIntroBody),
-                    if (widget.onGoTrain != null) ...[
-                      const SizedBox(height: 12),
-                      FilledButton.icon(
-                        icon: const Icon(Icons.fitness_center),
-                        label: Text(loc.progressGoTrain),
-                        onPressed: widget.onGoTrain,
-                      ),
-                    ],
+                    Text(loc.progressIntroTitle, style: Ds.title(context)),
+                    const SizedBox(height: 6),
+                    Text(loc.progressIntroBody, style: Ds.secondary(context)),
                   ],
                 ),
               ),
-            ),
-          section(loc.progressConsistencyTitle, loc.progressConsistencyHelp),
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.local_fire_department,
-                    value: '${weekStreak(workouts)}',
-                    label: loc.statStreak,
-                  ),
+              if (widget.onGoTrain != null)
+                DsPrimaryButton(
+                  label: loc.progressGoTrain,
+                  icon: Icons.today,
+                  onPressed: widget.onGoTrain,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.calendar_month,
-                    value: '$thisMonth',
-                    label: loc.statThisMonth,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: StatTile(
-                    icon: Icons.fitness_center,
-                    value: '${workouts.length}',
-                    label: loc.statTotal,
-                  ),
-                ),
+            ],
+            DsSection(loc.progressConsistencyTitle, help: loc.progressConsistencyHelp),
+            const SizedBox(height: 4),
+            DsStatStrip(
+              stats: [
+                ('${weekStreak(workouts)}', loc.statStreak),
+                ('$thisMonth', loc.statThisMonth),
+                ('${workouts.length}', loc.statTotal),
               ],
             ),
-          ),
-          section(loc.progressCalendarTitle, loc.progressCalendarHelp),
-          _Calendar(
-            month: _month,
-            trained: trainedDays(workouts),
-            onMonth: (m) => setState(() => _month = m),
-            onDay: (day) {
-              final match = workouts.where((x) {
-                final d = x.date.toLocal();
-                return d.year == day.year && d.month == day.month && d.day == day.day;
-              });
-              if (match.isEmpty) return;
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => WorkoutDetailScreen(store: store, workoutId: match.first.id),
-                ),
-              );
-            },
-          ),
-          section(loc.recordsTitle, loc.progressRecordsHelp),
-          if (lifts.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(loc.recordsEmpty),
-            ),
-          for (final lift in lifts)
-            Builder(
-              builder: (context) {
-                final hist = liftHistory(workouts, lift, unit);
-                final heavy = hist.map((s) => s.heaviest).fold(0.0, math.max);
-                final best = hist.map((s) => s.best1Rm).fold(0.0, math.max);
-                return Card(
-                  child: ListTile(
-                    leading: liftIconFor(store.storage, lift, size: 36),
-                    title: Text(liftDisplayName(lift)),
-                    subtitle: Text(
-                      '${loc.recordHeaviest(fmtWeight(heavy), unit.label)} · '
-                      '${loc.e1rmShort(fmtWeight(best, maxDecimals: 1), unit.label)}',
-                    ),
-                    trailing: const Icon(Icons.show_chart),
+            DsSection(loc.recordsTitle, help: loc.progressRecordsHelp),
+            if (lifts.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
+                child: Text(loc.recordsEmpty, style: Ds.secondary(context)),
+              ),
+            for (final lift in lifts)
+              Builder(
+                builder: (context) {
+                  final hist = liftHistory(workouts, lift, unit);
+                  final heavy = hist.map((s) => s.heaviest).fold(0.0, math.max);
+                  final best = hist.map((s) => s.best1Rm).fold(0.0, math.max);
+                  return DsRow(
+                    title: liftDisplayName(lift),
+                    subtitle:
+                        '${loc.recordHeaviest(fmtWeight(heavy), unit.label)} · '
+                        '${loc.e1rmShort(fmtWeight(best, maxDecimals: 1), unit.label)}',
+                    trailing: hist.length < 2
+                        ? null
+                        : SizedBox(
+                            width: 64,
+                            height: 28,
+                            child: _Sparkline([for (final s in hist) s.best1Rm]),
+                          ),
+                    divider: lift != lifts.last,
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         builder: (_) => LiftProgressScreen(store: store, lift: lift, unit: unit),
                       ),
                     ),
+                  );
+                },
+              ),
+            DsSection(loc.progressCalendarTitle, help: loc.progressCalendarHelp),
+            _Calendar(
+              month: _month,
+              trained: trainedDays(workouts),
+              onMonth: (m) => setState(() => _month = m),
+              onDay: (day) {
+                final match = workouts.where((x) {
+                  final d = x.date.toLocal();
+                  return d.year == day.year && d.month == day.month && d.day == day.day;
+                });
+                if (match.isEmpty) return;
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => WorkoutDetailScreen(store: store, workoutId: match.first.id),
                   ),
                 );
               },
             ),
-          section(loc.e1rmCalcTitle, loc.e1rmCalcHelp),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            DsSection(loc.e1rmCalcTitle, help: loc.e1rmCalcHelp),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _calcWeight,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            labelText: loc.e1rmWeight,
-                            suffixText: unit.label,
-                            border: const OutlineInputBorder(),
-                          ),
-                          onChanged: (_) => setState(() {}),
-                        ),
+                  Expanded(
+                    child: TextField(
+                      controller: _calcWeight,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: loc.e1rmWeight,
+                        suffixText: unit.label,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: _calcReps,
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.done,
-                          decoration: InputDecoration(
-                            labelText: loc.workoutReps,
-                            border: const OutlineInputBorder(),
-                          ),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                      ),
-                    ],
+                      onChanged: (_) => setState(() {}),
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    est > 0
-                        ? loc.e1rmResult(fmtWeight(est, maxDecimals: 1), unit.label)
-                        : loc.e1rmExample(
-                            unit == WeightUnit.kg ? '100 kg' : '225 lb',
-                            unit == WeightUnit.kg ? '117 kg' : '263 lb',
-                          ),
-                    style: est > 0
-                        ? theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)
-                        : theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _calcReps,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(labelText: loc.workoutReps),
+                      onChanged: (_) => setState(() {}),
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(Ds.gutter, 14, Ds.gutter, 0),
+              child: Text(
+                est > 0
+                    ? loc.e1rmResult(fmtWeight(est, maxDecimals: 1), unit.label)
+                    : loc.e1rmExample(
+                        unit == WeightUnit.kg ? '100 kg' : '225 lb',
+                        unit == WeightUnit.kg ? '117 kg' : '263 lb',
+                      ),
+                style: est > 0 ? Ds.display(context) : Ds.secondary(context),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+/// Mini gráfico de tendencia para la fila de cada récord.
+class _Sparkline extends StatelessWidget {
+  const _Sparkline(this.values);
+
+  final List<double> values;
+
+  @override
+  Widget build(BuildContext context) => CustomPaint(painter: _SparkPainter(values, AppColors.blue));
+}
+
+class _SparkPainter extends CustomPainter {
+  _SparkPainter(this.values, this.color);
+
+  final List<double> values;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (values.length < 2) return;
+    final lo = values.reduce(math.min);
+    final hi = values.reduce(math.max);
+    final span = (hi - lo).abs() < 0.001 ? 1.0 : hi - lo;
+    final path = Path();
+    for (var i = 0; i < values.length; i++) {
+      final x = i * size.width / (values.length - 1);
+      final y = size.height - (values[i] - lo) / span * size.height;
+      i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
+    }
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_SparkPainter old) => old.values != values;
 }
 
 class _Calendar extends StatelessWidget {
@@ -274,9 +256,10 @@ class _Calendar extends StatelessWidget {
     final names = [...ml.narrowWeekdays.skip(1), ml.narrowWeekdays.first];
     final today = DateTime.now();
 
-    return Card(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Ds.gutter - 12),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 4, 8, 12),
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
         child: Column(
           children: [
             Row(
@@ -331,7 +314,7 @@ class _Calendar extends StatelessWidget {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: on ? AppColors.brandGradient : null,
+                                color: on ? AppColors.blue : null,
                                 border: isToday
                                     ? Border.all(color: theme.colorScheme.primary, width: 1.5)
                                     : null,

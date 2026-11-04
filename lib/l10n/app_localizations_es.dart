@@ -670,7 +670,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get statThisMonth => 'este mes';
 
   @override
-  String get statTotal => 'entrenamientos';
+  String get statTotal => 'en total';
 
   @override
   String get e1rmCalcTitle => 'RM estimado';
@@ -871,4 +871,44 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tabToday => 'Hoy';
+
+  @override
+  String get tabBox => 'Box';
+
+  @override
+  String get tabPlates => 'Discos';
+
+  @override
+  String get todayInProgress => 'En curso';
+
+  @override
+  String get todayResume => 'Seguir';
+
+  @override
+  String get todayNext => 'Próxima sesión';
+
+  @override
+  String get todayNoPlanBody =>
+      'No tienes un plan activo. Elige un programa abajo, crea una rutina o escanea el plan de tu coach.';
+
+  @override
+  String get todayFreeWorkout => 'O empieza un entrenamiento libre';
+
+  @override
+  String get todayRecent => 'Recientes';
+
+  @override
+  String get seeAll => 'Ver todo';
+
+  @override
+  String get colSet => 'SERIE';
+
+  @override
+  String get colPrevious => 'ANTERIOR';
+
+  @override
+  String get workoutFinishShort => 'Terminar';
 }

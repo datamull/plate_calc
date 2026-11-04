@@ -2,6 +2,11 @@
 
 ## 3.0.0 (beta en TestFlight)
 
+- Rediseño (referencias: Strong, Hevy y SugarWOD): barra inferior Hoy · Progreso · Box | Discos, con la calculadora separada.
+- Hoy: pizarra con la próxima sesión del plan y los pesos calculados con tu RM, semana con días entrenados, planes y recientes.
+- Registro tipo tabla (SERIE · ANTERIOR · KG · REPS · RPE): columna con lo que hiciste la última vez, fila verde al marcar la serie y botón Terminar arriba.
+- Estilo plano: líneas finas en vez de tarjetas, un solo color de acento, números grandes.
+
 - Nuevas pestañas: Calculadora, Entrenar, Progreso y Coach.
 - Entrenar: registro de sesiones con series, peso, repeticiones y RPE; temporizador de descanso; calculadora de discos por serie; entrenamiento en curso se guarda solo.
 - Rutinas propias y programas por porcentaje (Halterofilia 4 semanas, Fuerza 5/3/1) que calculan los pesos con el RM de cada persona.

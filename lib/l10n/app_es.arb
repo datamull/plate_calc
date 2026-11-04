@@ -301,7 +301,7 @@
   "shareCameraError": "No se puede abrir la cámara. Permite el acceso a la cámara para Plate Calc en Ajustes, o pega el código.",
   "statStreak": "semanas seguidas",
   "statThisMonth": "este mes",
-  "statTotal": "entrenamientos",
+  "statTotal": "en total",
   "e1rmCalcTitle": "RM estimado",
   "e1rmCalcHelp": "Peso y repeticiones de una serie exigente (fórmula de Epley).",
   "e1rmWeight": "Peso",
@@ -353,5 +353,18 @@
   "saveSetOkSnack": "Guardado para {movementName}.",
   "bodyweight": "Peso corporal",
   "setsRepsLine": "{weight} × {reps} reps",
-  "roundsCount": "{count, plural, =1{1 ronda} other{{count} rondas}}"
+  "roundsCount": "{count, plural, =1{1 ronda} other{{count} rondas}}",
+  "tabToday": "Hoy",
+  "tabBox": "Box",
+  "tabPlates": "Discos",
+  "todayInProgress": "En curso",
+  "todayResume": "Seguir",
+  "todayNext": "Próxima sesión",
+  "todayNoPlanBody": "No tienes un plan activo. Elige un programa abajo, crea una rutina o escanea el plan de tu coach.",
+  "todayFreeWorkout": "O empieza un entrenamiento libre",
+  "todayRecent": "Recientes",
+  "seeAll": "Ver todo",
+  "colSet": "SERIE",
+  "colPrevious": "ANTERIOR",
+  "workoutFinishShort": "Terminar"
 }

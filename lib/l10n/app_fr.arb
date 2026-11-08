@@ -411,5 +411,6 @@
   "scanRawText": "Texte lu sur la photo",
   "scanRepsLabel": "Reps / distance / calories",
   "scanMoveLabel": "Exercice",
-  "scanRxLabel": "Charge Rx (facultatif)"
+  "scanRxLabel": "Charge Rx (facultatif)",
+  "scanByAi": "✦ LU PAR IA"
 }

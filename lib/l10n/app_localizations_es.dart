@@ -1054,4 +1054,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get scanRxLabel => 'Peso Rx (opcional)';
+
+  @override
+  String get scanByAi => '✦ LEÍDO CON IA';
 }

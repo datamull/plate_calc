@@ -1911,6 +1911,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Weight Rx (optional)'**
   String get scanRxLabel;
+
+  /// No description provided for @scanByAi.
+  ///
+  /// In en, this message translates to:
+  /// **'✦ READ WITH AI'**
+  String get scanByAi;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

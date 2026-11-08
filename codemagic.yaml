@@ -13,6 +13,10 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.example.plateCalc
+      # Lectura de pizarras con IA: PLATECALC_AI_URL y PLATECALC_AI_TOKEN
+      # (Codemagic → plate_calc → Environment variables, grupo "platecalc_ai").
+      groups:
+        - platecalc_ai
       vars:
         BUNDLE_ID: "com.example.plateCalc"
         XCODE_SCHEME: "Runner"
@@ -39,6 +43,8 @@ workflows:
         script: |
           flutter build ipa --release \
             --build-number=$BUILD_NUMBER \
+            --dart-define=PLATECALC_AI_URL="${PLATECALC_AI_URL:-}" \
+            --dart-define=PLATECALC_AI_TOKEN="${PLATECALC_AI_TOKEN:-}" \
             --export-options-plist=/Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
@@ -61,6 +67,8 @@ workflows:
       # (Code signing identities → Android keystores), con este nombre.
       android_signing:
         - platecalc_upload
+      groups:
+        - platecalc_ai
       flutter: stable
     scripts:
       - name: Instalar dependencias
@@ -82,6 +90,8 @@ workflows:
       - name: Compilar App Bundle
         script: |
           flutter build appbundle --release \
-            --build-number=$((BUILD_NUMBER + 100))
+            --build-number=$((BUILD_NUMBER + 100)) \
+            --dart-define=PLATECALC_AI_URL="${PLATECALC_AI_URL:-}" \
+            --dart-define=PLATECALC_AI_TOKEN="${PLATECALC_AI_TOKEN:-}"
     artifacts:
       - build/app/outputs/bundle/release/*.aab

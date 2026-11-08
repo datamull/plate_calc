@@ -7,8 +7,10 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../data/daily_library.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/board_ai.dart';
 import '../../services/board_parser.dart';
 import '../../services/training_store.dart';
+import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import 'training_home.dart';
 import 'wod_screen.dart';
@@ -44,7 +46,7 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
 
   XFile? photo;
   try {
-    photo = await ImagePicker().pickImage(source: source, maxWidth: 2400, imageQuality: 92);
+    photo = await ImagePicker().pickImage(source: source, maxWidth: 1800, imageQuality: 85);
   } catch (_) {
     if (context.mounted) _snack(context, loc.scanPermission);
     return;
@@ -74,26 +76,38 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
       ),
     ),
   );
-  String text = '';
-  final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
-  try {
-    final result = await recognizer.processImage(InputImage.fromFilePath(photo.path));
-    text = linesTopToBottom(result);
-  } catch (_) {
-    text = '';
-  } finally {
-    await recognizer.close();
+  // 1) IA (Gemini en el servidor). 2) Si no hay internet o falla: lector local.
+  var text = '';
+  var byAi = false;
+  var wod = await BoardAi.read(photo.path, fallbackName: loc.scanDefaultName);
+  if (wod != null && wod.items.isNotEmpty) {
+    byAi = true;
+  } else {
+    final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    try {
+      final result = await recognizer.processImage(InputImage.fromFilePath(photo.path));
+      text = linesTopToBottom(result);
+    } catch (_) {
+      text = '';
+    } finally {
+      await recognizer.close();
+    }
+    wod = BoardParser.parse(text, fallbackName: loc.scanDefaultName);
   }
   if (!context.mounted) return;
   Navigator.of(context, rootNavigator: true).pop();
 
-  final wod = BoardParser.parse(text, fallbackName: loc.scanDefaultName);
   // Aunque no se lea nada se abre la revisión: ahí se puede escribir a mano.
   if (wod.items.isEmpty) _snack(context, loc.scanNothing);
   await Navigator.of(context).push(
     MaterialPageRoute<void>(
-      builder: (_) =>
-          ScanReviewScreen(store: store, wod: wod, imagePath: photo!.path, rawText: text),
+      builder: (_) => ScanReviewScreen(
+        store: store,
+        wod: wod!,
+        imagePath: photo!.path,
+        rawText: text,
+        byAi: byAi,
+      ),
     ),
   );
 }
@@ -136,6 +150,7 @@ class ScanReviewScreen extends StatefulWidget {
     required this.wod,
     required this.imagePath,
     this.rawText = '',
+    this.byAi = false,
   });
 
   final TrainingStore store;
@@ -144,6 +159,9 @@ class ScanReviewScreen extends StatefulWidget {
 
   /// Texto tal como lo leyó la cámara (para revisar qué entendió).
   final String rawText;
+
+  /// true si la leyó la IA (se muestra una etiqueta).
+  final bool byAi;
 
   @override
   State<ScanReviewScreen> createState() => _ScanReviewScreenState();
@@ -222,6 +240,11 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
               ),
             ),
           ),
+          if (widget.byAi)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(Ds.gutter, 0, Ds.gutter, 8),
+              child: Row(children: [DsPill(loc.scanByAi, color: AppColors.purple)]),
+            ),
           Padding(
             padding: const EdgeInsets.fromLTRB(Ds.gutter, 0, Ds.gutter, 12),
             child: Text(loc.scanCheck, style: Ds.secondary(context)),

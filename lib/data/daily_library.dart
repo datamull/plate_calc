@@ -61,7 +61,9 @@ class DailyItem {
 
   String? rx(WeightUnit u) {
     final v = u == WeightUnit.kg ? rxKg : rxLb;
-    return v == null ? null : '$v ${u.label}';
+    if (v == null) return null;
+    // Si ya trae unidad ("20/14 lb", "60/50 cm") se muestra tal cual.
+    return RegExp('[a-zA-Z"#]').hasMatch(v) ? v : '$v ${u.label}';
   }
 }
 

@@ -1057,4 +1057,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get scanRxLabel => 'Charge Rx (facultatif)';
+
+  @override
+  String get scanByAi => '✦ LU PAR IA';
 }

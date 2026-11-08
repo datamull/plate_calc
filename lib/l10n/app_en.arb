@@ -681,5 +681,6 @@
   "scanRawText": "Text read from the photo",
   "scanRepsLabel": "Reps / distance / calories",
   "scanMoveLabel": "Exercise",
-  "scanRxLabel": "Weight Rx (optional)"
+  "scanRxLabel": "Weight Rx (optional)",
+  "scanByAi": "✦ READ WITH AI"
 }

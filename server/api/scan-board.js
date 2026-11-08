@@ -5,7 +5,7 @@
 // Variables de entorno en Vercel:
 //   GEMINI_API_KEY  clave de Google AI Studio (obligatoria)
 //   APP_TOKEN       texto secreto que la app manda en "x-app-token" (obligatoria)
-//   GEMINI_MODEL    modelo a usar (opcional, por defecto gemini-3.8-flash)
+//   GEMINI_MODEL    modelo a usar (opcional, por defecto gemini-3.6-flash)
 
 const MOVES = [
   'Wall Ball', 'Double Under', 'Single Under', 'Row', 'Bike', 'Ski', 'Run', 'Burpee',
@@ -71,7 +71,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'unauthorized' });
     }
     const t0 = Date.now();
-    const model = String(req.query.model || process.env.GEMINI_MODEL || 'gemini-3.8-flash')
+    const model = String(req.query.model || process.env.GEMINI_MODEL || 'gemini-3.6-flash')
       .replace(/[^a-z0-9.\-]/gi, '');
     try {
       const r = await fetch(
@@ -112,7 +112,7 @@ export default async function handler(req, res) {
   }
   if (image.length > MAX_IMAGE_CHARS) return res.status(413).json({ error: 'too_large' });
 
-  const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   try {
     const r = await fetch(url, {

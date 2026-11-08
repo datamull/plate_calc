@@ -11,6 +11,7 @@ import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
+import '../widgets/training_widgets.dart' show fmtDuration;
 import 'board_scan.dart';
 import 'progress_screen.dart';
 import 'wod_screen.dart';

@@ -1035,4 +1035,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanRetake => 'Take another photo';
+
+  @override
+  String get scanTapToEdit => 'Tap an exercise to fix it.';
+
+  @override
+  String get scanRawText => 'Text read from the photo';
+
+  @override
+  String get scanRepsLabel => 'Reps / distance / calories';
+
+  @override
+  String get scanMoveLabel => 'Exercise';
+
+  @override
+  String get scanRxLabel => 'Weight Rx (optional)';
 }

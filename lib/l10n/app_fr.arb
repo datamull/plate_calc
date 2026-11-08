@@ -406,5 +406,10 @@
   "scanTitle": "Tableau",
   "scanDefaultName": "WOD du tableau",
   "scanCheck": "Vérifie avant de commencer : change le format ou retire ce qui a été mal lu.",
-  "scanRetake": "Prendre une autre photo"
+  "scanRetake": "Prendre une autre photo",
+  "scanTapToEdit": "Touche un exercice pour le corriger.",
+  "scanRawText": "Texte lu sur la photo",
+  "scanRepsLabel": "Reps / distance / calories",
+  "scanMoveLabel": "Exercice",
+  "scanRxLabel": "Charge Rx (facultatif)"
 }

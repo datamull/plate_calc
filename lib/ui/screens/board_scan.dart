@@ -78,7 +78,7 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
   final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
   try {
     final result = await recognizer.processImage(InputImage.fromFilePath(photo.path));
-    text = result.text;
+    text = linesTopToBottom(result);
   } catch (_) {
     text = '';
   } finally {
@@ -88,15 +88,28 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
   Navigator.of(context, rootNavigator: true).pop();
 
   final wod = BoardParser.parse(text, fallbackName: loc.scanDefaultName);
-  if (wod.items.isEmpty) {
-    _snack(context, loc.scanNothing);
-    return;
-  }
+  // Aunque no se lea nada se abre la revisión: ahí se puede escribir a mano.
+  if (wod.items.isEmpty) _snack(context, loc.scanNothing);
   await Navigator.of(context).push(
     MaterialPageRoute<void>(
-      builder: (_) => ScanReviewScreen(store: store, wod: wod, imagePath: photo!.path),
+      builder: (_) =>
+          ScanReviewScreen(store: store, wod: wod, imagePath: photo!.path, rawText: text),
     ),
   );
+}
+
+/// Todas las líneas leídas, de arriba hacia abajo (y de izquierda a derecha
+/// si están a la misma altura). ML Kit agrupa por bloques y, con letra a mano,
+/// a veces mezcla el orden.
+String linesTopToBottom(RecognizedText result) {
+  final lines = [for (final b in result.blocks) ...b.lines];
+  lines.sort((a, b) {
+    final ay = a.boundingBox.center.dy, by = b.boundingBox.center.dy;
+    final h = (a.boundingBox.height + b.boundingBox.height) / 4;
+    if ((ay - by).abs() > h) return ay.compareTo(by);
+    return a.boundingBox.left.compareTo(b.boundingBox.left);
+  });
+  return lines.map((l) => l.text).join('\n');
 }
 
 void _snack(BuildContext context, String msg) =>
@@ -122,11 +135,15 @@ class ScanReviewScreen extends StatefulWidget {
     required this.store,
     required this.wod,
     required this.imagePath,
+    this.rawText = '',
   });
 
   final TrainingStore store;
   final DailyWorkout wod;
   final String imagePath;
+
+  /// Texto tal como lo leyó la cámara (para revisar qué entendió).
+  final String rawText;
 
   @override
   State<ScanReviewScreen> createState() => _ScanReviewScreenState();
@@ -166,6 +183,16 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
       WodFormat.sets => ScoreType.load,
     },
   );
+
+  /// Editar (o agregar, si [index] es null) un ejercicio.
+  Future<void> _edit(int? index) async {
+    final edited = await showDialog<DailyItem>(
+      context: context,
+      builder: (_) => _ItemEditor(item: index == null ? null : _items[index]),
+    );
+    if (edited == null) return;
+    setState(() => index == null ? _items.add(edited) : _items[index] = edited);
+  }
 
   bool get _needsMinutes =>
       (_format == WodFormat.amrap || _format == WodFormat.emom) &&
@@ -270,21 +297,36 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
             padding: const EdgeInsets.fromLTRB(20, 6, 8, 6),
             child: Column(
               children: [
-                for (final item in _items)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: WodItemRow(item: item, store: widget.store, unit: unit),
-                      ),
-                      IconButton(
-                        tooltip: loc.delete,
-                        icon: Icon(Icons.close, size: 18, color: Ds.muted(context)),
-                        onPressed: () => setState(() => _items.remove(item)),
-                      ),
-                    ],
+                for (var i = 0; i < _items.length; i++)
+                  InkWell(
+                    onTap: () => _edit(i),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: WodItemRow(item: _items[i], store: widget.store, unit: unit),
+                        ),
+                        IconButton(
+                          tooltip: loc.delete,
+                          icon: Icon(Icons.close, size: 18, color: Ds.muted(context)),
+                          onPressed: () => setState(() => _items.removeAt(i)),
+                        ),
+                      ],
+                    ),
                   ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.add, size: 18),
+                    label: Text(loc.workoutAddExercise),
+                    onPressed: () => _edit(null),
+                  ),
+                ),
               ],
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(Ds.gutter, 8, Ds.gutter, 0),
+            child: Text(loc.scanTapToEdit, style: Ds.secondary(context)),
           ),
           const SizedBox(height: 20),
           DsPrimaryButton(
@@ -309,8 +351,111 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
               },
             ),
           ),
+          if (widget.rawText.trim().isNotEmpty)
+            Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                title: Text(loc.scanRawText, style: Ds.secondary(context)),
+                childrenPadding: const EdgeInsets.fromLTRB(Ds.gutter, 0, Ds.gutter, 16),
+                expandedAlignment: Alignment.centerLeft,
+                children: [SelectableText(widget.rawText, style: Ds.secondary(context))],
+              ),
+            ),
         ],
       ),
+    );
+  }
+}
+
+/// Diálogo para corregir un ejercicio leído de la pizarra.
+class _ItemEditor extends StatefulWidget {
+  const _ItemEditor({this.item});
+
+  final DailyItem? item;
+
+  @override
+  State<_ItemEditor> createState() => _ItemEditorState();
+}
+
+class _ItemEditorState extends State<_ItemEditor> {
+  late final _reps = TextEditingController(text: widget.item?.reps ?? '');
+  late final _rx = TextEditingController(text: widget.item?.rxKg ?? widget.item?.rxLb ?? '');
+  late String _move = widget.item?.lift ?? '';
+
+  @override
+  void dispose() {
+    _reps.dispose();
+    _rx.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final move = _move.trim();
+    if (move.isEmpty) return;
+    final known = BoardParser.matchMove(move);
+    final lift = known ?? move;
+    final rx = _rx.text.trim();
+    final old = widget.item;
+    Navigator.pop(
+      context,
+      DailyItem(
+        lift,
+        reps: _reps.text.trim(),
+        sets: old?.sets,
+        repsPerSet: old?.repsPerSet,
+        percent: old?.lift == lift ? old?.percent : null,
+        rmOf: known == null ? null : BoardParser.rmOf(known),
+        rxKg: rx.isEmpty ? null : rx,
+        rxLb: rx.isEmpty ? null : rx,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(widget.item == null ? loc.workoutAddExercise : loc.edit),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _reps,
+              decoration: InputDecoration(
+                labelText: loc.scanRepsLabel,
+                hintText: '21-15-9, 400 m, 15',
+              ),
+            ),
+            const SizedBox(height: 12),
+            Autocomplete<String>(
+              initialValue: TextEditingValue(text: _move),
+              optionsBuilder: (v) {
+                final q = v.text.trim().toLowerCase();
+                if (q.isEmpty) return const Iterable<String>.empty();
+                return BoardParser.knownMoves.where((m) => m.toLowerCase().contains(q)).take(8);
+              },
+              onSelected: (m) => _move = m,
+              fieldViewBuilder: (context, ctrl, focus, onSubmit) => TextField(
+                controller: ctrl,
+                focusNode: focus,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(labelText: loc.scanMoveLabel),
+                onChanged: (v) => _move = v,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _rx,
+              decoration: InputDecoration(labelText: loc.scanRxLabel, hintText: '24/16'),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(loc.cancel)),
+        FilledButton(onPressed: _save, child: Text(loc.save)),
+      ],
     );
   }
 }

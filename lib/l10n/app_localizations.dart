@@ -1881,6 +1881,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Take another photo'**
   String get scanRetake;
+
+  /// No description provided for @scanTapToEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an exercise to fix it.'**
+  String get scanTapToEdit;
+
+  /// No description provided for @scanRawText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text read from the photo'**
+  String get scanRawText;
+
+  /// No description provided for @scanRepsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reps / distance / calories'**
+  String get scanRepsLabel;
+
+  /// No description provided for @scanMoveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise'**
+  String get scanMoveLabel;
+
+  /// No description provided for @scanRxLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight Rx (optional)'**
+  String get scanRxLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

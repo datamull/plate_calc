@@ -18,7 +18,7 @@ void main() {
     expect(w.format, WodFormat.amrap);
     expect(w.minutes, 12);
     expect(w.items.map((i) => i.lift), ['Toes-to-Bar', 'Kettlebell Swing', 'Double Under', 'Run']);
-    expect(w.items.map((i) => i.reps), ['10', '15', '50', '200m']);
+    expect(w.items.map((i) => i.reps), ['10', '15', '50', '200 m']);
     expect(w.items[1].rxKg, '24/16');
   });
 
@@ -52,5 +52,36 @@ void main() {
     final w = p('For time\n30 GHD situps\n20 Sandbag cleans');
     expect(w.items.length, 2);
     expect(w.items.last.lift, 'Sandbag Cleans');
+  });
+
+  group('pizarra escrita a mano (foto real de un box)', () {
+    const expected = [
+      ('100', 'Wall Ball'),
+      ('90', 'Double Under'),
+      ('80 cal', 'Row'),
+      ('70', 'Dumbbell Snatch'),
+      ('60 cal', 'Bike'),
+      ('50', 'Burpee'),
+      ('40', 'Pull-Up'),
+      ('30', 'Dumbbell Lunge'),
+      ('20', 'Push-Up'),
+      ('10', 'Bar Muscle-Up'),
+    ];
+    final variants = {
+      'lectura limpia con logos':
+          "AMRAP32:\nCLUB\nL'EPAULE\n-100 VVB\n90 DU\n80 calrow\n70 dbsnatch\n60 cal echo\n"
+          '50 burpees\n40 pull-ups\n30 db lunges\n20 posh-ups\n10 BNU\nCROSSFIT\n25 COMPETITION LB',
+      'letras por números y líneas juntas':
+          'ANRAP 3Z:\n+00 WB 90 Du\n8O cal row\n7O dlb snatch\n6O cal echo\nS0 burpees\n'
+          '4O pull-ops\n3O db lunges\n2O push-ups\nlO BMU',
+    };
+    for (final v in variants.entries) {
+      test(v.key, () {
+        final w = BoardParser.parse(v.value, fallbackName: 'WOD');
+        expect(w.format, WodFormat.amrap);
+        expect(w.minutes, 32);
+        expect([for (final i in w.items) (i.reps, i.lift)], expected);
+      });
+    }
   });
 }

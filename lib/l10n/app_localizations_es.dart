@@ -1039,4 +1039,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get scanRetake => 'Tomar otra foto';
+
+  @override
+  String get scanTapToEdit => 'Toca un ejercicio para corregirlo.';
+
+  @override
+  String get scanRawText => 'Texto leído de la foto';
+
+  @override
+  String get scanRepsLabel => 'Reps / distancia / calorías';
+
+  @override
+  String get scanMoveLabel => 'Ejercicio';
+
+  @override
+  String get scanRxLabel => 'Peso Rx (opcional)';
 }

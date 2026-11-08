@@ -46,7 +46,7 @@ class BoardParser {
     'Chest-to-Bar Pull-Up': (['chest to bar', 'c2b', 'ctb', 'chest-to-bar'], null),
     'Toes-to-Bar': (['toes to bar', 't2b', 'ttb', 'toes-to-bar', 'pies a la barra'], null),
     'Muscle-Up': (['muscle up', 'muscle-up', 'mu', 'ring muscle up', 'rmu'], null),
-    'Bar Muscle-Up': (['bar muscle up', 'bmu', 'bar mu'], null),
+    'Bar Muscle-Up': (['bar muscle up', 'bmu', 'bar mu', 'bmus'], null),
     'Handstand Push-Up': (['handstand push up', 'hspu', 'handstand push-up'], null),
     'Push-Up': (['push up', 'push-up', 'pushup', 'push ups', 'flexiones', 'pompes'], null),
     'Burpee': (['burpee', 'burpees'], null),
@@ -54,7 +54,10 @@ class BoardParser {
     'Burpee Box Jump': (['burpee box jump', 'bbj', 'burpee box jump over', 'bbjo'], null),
     'Box Jump': (['box jump', 'box jumps', 'bj', 'salto al cajón', 'salto cajon'], null),
     'Box Jump Over': (['box jump over', 'bjo'], null),
-    'Wall Ball': (['wall ball', 'wall balls', 'wb', 'wallball', 'wall ball shot'], null),
+    'Wall Ball': (
+      ['wall ball', 'wall balls', 'wb', 'wbs', 'vvb', 'wallball', 'wall ball shot'],
+      null,
+    ),
     'Kettlebell Swing': (
       ['kettlebell swing', 'kb swing', 'kbs', 'swings', 'russian swing', 'american swing'],
       null,
@@ -66,12 +69,30 @@ class BoardParser {
     'Single Under': (['single under', 'single unders', 'su'], null),
     'Sit-Up': (['sit up', 'sit-up', 'situp', 'sit ups', 'abmat', 'abdominales'], null),
     'Lunge': (['lunge', 'lunges', 'walking lunge', 'estocadas', 'fentes'], null),
-    'Dumbbell Snatch': (['dumbbell snatch', 'db snatch', 'dbs'], null),
+    'Dumbbell Snatch': (
+      ['dumbbell snatch', 'db snatch', 'dbs', 'db sn', 'mancuerna arranque'],
+      null,
+    ),
+    'Dumbbell Lunge': (['dumbbell lunge', 'db lunge', 'db lunges', 'db walking lunge'], null),
+    'Dumbbell Thruster': (['dumbbell thruster', 'db thruster', 'db thrusters'], null),
     'Devil Press': (['devil press', 'devils press'], null),
     'Ring Dip': (['ring dip', 'ring dips', 'dips', 'fondos'], null),
     'Rope Climb': (['rope climb', 'rope climbs', 'rc', 'trepa', 'cuerda'], null),
-    'Row': (['row', 'rower', 'remo', 'rameur', 'cal row', 'row cal'], null),
-    'Bike': (['bike', 'assault bike', 'echo bike', 'airbike', 'bici'], null),
+    'Row': (['row', 'rower', 'remo', 'rameur', 'cal row', 'row cal', 'calrow'], null),
+    'Bike': (
+      [
+        'bike',
+        'assault bike',
+        'echo bike',
+        'echo',
+        'cal echo',
+        'cal bike',
+        'airbike',
+        'bici',
+        'assault',
+      ],
+      null,
+    ),
     'Ski': (['ski', 'ski erg', 'skierg'], null),
     'Run': (['run', 'running', 'correr', 'carrera', 'course'], null),
   };
@@ -88,6 +109,9 @@ class BoardParser {
       .trim();
 
   static String? rmOf(String move) => _moves[move]?.$2;
+
+  /// Nombres de todos los movimientos que reconoce (para sugerencias).
+  static List<String> get knownMoves => _moves.keys.toList()..sort();
 
   /// Busca el movimiento en [text]: exacto, el alias más largo contenido, o
   /// con hasta 2 letras distintas (errores de lectura de la foto).
@@ -109,12 +133,23 @@ class BoardParser {
       }
     }
     if (best != null) return best;
-    if (n.length >= 5) {
-      for (final e in _alias.entries) {
-        if (e.key.length >= 5 && _lev(n, e.key) <= 2) return e.value;
+    // Errores de lectura: el alias más parecido (y el más largo si empatan).
+    String? fuzzy;
+    var fuzzyD = 99, fuzzyLen = 0;
+    for (final e in _alias.entries) {
+      final a = e.key;
+      final max = n.length >= 5 && a.length >= 5
+          ? 2
+          : (n.length >= 3 && a.length == n.length && !n.contains(' ') ? 1 : 0);
+      if (max == 0) continue;
+      final d = _lev(n, a);
+      if (d <= max && (d < fuzzyD || (d == fuzzyD && a.length > fuzzyLen))) {
+        fuzzy = e.value;
+        fuzzyD = d;
+        fuzzyLen = a.length;
       }
     }
-    return null;
+    return fuzzy;
   }
 
   static int _lev(String a, String b) {
@@ -135,7 +170,7 @@ class BoardParser {
   }
 
   static final _amrap = RegExp(
-    r'amrap\s*(?:of\s*|de\s*)?(\d+)|(\d+)\s*(?:min|minutes|minutos|′|\x27)?\s*amrap',
+    r'a[mn]rap\s*(?:of\s*|de\s*)?(\d[0-9OoZzSsl]?\d?)|(\d+)\s*(?:min|minutes|minutos|′|\x27)?\s*a[mn]rap',
     caseSensitive: false,
   );
   static final _emom = RegExp(
@@ -166,10 +201,71 @@ class BoardParser {
   );
   static final _pct = RegExp(r'@?\s*(\d{2,3})\s*%');
 
+  /// Palabras de logos, discos y marcas que aparecen en las fotos.
+  static const _noise = {
+    'crossfit',
+    'club',
+    'competition',
+    'lb',
+    'lbs',
+    'kg',
+    'kgs',
+    'rogue',
+    'eleiko',
+    'concept',
+    'gym',
+    'box',
+    'wod',
+    'by',
+    'the',
+    'and',
+  };
+
+  /// Letras que la lectura confunde con números (O→0, l→1, S→5, Z→2).
+  static String _digits(String t) => t
+      .replaceAll(RegExp('[Oo]'), '0')
+      .replaceAll(RegExp(r'[Il|]'), '1')
+      .replaceAll(RegExp('[Ss]'), '5')
+      .replaceAll(RegExp('[Zz]'), '2');
+
+  static final _fuzzyNum = RegExp(r'^[0-9OoIl|SsZz]{1,3}$');
+
+  /// Arregla una línea leída de la foto: ruido al inicio, números con
+  /// letras ("4O", "lO", "S0"), palabras pegadas ("calrow", "dbsnatch").
+  static String _clean(String l) {
+    var line = l.replaceAll(RegExp(r'\s+'), ' ').trim();
+    // "+00" suele ser un "1" con una mancha delante.
+    line = line.replaceFirst(RegExp(r'^\+(?=\d)'), '1');
+    line = line.replaceFirst(RegExp(r'^[\-~¬•·*_.,]+\s*'), '');
+    final first = line.split(' ').first;
+    if (first.length >= 2 &&
+        _fuzzyNum.hasMatch(first) &&
+        RegExp('[0-9Oo]').hasMatch(first) &&
+        line.length > first.length) {
+      line = _digits(first) + line.substring(first.length);
+    }
+    // Número pegado al movimiento: "10BMU" → "10 BMU".
+    line = line.replaceFirst(RegExp(r'^(\d+)(?=[A-Za-z]{2})'), r'$1 ');
+    // "db" leído como "dlb", "clb" o "d6".
+    line = line.replaceAll(RegExp(r'\b(?:dlb|clb|d1b|d6|olb)\b', caseSensitive: false), 'db');
+    // Prefijos pegados: "calrow", "dbsnatch", "kbswing".
+    line = line.replaceAllMapped(
+      RegExp(r'\b(cal|db|kb)(?=[a-z]{3,})', caseSensitive: false),
+      (m) => '${m[1]} ',
+    );
+    return line;
+  }
+
+  /// Separa líneas que la lectura juntó: "WB 90 DU" → "WB" / "90 DU".
+  static final _splitter = RegExp(
+    r'(?<=[a-zA-Z])\s+(?=\d{1,3}\s*(?!m\b|km\b|cal|reps?\b|kg|lb|%)[a-zA-Z]{2})',
+  );
+
   static DailyWorkout parse(String text, {required String fallbackName}) {
     final lines = text
         .split(RegExp(r'[\n\r]+'))
-        .map((l) => l.replaceAll(RegExp(r'\s+'), ' ').trim())
+        .expand((l) => l.split(_splitter))
+        .map(_clean)
         .where((l) => l.isNotEmpty)
         .toList();
     final all = lines.join('\n');
@@ -181,7 +277,7 @@ class BoardParser {
     final em = _emom.firstMatch(all);
     if (am != null) {
       format = WodFormat.amrap;
-      minutes = int.tryParse(am.group(1) ?? am.group(2) ?? '');
+      minutes = int.tryParse(_digits(am.group(1) ?? am.group(2) ?? ''));
     } else if (em != null) {
       format = WodFormat.emom;
       minutes = int.tryParse(em.group(1) ?? em.group(2) ?? '');
@@ -193,7 +289,7 @@ class BoardParser {
     }
 
     String? name;
-    final items = <DailyItem>[];
+    final candidates = <(DailyItem, bool)>[];
     var setsLines = 0;
     for (final raw in lines) {
       // Líneas que solo dicen el formato.
@@ -245,25 +341,35 @@ class BoardParser {
       } else {
         final lr = _leadReps.firstMatch(line);
         if (lr != null && RegExp(r'[a-zA-Z]').hasMatch(lr.group(2)!)) {
-          reps = lr.group(1)!.replaceAll(' ', '');
+          reps = _reps(lr.group(1)!);
           move = lr.group(2)!;
         } else {
           final tr = _tailReps.firstMatch(line);
           if (tr != null && RegExp(r'[a-zA-Z]').hasMatch(tr.group(1)!)) {
-            reps = tr.group(2)!.replaceAll(' ', '');
+            reps = _reps(tr.group(2)!);
             move = tr.group(1)!;
           }
         }
       }
 
       final known = matchMove(move);
-      if (known == null && reps.isEmpty) {
-        // Sin movimiento ni reps: probablemente el título.
-        if (name == null && items.isEmpty && move.length <= 30) name = _title(move);
+      // Nombre del WOD: solo si es la primera línea de la pizarra, sin
+      // números y no es un movimiento ("Fran", "Murph").
+      if (raw == lines.first &&
+          known == null &&
+          reps.isEmpty &&
+          !RegExp(r'\d').hasMatch(move) &&
+          move.split(' ').length <= 3 &&
+          !_norm(move).split(' ').every(_noise.contains)) {
+        name = _title(move);
         continue;
       }
+      // Logos, marcas y discos ("25 COMPETITION LB", "CROSSFIT").
+      final words = _norm(move).split(' ').where((w) => w.isNotEmpty);
+      if (known == null && (words.isEmpty || words.every(_noise.contains))) continue;
+      if (known == null && reps.isEmpty) continue;
       if (known == null && !RegExp(r'[a-zA-Z]{2}').hasMatch(move)) continue;
-      items.add(
+      candidates.add((
         DailyItem(
           known ?? _title(move),
           reps: reps,
@@ -274,8 +380,16 @@ class BoardParser {
           rxKg: rxKg,
           rxLb: rxLb,
         ),
-      );
+        reps.isNotEmpty,
+      ));
     }
+    // Si la pizarra trae repeticiones, las líneas sin número son texto suelto
+    // (logos, nombres) y se descartan.
+    final anyReps = candidates.any((c) => c.$2);
+    final items = [
+      for (final c in candidates)
+        if (c.$2 || !anyReps) c.$1,
+    ];
 
     // Solo series × reps (fuerza): se registra por series.
     if (am == null && em == null && rounds == null && setsLines > 0 && setsLines == items.length) {
@@ -285,7 +399,8 @@ class BoardParser {
     return DailyWorkout(
       id: 'scan_${DateTime.now().millisecondsSinceEpoch}',
       style: TrainingStyle.crossfit,
-      name: name ?? fallbackName,
+      name:
+          name ?? (minutes != null && format == WodFormat.amrap ? 'AMRAP $minutes′' : fallbackName),
       format: format,
       items: items,
       minutes: minutes,
@@ -298,6 +413,14 @@ class BoardParser {
       },
     );
   }
+
+  /// "60cal" / "60 cal" → "60 cal"; "400m" → "400 m".
+  static String _reps(String r) => r
+      .replaceAll(' ', '')
+      .replaceFirstMapped(
+        RegExp(r'^([\d/\-]+)([a-zA-Z]+)$'),
+        (m) => '${m[1]} ${m[2]!.toLowerCase()}',
+      );
 
   static String _title(String s) {
     final t = s.trim();

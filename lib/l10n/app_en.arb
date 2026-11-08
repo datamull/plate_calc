@@ -676,5 +676,10 @@
   "scanTitle": "Whiteboard",
   "scanDefaultName": "Whiteboard WOD",
   "scanCheck": "Check it before you start: change the format or remove anything misread.",
-  "scanRetake": "Take another photo"
+  "scanRetake": "Take another photo",
+  "scanTapToEdit": "Tap an exercise to fix it.",
+  "scanRawText": "Text read from the photo",
+  "scanRepsLabel": "Reps / distance / calories",
+  "scanMoveLabel": "Exercise",
+  "scanRxLabel": "Weight Rx (optional)"
 }

@@ -406,5 +406,10 @@
   "scanTitle": "Pizarra",
   "scanDefaultName": "WOD de la pizarra",
   "scanCheck": "Revísalo antes de empezar: cambia el formato o quita lo que se haya leído mal.",
-  "scanRetake": "Tomar otra foto"
+  "scanRetake": "Tomar otra foto",
+  "scanTapToEdit": "Toca un ejercicio para corregirlo.",
+  "scanRawText": "Texto leído de la foto",
+  "scanRepsLabel": "Reps / distancia / calorías",
+  "scanMoveLabel": "Ejercicio",
+  "scanRxLabel": "Peso Rx (opcional)"
 }

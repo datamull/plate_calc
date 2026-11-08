@@ -342,6 +342,7 @@ void main() {
     await tester.tap(find.text('AMRAP'));
     await tester.pumpAndSettle();
     final start = find.widgetWithText(FilledButton, 'Empezar');
+    await tester.scrollUntilVisible(start, 200, scrollable: find.byType(Scrollable).first);
     expect(tester.widget<FilledButton>(start).onPressed, isNull);
     await tester.enterText(find.widgetWithText(TextField, 'Min'), '12');
     await tester.pumpAndSettle();
@@ -351,5 +352,57 @@ void main() {
     await tester.tap(find.byTooltip('Eliminar').first);
     await tester.pumpAndSettle();
     expect(find.text('Burpee'), findsNothing);
+  });
+
+  testWidgets('revisión de la pizarra: corregir un ejercicio y agregar otro', (tester) async {
+    SharedPreferences.setMockInitialValues({'app_locale': 'es', 'lifts_units': 'kg'});
+    final storage = await AppStorage.load();
+    final wod = BoardParser.parse('AMRAP 20\n10 Burpees', fallbackName: 'WOD');
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('es'),
+        home: ScanReviewScreen(
+          store: TrainingStore(storage),
+          wod: wod,
+          imagePath: '/no/existe.jpg',
+          rawText: 'AMRAP 20\n10 Burpees',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Corregir: tocar la fila y cambiar repeticiones y ejercicio.
+    await tester.tap(find.text('Burpee'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Reps / distancia / calorías'), '15');
+    await tester.enterText(find.widgetWithText(TextField, 'Ejercicio'), 'box jump');
+    await tester.pumpAndSettle();
+    // Se elige la sugerencia (tapa el botón mientras está abierta).
+    await tester.tap(find.text('Box Jump'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Box Jump'), findsOneWidget);
+    expect(find.text('15'), findsOneWidget);
+
+    // Agregar uno que no estaba.
+    await tester.tap(find.text('Agregar ejercicio'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Reps / distancia / calorías'), '400 m');
+    await tester.enterText(find.widgetWithText(TextField, 'Ejercicio'), 'Run');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Run').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Run'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Texto leído de la foto'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Texto leído de la foto'), findsOneWidget);
   });
 }

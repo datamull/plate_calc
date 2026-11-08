@@ -412,5 +412,12 @@
   "scanRepsLabel": "Reps / distancia / calorías",
   "scanMoveLabel": "Ejercicio",
   "scanRxLabel": "Peso Rx (opcional)",
-  "scanByAi": "✦ LEÍDO CON IA"
+  "scanByAi": "✦ LEÍDO CON IA",
+  "aiConsentTitle": "¿Leer la pizarra con IA?",
+  "aiConsentBody": "Para leer la pizarra, Plate Calc envía la foto a Google Gemini (el servicio de IA de Google) a través de nuestro servidor. Google puede usarla para mejorar sus productos. Nosotros no guardamos la foto ni la asociamos a ti.\n\nSi prefieres, la app la lee solo en tu teléfono (menos preciso). Puedes cambiarlo en Ajustes.",
+  "aiConsentYes": "Usar IA",
+  "aiConsentNo": "Solo en mi teléfono",
+  "aiSettingTitle": "Fotos de la pizarra",
+  "aiSettingSwitch": "Leer con IA (Google Gemini)",
+  "aiSettingHelp": "La foto se envía a Google para leerla. Apagado: se lee solo en este teléfono."
 }

@@ -1057,4 +1057,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get scanByAi => '✦ LEÍDO CON IA';
+
+  @override
+  String get aiConsentTitle => '¿Leer la pizarra con IA?';
+
+  @override
+  String get aiConsentBody =>
+      'Para leer la pizarra, Plate Calc envía la foto a Google Gemini (el servicio de IA de Google) a través de nuestro servidor. Google puede usarla para mejorar sus productos. Nosotros no guardamos la foto ni la asociamos a ti.\n\nSi prefieres, la app la lee solo en tu teléfono (menos preciso). Puedes cambiarlo en Ajustes.';
+
+  @override
+  String get aiConsentYes => 'Usar IA';
+
+  @override
+  String get aiConsentNo => 'Solo en mi teléfono';
+
+  @override
+  String get aiSettingTitle => 'Fotos de la pizarra';
+
+  @override
+  String get aiSettingSwitch => 'Leer con IA (Google Gemini)';
+
+  @override
+  String get aiSettingHelp =>
+      'La foto se envía a Google para leerla. Apagado: se lee solo en este teléfono.';
 }

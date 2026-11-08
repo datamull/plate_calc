@@ -682,5 +682,12 @@
   "scanRepsLabel": "Reps / distance / calories",
   "scanMoveLabel": "Exercise",
   "scanRxLabel": "Weight Rx (optional)",
-  "scanByAi": "✦ READ WITH AI"
+  "scanByAi": "✦ READ WITH AI",
+  "aiConsentTitle": "Read the whiteboard with AI?",
+  "aiConsentBody": "To read the whiteboard, Plate Calc sends the photo to Google Gemini (Google’s AI service) through our server. Google may use it to improve its products. We don’t store the photo or link it to you.\n\nIf you prefer, the app can read it only on your phone (less accurate). You can change this in Settings.",
+  "aiConsentYes": "Use AI",
+  "aiConsentNo": "Only on my phone",
+  "aiSettingTitle": "Whiteboard photos",
+  "aiSettingSwitch": "Read with AI (Google Gemini)",
+  "aiSettingHelp": "The photo is sent to Google to read it. Off: read only on this phone."
 }

@@ -1,6 +1,8 @@
 # Cambios
 
-## 3.0.0 (beta en TestFlight)
+## 3.0.0
+
+- Foto de la pizarra leída con IA (Google Gemini, vía servidor propio en Vercel), con respaldo local sin internet. Se pide permiso antes del primer envío (regla 5.1.2(i) de Apple) y se puede apagar en Ajustes.
 
 - Botón "Otro" para cambiar el entrenamiento del día por otro del mismo estilo.
 - Foto de la pizarra: se lee el texto en el teléfono (ML Kit, sin internet), se reconocen formato, repeticiones, movimientos y pesos, se revisa y se empieza. Requiere iOS 15.5 o más.

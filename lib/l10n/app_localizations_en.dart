@@ -1053,4 +1053,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanByAi => '✦ READ WITH AI';
+
+  @override
+  String get aiConsentTitle => 'Read the whiteboard with AI?';
+
+  @override
+  String get aiConsentBody =>
+      'To read the whiteboard, Plate Calc sends the photo to Google Gemini (Google’s AI service) through our server. Google may use it to improve its products. We don’t store the photo or link it to you.\n\nIf you prefer, the app can read it only on your phone (less accurate). You can change this in Settings.';
+
+  @override
+  String get aiConsentYes => 'Use AI';
+
+  @override
+  String get aiConsentNo => 'Only on my phone';
+
+  @override
+  String get aiSettingTitle => 'Whiteboard photos';
+
+  @override
+  String get aiSettingSwitch => 'Read with AI (Google Gemini)';
+
+  @override
+  String get aiSettingHelp =>
+      'The photo is sent to Google to read it. Off: read only on this phone.';
 }

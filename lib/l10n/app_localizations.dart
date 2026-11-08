@@ -1917,6 +1917,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'✦ READ WITH AI'**
   String get scanByAi;
+
+  /// No description provided for @aiConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the whiteboard with AI?'**
+  String get aiConsentTitle;
+
+  /// No description provided for @aiConsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To read the whiteboard, Plate Calc sends the photo to Google Gemini (Google’s AI service) through our server. Google may use it to improve its products. We don’t store the photo or link it to you.\n\nIf you prefer, the app can read it only on your phone (less accurate). You can change this in Settings.'**
+  String get aiConsentBody;
+
+  /// No description provided for @aiConsentYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Use AI'**
+  String get aiConsentYes;
+
+  /// No description provided for @aiConsentNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Only on my phone'**
+  String get aiConsentNo;
+
+  /// No description provided for @aiSettingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Whiteboard photos'**
+  String get aiSettingTitle;
+
+  /// No description provided for @aiSettingSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Read with AI (Google Gemini)'**
+  String get aiSettingSwitch;
+
+  /// No description provided for @aiSettingHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The photo is sent to Google to read it. Off: read only on this phone.'**
+  String get aiSettingHelp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1060,4 +1060,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get scanByAi => '✦ LU PAR IA';
+
+  @override
+  String get aiConsentTitle => 'Lire le tableau avec l’IA ?';
+
+  @override
+  String get aiConsentBody =>
+      'Pour lire le tableau, Plate Calc envoie la photo à Google Gemini (le service d’IA de Google) via notre serveur. Google peut l’utiliser pour améliorer ses produits. Nous ne conservons pas la photo et ne l’associons pas à toi.\n\nSi tu préfères, l’app la lit seulement sur ton téléphone (moins précis). Tu peux changer ça dans Réglages.';
+
+  @override
+  String get aiConsentYes => 'Utiliser l’IA';
+
+  @override
+  String get aiConsentNo => 'Seulement sur mon téléphone';
+
+  @override
+  String get aiSettingTitle => 'Photos du tableau';
+
+  @override
+  String get aiSettingSwitch => 'Lire avec l’IA (Google Gemini)';
+
+  @override
+  String get aiSettingHelp =>
+      'La photo est envoyée à Google pour la lire. Désactivé : lecture seulement sur ce téléphone.';
 }

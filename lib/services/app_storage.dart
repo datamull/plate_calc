@@ -125,6 +125,16 @@ class AppStorage {
   String? readString(String key) => _prefs.getString(key);
   Future<void> writeString(String key, String value) => _prefs.setString(key, value);
 
+  // ── Permiso para leer pizarras con IA (Google Gemini) ─────────────────────
+  /// null = aún no se preguntó; true = acepta; false = solo lector local.
+  bool? get aiConsent => switch (_prefs.getString('ai_consent')) {
+    'yes' => true,
+    'no' => false,
+    _ => null,
+  };
+
+  Future<void> setAiConsent(bool v) => _prefs.setString('ai_consent', v ? 'yes' : 'no');
+
   // ── Idioma ────────────────────────────────────────────────────────────────
   String? get localeCode => _prefs.getString(_kLocale);
 

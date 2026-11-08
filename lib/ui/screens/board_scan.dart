@@ -53,6 +53,17 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
   }
   if (photo == null || !context.mounted) return;
 
+  // Apple (regla 5.1.2(i)): pedir permiso antes de enviar la foto a una IA
+  // de terceros. Se pregunta una vez; se cambia en Ajustes.
+  var useAi = BoardAi.enabled && store.storage.aiConsent != false;
+  if (useAi && store.storage.aiConsent == null) {
+    final ok = await askAiConsent(context);
+    if (ok == null || !context.mounted) return;
+    await store.storage.setAiConsent(ok);
+    useAi = ok;
+  }
+  if (!context.mounted) return;
+
   // Lectura con indicador de espera (se cierra al terminar).
   unawaited(
     showDialog<void>(
@@ -79,7 +90,7 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
   // 1) IA (Gemini en el servidor). 2) Si no hay internet o falla: lector local.
   var text = '';
   var byAi = false;
-  var wod = await BoardAi.read(photo.path, fallbackName: loc.scanDefaultName);
+  var wod = useAi ? await BoardAi.read(photo.path, fallbackName: loc.scanDefaultName) : null;
   if (wod != null && wod.items.isNotEmpty) {
     byAi = true;
   } else {
@@ -108,6 +119,23 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
         rawText: text,
         byAi: byAi,
       ),
+    ),
+  );
+}
+
+/// Pregunta si se puede enviar la foto a Google Gemini. null = canceló.
+Future<bool?> askAiConsent(BuildContext context) {
+  final loc = AppLocalizations.of(context);
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      icon: const Icon(Icons.auto_awesome, color: AppColors.purple),
+      title: Text(loc.aiConsentTitle),
+      content: Text(loc.aiConsentBody),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(loc.aiConsentNo)),
+        FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(loc.aiConsentYes)),
+      ],
     ),
   );
 }

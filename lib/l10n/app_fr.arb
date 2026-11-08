@@ -412,5 +412,12 @@
   "scanRepsLabel": "Reps / distance / calories",
   "scanMoveLabel": "Exercice",
   "scanRxLabel": "Charge Rx (facultatif)",
-  "scanByAi": "✦ LU PAR IA"
+  "scanByAi": "✦ LU PAR IA",
+  "aiConsentTitle": "Lire le tableau avec l’IA ?",
+  "aiConsentBody": "Pour lire le tableau, Plate Calc envoie la photo à Google Gemini (le service d’IA de Google) via notre serveur. Google peut l’utiliser pour améliorer ses produits. Nous ne conservons pas la photo et ne l’associons pas à toi.\n\nSi tu préfères, l’app la lit seulement sur ton téléphone (moins précis). Tu peux changer ça dans Réglages.",
+  "aiConsentYes": "Utiliser l’IA",
+  "aiConsentNo": "Seulement sur mon téléphone",
+  "aiSettingTitle": "Photos du tableau",
+  "aiSettingSwitch": "Lire avec l’IA (Google Gemini)",
+  "aiSettingHelp": "La photo est envoyée à Google pour la lire. Désactivé : lecture seulement sur ce téléphone."
 }

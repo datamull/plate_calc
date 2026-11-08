@@ -1,4 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:plate_calc/l10n/app_localizations.dart';
+import 'package:plate_calc/services/app_storage.dart';
+import 'package:plate_calc/ui/screens/board_scan.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:plate_calc/data/daily_library.dart';
 import 'package:plate_calc/models/weight_unit.dart';
 import 'package:plate_calc/services/board_ai.dart';
@@ -52,5 +57,37 @@ void main() {
 
   test('respuesta rota → null', () {
     expect(BoardAi.fromJson({'format': 'amrap'}, fallbackName: 'WOD'), isNull);
+  });
+
+  testWidgets('aviso de IA: explica que la foto va a Google y deja elegir', (tester) async {
+    bool? answer;
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('es'),
+        home: Builder(
+          builder: (context) => TextButton(
+            onPressed: () async => answer = await askAiConsent(context),
+            child: const Text('go'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    expect(find.text('¿Leer la pizarra con IA?'), findsOneWidget);
+    expect(find.textContaining('Google Gemini'), findsOneWidget);
+    await tester.tap(find.text('Solo en mi teléfono'));
+    await tester.pumpAndSettle();
+    expect(answer, isFalse);
+  });
+
+  test('el permiso se guarda', () async {
+    SharedPreferences.setMockInitialValues({});
+    final s = await AppStorage.load();
+    expect(s.aiConsent, isNull);
+    await s.setAiConsent(true);
+    expect(s.aiConsent, isTrue);
   });
 }

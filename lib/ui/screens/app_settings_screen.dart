@@ -7,6 +7,7 @@ import '../../models/plate.dart';
 import '../../models/settings.dart';
 import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
+import '../../services/board_ai.dart';
 import '../../services/cloud_sync.dart';
 import '../../utils/format.dart';
 import '../widgets/plate_colors.dart';
@@ -94,6 +95,20 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     : Icons.cloud_off_outlined,
               ),
               title: Text(widget.cloud?.available == true ? loc.iCloudSyncOn : loc.iCloudSyncOff),
+            ),
+          ],
+          if (BoardAi.enabled) ...[
+            const SizedBox(height: 24),
+            Text(loc.aiSettingTitle, style: Theme.of(context).textTheme.titleMedium),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              value: widget.storage.aiConsent == true,
+              title: Text(loc.aiSettingSwitch),
+              subtitle: Text(loc.aiSettingHelp),
+              onChanged: (v) async {
+                await widget.storage.setAiConsent(v);
+                setState(() {});
+              },
             ),
           ],
         ],

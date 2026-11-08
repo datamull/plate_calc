@@ -5,7 +5,7 @@
 // Variables de entorno en Vercel:
 //   GEMINI_API_KEY  clave de Google AI Studio (obligatoria)
 //   APP_TOKEN       texto secreto que la app manda en "x-app-token" (obligatoria)
-//   GEMINI_MODEL    modelo a usar (opcional, por defecto gemini-3.8-flash)
+//   GEMINI_MODEL    modelo a usar (opcional, por defecto gemini-3.6-flash)
 
 const MOVES = [
   'Wall Ball', 'Double Under', 'Single Under', 'Row', 'Bike', 'Ski', 'Run', 'Burpee',
@@ -62,7 +62,40 @@ const SCHEMA = {
 
 const MAX_IMAGE_CHARS = 4_000_000; // base64 (~3 MB); Vercel acepta hasta 4.5 MB
 
+export const config = { maxDuration: 60 };
+
 export default async function handler(req, res) {
+  // Diagnóstico: GET /api/scan-board?ping=1 con el token prueba la clave.
+  if (req.method === 'GET' && req.query?.ping) {
+    if (req.headers['x-app-token'] !== process.env.APP_TOKEN) {
+      return res.status(401).json({ error: 'unauthorized' });
+    }
+    const t0 = Date.now();
+    const model = String(req.query.model || process.env.GEMINI_MODEL || 'gemini-3.6-flash')
+      .replace(/[^a-z0-9.\-]/gi, '');
+    try {
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: 'POST',
+          signal: AbortSignal.timeout(20000),
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY || '' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: 'Reply with: ok' }] }] }),
+        },
+      );
+      const data = await r.json();
+      return res.status(200).json({
+        model,
+        hasKey: Boolean(process.env.GEMINI_API_KEY),
+        status: r.status,
+        ms: Date.now() - t0,
+        reply: data?.candidates?.[0]?.content?.parts?.[0]?.text ?? null,
+        error: data?.error?.message ?? null,
+      });
+    } catch (e) {
+      return res.status(200).json({ model, ms: Date.now() - t0, error: String(e?.message || e) });
+    }
+  }
   if (req.method !== 'POST') return res.status(405).json({ error: 'method' });
   const token = process.env.APP_TOKEN;
   if (!token || req.headers['x-app-token'] !== token) {
@@ -79,11 +112,12 @@ export default async function handler(req, res) {
   }
   if (image.length > MAX_IMAGE_CHARS) return res.status(413).json({ error: 'too_large' });
 
-  const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   try {
     const r = await fetch(url, {
       method: 'POST',
+      signal: AbortSignal.timeout(45000),
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
         contents: [

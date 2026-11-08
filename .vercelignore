@@ -1,0 +1,6 @@
+# Vercel solo necesita el servidor; el resto (app Flutter) no se sube.
+/*
+!api
+!server
+!package.json
+!vercel.json

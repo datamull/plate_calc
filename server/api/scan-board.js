@@ -112,12 +112,38 @@ export default async function handler(req, res) {
   }
   if (image.length > MAX_IMAGE_CHARS) return res.status(413).json({ error: 'too_large' });
 
-  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+  // Modelo principal y uno de respaldo (más liviano) si el primero falla o
+  // está ocupado. Cada uno se intenta hasta 2 veces.
+  const models = [
+    process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+    process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.5-flash-lite',
+  ];
+  const deadline = Date.now() + 50000;
+  let last = { status: 0, detail: '' };
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const left = deadline - Date.now();
+      if (left < 4000) break;
+      const out = await callGemini(model, key, image, mime, Math.min(left, 30000));
+      if (out.wod) {
+        return res.status(200).json({ ...clean(out.wod), model });
+      }
+      last = { status: out.status, detail: out.detail, model };
+      console.error('gemini fallo', model, attempt, out.status, out.detail);
+      // 4xx (salvo 429) no mejora reintentando el mismo modelo.
+      if (out.status >= 400 && out.status < 500 && out.status !== 429) break;
+      await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+    }
+  }
+  return res.status(502).json({ error: 'gemini', ...last });
+}
+
+async function callGemini(model, key, image, mime, timeoutMs) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   try {
     const r = await fetch(url, {
       method: 'POST',
-      signal: AbortSignal.timeout(45000),
+      signal: AbortSignal.timeout(timeoutMs),
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
         contents: [
@@ -130,16 +156,16 @@ export default async function handler(req, res) {
         },
       }),
     });
-    const data = await r.json();
-    if (!r.ok) {
-      return res.status(502).json({ error: 'gemini', status: r.status, detail: data?.error?.message });
-    }
+    const data = await r.json().catch(() => null);
+    if (!r.ok) return { status: r.status, detail: data?.error?.message || '' };
     const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || '';
     const wod = safeJson(text);
-    if (!wod || !Array.isArray(wod.items)) return res.status(502).json({ error: 'bad_output' });
-    return res.status(200).json(clean(wod));
+    if (!wod || !Array.isArray(wod.items) || wod.items.length === 0) {
+      return { status: 200, detail: 'empty' };
+    }
+    return { wod };
   } catch (e) {
-    return res.status(502).json({ error: 'network', detail: String(e?.message || e) });
+    return { status: 0, detail: String(e?.message || e) };
   }
 }
 

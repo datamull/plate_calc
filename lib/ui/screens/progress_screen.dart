@@ -71,7 +71,7 @@ class _ProgressViewState extends State<ProgressView> {
             height: 36,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
               children: [
                 for (final l in lifts)
                   Padding(
@@ -206,20 +206,10 @@ class _ConsistencyCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: _BigNumber(
-                  value: '$streak',
-                  label: loc.statStreak,
-                  icon: AppIcons.fire,
-                  color: const Color(0xFFFF7A3D),
-                ),
+                child: _BigNumber(value: '$streak', label: loc.statStreak),
               ),
               Expanded(
-                child: _BigNumber(
-                  value: '$thisWeek',
-                  label: loc.statThisWeek,
-                  icon: AppIcons.bolt,
-                  color: AppColors.blue,
-                ),
+                child: _BigNumber(value: '$thisWeek', label: loc.statThisWeek),
               ),
             ],
           ),
@@ -302,30 +292,18 @@ class _ConsistencyCard extends StatelessWidget {
 }
 
 class _BigNumber extends StatelessWidget {
-  const _BigNumber({
-    required this.value,
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
+  const _BigNumber({required this.value, required this.label});
 
   final String value;
   final String label;
-  final IconData icon;
-  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(value, style: Ds.display(context).copyWith(fontSize: 44, letterSpacing: -1.5)),
-            const SizedBox(width: 6),
-            Icon(icon, color: color, size: 22),
-          ],
-        ),
+        Text(value, style: Ds.display(context).copyWith(fontSize: 48)),
+        const SizedBox(height: 2),
         Text(label, style: Ds.secondary(context)),
       ],
     );
@@ -394,34 +372,27 @@ class _LiftChartCard extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           if (history.length < 2)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 28),
-              child: Center(
-                child: Text(
-                  loc.chartNeedsMore,
-                  textAlign: TextAlign.center,
-                  style: Ds.secondary(context),
-                ),
-              ),
-            )
-          else
+            Text(loc.chartNeedsMore, style: Ds.secondary(context))
+          else ...[
             SizedBox(height: 210, child: _line(context, values, locale)),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _MetricChip(
-                label: loc.metricE1rm,
-                on: metric == _Metric.estimated,
-                onTap: () => onMetric(_Metric.estimated),
-              ),
-              const SizedBox(width: 8),
-              _MetricChip(
-                label: loc.metricHeaviest,
-                on: metric == _Metric.heaviest,
-                onTap: () => onMetric(_Metric.heaviest),
-              ),
-            ],
-          ),
+            const SizedBox(height: 12),
+          ],
+          if (history.length >= 2)
+            Row(
+              children: [
+                _MetricChip(
+                  label: loc.metricE1rm,
+                  on: metric == _Metric.estimated,
+                  onTap: () => onMetric(_Metric.estimated),
+                ),
+                const SizedBox(width: 8),
+                _MetricChip(
+                  label: loc.metricHeaviest,
+                  on: metric == _Metric.heaviest,
+                  onTap: () => onMetric(_Metric.heaviest),
+                ),
+              ],
+            ),
         ],
       ),
     );

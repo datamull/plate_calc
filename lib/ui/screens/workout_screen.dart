@@ -320,7 +320,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.onAccent,
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             fontFeatures: Ds.tabular,
@@ -339,7 +339,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       ),
                       IconButton(
                         tooltip: loc.restSkip,
-                        color: Colors.white,
+                        color: AppColors.onAccent,
                         icon: const Icon(AppIcons.skip),
                         onPressed: () => setState(() => _rest = null),
                       ),
@@ -353,7 +353,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 }
 
 final _compact = TextButton.styleFrom(
-  foregroundColor: Colors.white,
+  foregroundColor: AppColors.onAccent,
   minimumSize: const Size(44, 40),
   padding: const EdgeInsets.symmetric(horizontal: 8),
   visualDensity: VisualDensity.compact,

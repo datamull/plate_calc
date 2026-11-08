@@ -423,5 +423,8 @@
   "detailDuration": "Durée",
   "detailResult": "Résultat",
   "detailMovements": "Mouvements",
-  "detailExercises": "Exercices"
+  "detailExercises": "Exercices",
+  "freeWorkoutRow": "Entraînement libre",
+  "yourRms": "Vos 1RM",
+  "yourRmsEmpty": "Enregistrez votre 1RM sur un mouvement et il apparaîtra ici, à un toucher du calculateur."
 }

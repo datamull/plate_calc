@@ -6,10 +6,8 @@ import '../../services/app_storage.dart';
 import '../../services/training_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
-import '../widgets/plate_glyph.dart';
 import 'category_screen.dart';
 import 'training_home.dart';
-import '../widgets/app_icons.dart';
 
 /// Dos pestañas: Discos (la calculadora, lo central; la app abre aquí) y
 /// Entrenar (entrenamiento del día, historial y progreso).
@@ -53,15 +51,17 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: _TabBar(
         selected: _tab,
         onSelect: _go,
-        items: [(null, null, loc.tabPlates), (AppIcons.train, AppIcons.trainFill, loc.tabTrain)],
+        items: [('plates', loc.tabPlates), ('train', loc.tabTrain)],
       ),
     );
   }
 }
 
-/// Ícono normal, ícono elegido y texto. Sin íconos se dibuja el disco.
-typedef _Item = (IconData? icon, IconData? selectedIcon, String label);
+/// Ícono (nombre del recurso en assets/icons) y texto de una pestaña.
+typedef _Item = (String icon, String label);
 
+/// Barra inferior: la pestaña elegida se marca con el ícono relleno en tiza
+/// y una línea de señal en el borde superior que se desliza entre pestañas.
 class _TabBar extends StatelessWidget {
   const _TabBar({required this.selected, required this.onSelect, required this.items});
 
@@ -71,9 +71,10 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final n = items.length;
+    final still = MediaQuery.disableAnimationsOf(context);
     return Material(
-      color: theme.scaffoldBackgroundColor,
+      color: Theme.of(context).scaffoldBackgroundColor,
       child: Container(
         decoration: BoxDecoration(
           border: Border(top: BorderSide(color: Ds.hairline(context))),
@@ -81,20 +82,46 @@ class _TabBar extends StatelessWidget {
         child: SafeArea(
           top: false,
           child: SizedBox(
-            height: 64,
-            child: Row(
+            height: 60,
+            child: Stack(
               children: [
-                for (var i = 0; i < items.length; i++)
-                  Expanded(
-                    child: _TabItem(
-                      item: items[i],
-                      on: selected == i,
-                      onTap: () {
-                        if (selected != i) HapticFeedback.selectionClick();
-                        onSelect(i);
-                      },
+                // Indicador: línea corta sobre el borde superior.
+                Positioned.fill(
+                  child: AnimatedAlign(
+                    duration: still ? Duration.zero : const Duration(milliseconds: 280),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment(n == 1 ? 0 : -1 + 2 * selected / (n - 1), -1),
+                    child: FractionallySizedBox(
+                      widthFactor: 1 / n,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Container(
+                          width: 28,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            color: AppColors.blue,
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
+                ),
+                Row(
+                  children: [
+                    for (var i = 0; i < n; i++)
+                      Expanded(
+                        child: _TabItem(
+                          item: items[i],
+                          on: selected == i,
+                          onTap: () {
+                            if (selected != i) HapticFeedback.selectionClick();
+                            onSelect(i);
+                          },
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -104,8 +131,6 @@ class _TabBar extends StatelessWidget {
   }
 }
 
-/// Pestaña: ícono de trazo; elegida, ícono relleno sobre una cápsula del
-/// color de acento.
 class _TabItem extends StatelessWidget {
   const _TabItem({required this.item, required this.on, required this.onTap});
 
@@ -115,11 +140,11 @@ class _TabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = on ? AppColors.blue : Ds.muted(context);
+    final color = on ? Theme.of(context).colorScheme.onSurface : Ds.muted(context);
     return Semantics(
       selected: on,
       button: true,
-      label: item.$3,
+      label: item.$2,
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -129,40 +154,30 @@ class _TabItem extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 240),
-                curve: Curves.easeOutCubic,
-                width: on ? 60 : 44,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: on ? AppColors.blue.withValues(alpha: 0.16) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 180),
-                  transitionBuilder: (c, a) => ScaleTransition(
-                    scale: Tween(begin: 0.8, end: 1.0).animate(a),
-                    child: FadeTransition(opacity: a, child: c),
-                  ),
-                  child: item.$1 == null
-                      ? Center(
-                          key: ValueKey(on),
-                          child: PlateGlyph(color: color, filled: on),
-                        )
-                      : Icon(on ? item.$2 : item.$1, key: ValueKey(on), color: color, size: 24),
+              // Íconos de acero (disco torneado y atleta en snatch), exportados
+              // a 3x con versión elegida y no elegida.
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 160),
+                child: Image.asset(
+                  'assets/icons/tab_${item.$1}_${on ? 'on' : 'off'}.png',
+                  key: ValueKey(on),
+                  width: 28,
+                  height: 28,
+                  filterQuality: FilterQuality.medium,
+                  excludeFromSemantics: true,
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                item.$3,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 160),
                 style: TextStyle(
+                  fontFamily: 'Barlow',
                   fontSize: 11,
-                  letterSpacing: 0.1,
-                  fontWeight: on ? FontWeight.w700 : FontWeight.w500,
+                  letterSpacing: 0.2,
+                  fontWeight: on ? FontWeight.w600 : FontWeight.w500,
                   color: color,
                 ),
+                child: Text(item.$2, maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
             ],
           ),

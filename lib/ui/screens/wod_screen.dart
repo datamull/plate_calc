@@ -8,7 +8,6 @@ import '../../l10n/app_localizations.dart';
 import '../../l10n/lift_names.dart';
 import '../../services/training_store.dart';
 import '../../utils/format.dart';
-import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import 'workout_detail_screen.dart';
 import '../widgets/app_icons.dart';
@@ -181,36 +180,32 @@ class _WodScreenState extends State<WodScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            // Una sola acción principal: empezar / pausar / seguir. Terminar
+            // queda secundario para no tocarlo por error.
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
               child: Row(
                 children: [
                   Expanded(
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: _running ? const Color(0xFF3A404C) : AppColors.blue,
-                        minimumSize: const Size.fromHeight(60),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                      icon: Icon(_running ? AppIcons.pause : AppIcons.play),
-                      label: Text(
-                        _running ? loc.wodPause : (_elapsed == 0 ? loc.wodGo : loc.wodContinue),
-                      ),
+                    flex: 3,
+                    child: DsButton(
+                      height: 56,
+                      kind: _running ? DsButtonKind.secondary : DsButtonKind.primary,
+                      icon: _running ? AppIcons.pause : AppIcons.play,
+                      label: _running
+                          ? loc.wodPause
+                          : (_elapsed == 0 ? loc.wodGo : loc.wodContinue),
                       onPressed: _toggle,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Ds.done,
-                        minimumSize: const Size.fromHeight(60),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                      icon: const Icon(AppIcons.flagFill),
-                      label: Text(loc.workoutFinishShort),
+                    flex: 2,
+                    child: DsButton(
+                      height: 56,
+                      kind: DsButtonKind.outline,
+                      icon: AppIcons.flag,
+                      label: loc.workoutFinishShort,
                       onPressed: _finish,
                     ),
                   ),

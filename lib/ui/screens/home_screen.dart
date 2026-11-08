@@ -8,6 +8,7 @@ import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../services/plate_calculator.dart';
 import '../../utils/format.dart';
+import '../widgets/ds.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/lift_icon.dart';
 import '../widgets/percent_table.dart';
@@ -50,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _rmCtrl = TextEditingController();
   final _pctCtrl = TextEditingController(text: '100');
-  final _collarsCtrl = TextEditingController();
 
   String? _error;
 
@@ -75,7 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _rmCtrl.dispose();
     _pctCtrl.dispose();
-    _collarsCtrl.dispose();
     super.dispose();
   }
 
@@ -106,7 +105,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _rmCtrl.text = rm == null ? '' : fmtWeight(rm);
     _rmOrigin = rm;
     _rmOriginUnit = u;
-    _collarsCtrl.text = fmtWeight(_settings.collarsWeight);
     _error = null;
   }
 
@@ -123,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     _unit = u;
     _settings = _storage.settings(u);
-    _collarsCtrl.text = fmtWeight(_settings.collarsWeight);
     _error = null;
     final value = originUnit == u ? origin : u.round(originUnit.convert(origin, u));
     _setRmText(fmtWeight(value));
@@ -146,16 +143,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_rm <= 0) return setState(() => _error = loc.errorRmMissing);
     if (_fraction <= 0) return setState(() => _error = loc.errorPercentInvalid);
 
-    final t = _mode.targets(
-      rm: _rm,
-      fraction: _fraction,
-      bar: _settings.barWeight,
-      collars: _settings.collarsWeight,
-    );
+    final t = _mode.targets(rm: _rm, fraction: _fraction, bar: _settings.barWeight, collars: 0);
     final result = computePlates(
       target: t.total,
       barWeight: _settings.barWeight,
-      collarsWeight: _settings.collarsWeight,
+      collarsWeight: 0,
       plates: _settings.plates,
     );
     if (result == null) return setState(() => _error = loc.errorTargetTooLow);
@@ -228,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
       rm: _rm,
       fraction: _fraction,
       bar: _settings.barWeight,
-      collars: _settings.collarsWeight,
+      collars: 0,
     );
     final barOptions = {..._unit.barOptions, _settings.barWeight}.toList();
     const numberKeyboard = TextInputType.numberWithOptions(decimal: true);
@@ -275,58 +267,34 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(loc.unitsLabel),
                 const SizedBox(width: 12),
-                SegmentedButton<WeightUnit>(
-                  showSelectedIcon: false,
-                  segments: [
-                    for (final u in WeightUnit.values)
-                      ButtonSegment(value: u, label: Text(u.label)),
-                  ],
-                  selected: {_unit},
-                  onSelectionChanged: (s) {
-                    _switchUnit(s.first);
-                    setState(() {});
-                  },
+                SizedBox(
+                  width: 128,
+                  child: DsSegmented(
+                    compact: true,
+                    labels: [for (final u in WeightUnit.values) u.label],
+                    selected: WeightUnit.values.indexOf(_unit),
+                    onChanged: (i) {
+                      _switchUnit(WeightUnit.values[i]);
+                      setState(() {});
+                    },
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
 
-            // Barra + collares
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<double>(
-                    key: ValueKey('bar-${_unit.name}'),
-                    initialValue: _settings.barWeight,
-                    decoration: InputDecoration(labelText: loc.barLabel),
-                    items: [
-                      for (final w in barOptions)
-                        DropdownMenuItem(value: w, child: Text('${fmtWeight(w)} ${_unit.label}')),
-                    ],
-                    onChanged: (w) {
-                      if (w != null) _updateSettings(_settings.copyWith(barWeight: w));
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _collarsCtrl,
-                    keyboardType: numberKeyboard,
-                    decoration: InputDecoration(
-                      labelText: loc.collarsLabel,
-                      suffixText: _unit.label,
-                    ),
-                    onChanged: (v) {
-                      final c = parseNumber(v);
-                      if (c != null && c >= 0) {
-                        _updateSettings(_settings.copyWith(collarsWeight: c));
-                      }
-                    },
-                  ),
-                ),
+            // Barra (los collares no se cuentan: casi nadie los pesa).
+            DropdownButtonFormField<double>(
+              key: ValueKey('bar-${_unit.name}'),
+              initialValue: _settings.barWeight,
+              decoration: InputDecoration(labelText: loc.barLabel),
+              items: [
+                for (final w in barOptions)
+                  DropdownMenuItem(value: w, child: Text('${fmtWeight(w)} ${_unit.label}')),
               ],
+              onChanged: (w) {
+                if (w != null) _updateSettings(_settings.copyWith(barWeight: w));
+              },
             ),
             const SizedBox(height: 12),
 
@@ -391,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
               rm: _rm,
               mode: _mode,
               bar: _settings.barWeight,
-              collars: _settings.collarsWeight,
+              collars: 0,
               selectedPercent: (_fraction * 100).round(),
               onSelect: (p) {
                 _pctCtrl.text = '$p';

@@ -118,15 +118,9 @@ class LiftIcon extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.blue.withValues(alpha: 0.22),
-            AppColors.purple.withValues(alpha: 0.22),
-          ],
-        ),
-        border: Border.all(color: AppColors.blue.withValues(alpha: 0.35)),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceHigh
+            : const Color(0xFFE7E6E1),
       ),
       padding: EdgeInsets.all(size * 0.07),
       child: icon,
@@ -167,18 +161,8 @@ class _LiftPainter extends CustomPainter {
     }
 
     void plate(Offset c, double r) {
-      final rect = Rect.fromCircle(center: c, radius: r);
-      canvas.drawCircle(
-        c,
-        r,
-        Paint()
-          ..shader = const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppColors.blue, AppColors.purple],
-          ).createShader(rect),
-      );
-      canvas.drawCircle(c, r * 0.28, Paint()..color = const Color(0xFFD9DEE7));
+      canvas.drawCircle(c, r, Paint()..color = AppColors.blue);
+      canvas.drawCircle(c, r * 0.28, Paint()..color = AppColors.background);
     }
 
     const o = Offset.new;
@@ -273,13 +257,7 @@ class _LiftPainter extends CustomPainter {
             Rect.fromCenter(center: o(x, 50), width: 12, height: 54),
             const Radius.circular(4),
           );
-          canvas.drawRRect(
-            r,
-            Paint()
-              ..shader = const LinearGradient(
-                colors: [AppColors.blue, AppColors.purple],
-              ).createShader(r.outerRect),
-          );
+          canvas.drawRRect(r, Paint()..color = AppColors.blue);
         }
         for (final x in [30.0, 70.0]) {
           final r = RRect.fromRectAndRadius(

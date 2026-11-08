@@ -1983,6 +1983,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exercises'**
   String get detailExercises;
+
+  /// No description provided for @freeWorkoutRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Free workout'**
+  String get freeWorkoutRow;
+
+  /// No description provided for @yourRms.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 1RMs'**
+  String get yourRms;
+
+  /// No description provided for @yourRmsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a 1RM on any lift and it will show up here, one tap from the calculator.'**
+  String get yourRmsEmpty;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

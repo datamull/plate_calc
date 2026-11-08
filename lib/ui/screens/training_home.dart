@@ -21,8 +21,8 @@ import '../widgets/app_icons.dart';
 
 /// Color de cada estilo (solo en etiquetas y puntos).
 Color styleColor(TrainingStyle s) => switch (s) {
-  TrainingStyle.crossfit => const Color(0xFFFF7A3D),
-  TrainingStyle.haltero => AppColors.blue,
+  TrainingStyle.crossfit => AppColors.blue,
+  TrainingStyle.haltero => AppColors.sky,
   TrainingStyle.gym => AppColors.purple,
 };
 
@@ -298,7 +298,7 @@ class _TodayViewState extends State<TodayView> {
             height: 36,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
               children: [
                 for (final s in styles)
                   Padding(
@@ -334,9 +334,9 @@ class _TodayViewState extends State<TodayView> {
         ),
         const SizedBox(height: 12),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
           child: DsButton(
-            kind: DsButtonKind.secondary,
+            kind: DsButtonKind.outline,
             icon: AppIcons.camera,
             label: loc.scanButton,
             onPressed: () async {
@@ -345,31 +345,31 @@ class _TodayViewState extends State<TodayView> {
             },
           ),
         ),
-        const SizedBox(height: 4),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: DsButton(
-            kind: DsButtonKind.ghost,
-            height: 48,
-            icon: AppIcons.plus,
-            label: loc.todayFreeWorkout,
-            onPressed: _startFree,
+        const SizedBox(height: 20),
+        DsBlock(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Column(
+            children: [
+              DsRow(
+                leading: Icon(AppIcons.plus, size: 20, color: Ds.muted(context)),
+                title: loc.freeWorkoutRow,
+                divider: style == TrainingStyle.crossfit,
+                onTap: _startFree,
+              ),
+              if (style == TrainingStyle.crossfit)
+                DsRow(
+                  leading: Icon(AppIcons.external, size: 20, color: Ds.muted(context)),
+                  title: loc.crossfitOfficialWod,
+                  divider: false,
+                  trailing: const SizedBox.shrink(),
+                  onTap: () => launchUrl(
+                    Uri.parse('https://www.crossfit.com/wod'),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                ),
+            ],
           ),
         ),
-        if (style == TrainingStyle.crossfit)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: DsButton(
-              kind: DsButtonKind.ghost,
-              height: 44,
-              icon: AppIcons.external,
-              label: loc.crossfitOfficialWod,
-              onPressed: () => launchUrl(
-                Uri.parse('https://www.crossfit.com/wod'),
-                mode: LaunchMode.externalApplication,
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -385,7 +385,7 @@ class _ResumeBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
       child: DsPressable(
         child: Material(
           color: AppColors.blue,
@@ -398,21 +398,24 @@ class _ResumeBanner extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
               child: Row(
                 children: [
-                  const Icon(AppIcons.timer, color: Colors.white),
+                  const Icon(AppIcons.timer, color: AppColors.onAccent),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       '${loc.todayInProgress} · ${workout.title.isEmpty ? loc.workoutFree : workout.title}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        color: AppColors.onAccent,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   Text(
                     loc.todayResume,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                    style: const TextStyle(color: AppColors.onAccent, fontWeight: FontWeight.w800),
                   ),
-                  const Icon(AppIcons.chevron, color: Colors.white),
+                  const Icon(AppIcons.chevron, color: AppColors.onAccent),
                 ],
               ),
             ),
@@ -460,8 +463,9 @@ class WodCard extends StatelessWidget {
       if (wod.formatLabel.isNotEmpty) wod.formatLabel.toUpperCase(),
     ].join('  ·  ');
 
-    return DsBlock(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+    // Sin tarjeta: el WOD del día es el contenido principal de la pantalla.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(Ds.gutter, 8, Ds.gutter, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -485,10 +489,7 @@ class WodCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Text(
-            wod.name,
-            style: Ds.display(context).copyWith(fontSize: 40, letterSpacing: -1.2, height: 1),
-          ),
+          Text(wod.name, style: Ds.display(context).copyWith(fontSize: 52, height: 0.95)),
           const SizedBox(height: 18),
           for (var i = 0; i < wod.items.length; i++)
             WodItemRow(item: wod.items[i], store: store, unit: unit, first: i == 0),
@@ -496,15 +497,15 @@ class WodCard extends StatelessWidget {
           if (done != null)
             DsPressable(
               child: Material(
-                color: Ds.done.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(16),
+                color: Ds.done.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(Ds.radiusButton),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(Ds.radiusButton),
                   splashFactory: NoSplash.splashFactory,
                   onTap: onOpenDone,
                   child: Container(
                     height: 54,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
                     child: Row(
                       children: [
                         const Icon(AppIcons.checkCircle, color: Ds.done),
@@ -539,7 +540,7 @@ class WodCard extends StatelessWidget {
                   Tooltip(
                     message: loc.todayOther,
                     child: DsButton(
-                      kind: DsButtonKind.secondary,
+                      kind: DsButtonKind.outline,
                       expand: false,
                       icon: AppIcons.shuffle,
                       label: loc.todayOther,
@@ -671,7 +672,7 @@ class _HistoryViewState extends State<HistoryView> {
             child: DsBlock(
               padding: const EdgeInsets.symmetric(vertical: 2),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(Ds.radiusBlock),
                 child: Column(
                   children: [
                     for (final w in items)
@@ -720,8 +721,8 @@ class HistoryRow extends StatelessWidget {
         width: 46,
         height: 46,
         decoration: BoxDecoration(
-          color: tint.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.surfaceHigh,
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

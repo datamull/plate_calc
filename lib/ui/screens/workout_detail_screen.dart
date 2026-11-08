@@ -9,6 +9,7 @@ import '../../l10n/lift_names.dart';
 import '../../models/training.dart';
 import '../../services/training_store.dart';
 import '../../utils/format.dart';
+import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import '../widgets/training_widgets.dart';
 import 'training_home.dart';
@@ -138,14 +139,15 @@ class WorkoutDetailScreen extends StatelessWidget {
     final volume = w.doneSets.fold<double>(0, (a, s) => a + s.weight * s.reps);
 
     final stats = <(String, String)>[
-      if (w.durationSec > 0) (fmtDuration(w.durationSec), loc.detailDuration),
+      // En un For Time el resultado ya es la duración: no repetirlo.
+      if (w.durationSec > 0 && fmtDuration(w.durationSec) != w.score)
+        (fmtDuration(w.durationSec), loc.detailDuration),
       if (sets > 0) ('$sets', loc.planSets),
       if (volume > 0) ('${fmtWeight(volume, maxDecimals: 0)} $u', loc.metricVolume),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(w.title.isEmpty ? loc.workoutFree : w.title),
         actions: [
           PopupMenuButton<String>(
             tooltip: loc.edit,
@@ -175,13 +177,28 @@ class WorkoutDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
+                Row(
                   children: [
-                    if (style != null)
-                      DsPill(styleName(loc, style).toUpperCase(), color: styleColor(style)),
-                    if (w.format?.isNotEmpty == true) DsPill(w.format!, color: Ds.muted(context)),
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: style == null ? Ds.muted(context) : styleColor(style),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        [
+                          if (style != null) styleName(loc, style).toUpperCase(),
+                          if (w.format?.isNotEmpty == true) w.format!.toUpperCase(),
+                        ].join('  ·  '),
+                        style: Ds.label(
+                          context,
+                        ).copyWith(color: style == null ? null : styleColor(style)),
+                      ),
+                    ),
                   ],
                 ),
                 if (style != null || w.format?.isNotEmpty == true) const SizedBox(height: 12),
@@ -363,7 +380,7 @@ class _ExerciseBlock extends StatelessWidget {
                     Text('RPE ${fmtWeight(log.sets[i].rpe!)}', style: Ds.secondary(context)),
                   if (identical(log.sets[i], heaviest) && log.sets.length > 1) ...[
                     const SizedBox(width: 8),
-                    const Icon(AppIcons.star, size: 18, color: Color(0xFFFFB020)),
+                    const Icon(AppIcons.star, size: 18, color: AppColors.blue),
                   ],
                 ],
               ),
@@ -393,7 +410,7 @@ class _TrophyState extends State<_Trophy> {
 
   @override
   Widget build(BuildContext context) {
-    const icon = Icon(AppIcons.trophy, color: Color(0xFFFFB020), size: 40);
+    const icon = Icon(AppIcons.trophy, color: AppColors.blue, size: 40);
     if (!widget.animate || MediaQuery.disableAnimationsOf(context)) return icon;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),

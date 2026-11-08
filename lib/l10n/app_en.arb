@@ -693,5 +693,8 @@
   "detailDuration": "Duration",
   "detailResult": "Result",
   "detailMovements": "Movements",
-  "detailExercises": "Exercises"
+  "detailExercises": "Exercises",
+  "freeWorkoutRow": "Free workout",
+  "yourRms": "Your 1RMs",
+  "yourRmsEmpty": "Save a 1RM on any lift and it will show up here, one tap from the calculator."
 }

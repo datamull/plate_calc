@@ -1092,4 +1092,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get detailExercises => 'Ejercicios';
+
+  @override
+  String get freeWorkoutRow => 'Entrenamiento libre';
+
+  @override
+  String get yourRms => 'Tus RM';
+
+  @override
+  String get yourRmsEmpty =>
+      'Guarda tu RM en un movimiento y aparecerá aquí para calcular en un toque.';
 }

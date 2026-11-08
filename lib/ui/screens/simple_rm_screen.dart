@@ -5,6 +5,7 @@ import '../../l10n/lift_names.dart';
 import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../utils/format.dart';
+import '../widgets/ds.dart';
 import '../widgets/glass_button.dart';
 import '../widgets/lift_icon.dart';
 import '../widgets/rm_history_sheet.dart';
@@ -219,14 +220,14 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
               children: [
                 Text(loc.unitsLabel),
                 const SizedBox(width: 12),
-                SegmentedButton<WeightUnit>(
-                  showSelectedIcon: false,
-                  segments: [
-                    for (final u in WeightUnit.values)
-                      ButtonSegment(value: u, label: Text(u.label)),
-                  ],
-                  selected: {_unit},
-                  onSelectionChanged: (s) => _switchUnit(s.first),
+                SizedBox(
+                  width: 128,
+                  child: DsSegmented(
+                    compact: true,
+                    labels: [for (final u in WeightUnit.values) u.label],
+                    selected: WeightUnit.values.indexOf(_unit),
+                    onChanged: (i) => _switchUnit(WeightUnit.values[i]),
+                  ),
                 ),
               ],
             ),

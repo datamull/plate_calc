@@ -6,7 +6,7 @@ import 'package:plate_calc/models/weight_unit.dart';
 import 'package:plate_calc/services/app_storage.dart';
 import 'package:plate_calc/services/training_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:plate_calc/ui/widgets/app_icons.dart';
+import 'package:plate_calc/ui/widgets/ds.dart';
 
 /// Las pantallas de entrenamiento no se desbordan en un iPhone chico
 /// (375 × 667) en ningún idioma ni estilo.
@@ -46,9 +46,17 @@ void main() {
       await tester.pumpWidget(PlateCalcApp(storage: storage));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(AppIcons.train));
+      // Pestaña Entrenar (ícono de acero en imagen, sin texto fijo por idioma).
+      await tester.tap(
+        find.byWidgetPredicate(
+          (w) =>
+              w is Image &&
+              w.image is AssetImage &&
+              (w.image as AssetImage).assetName.contains('tab_train'),
+        ),
+      );
       await tester.pumpAndSettle();
-      for (final chip in find.byType(ChoiceChip).evaluate().toList()) {
+      for (final chip in find.byType(DsChip).evaluate().toList()) {
         await tester.tap(find.byWidget(chip.widget));
         await tester.pumpAndSettle();
       }

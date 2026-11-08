@@ -6,8 +6,7 @@ import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../services/lift_collection.dart';
 import '../../utils/format.dart';
-import '../theme/app_theme.dart';
-import '../widgets/glass_button.dart';
+import '../widgets/ds.dart';
 import '../widgets/lift_icon.dart';
 import '../widgets/rm_history_sheet.dart';
 import 'home_screen.dart';
@@ -84,91 +83,88 @@ class _RmListScreenState extends State<RmListScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final lifts = widget.collection.lifts;
-    final crossAxisCount = (MediaQuery.sizeOf(context).width ~/ 160).clamp(2, 4);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.collection.title(loc)),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: SegmentedButton<WeightUnit>(
-              showSelectedIcon: false,
-              style: const ButtonStyle(visualDensity: VisualDensity.compact),
-              segments: [
-                for (final u in WeightUnit.values) ButtonSegment(value: u, label: Text(u.label)),
-              ],
-              selected: {_unit},
-              onSelectionChanged: (s) => _setUnit(s.first),
+          SizedBox(
+            width: 112,
+            child: DsSegmented(
+              compact: true,
+              labels: [for (final u in WeightUnit.values) u.label],
+              selected: WeightUnit.values.indexOf(_unit),
+              onChanged: (i) => _setUnit(WeightUnit.values[i]),
             ),
           ),
           if (widget.onOpenSettings != null)
             IconButton(
               tooltip: loc.settingsTooltip,
-              icon: const Icon(AppIcons.settingsFill),
+              icon: const Icon(AppIcons.settings),
               onPressed: widget.onOpenSettings,
             ),
+          const SizedBox(width: 4),
         ],
       ),
       floatingActionButton: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Tooltip(
-            message: loc.converterTooltip,
-            child: GlassButton(
-              circular: true,
-              prominent: true,
-              tint: AppColors.blue,
-              onPressed: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
-              icon: AppIcons.plates,
-            ),
+          DsFab(
+            icon: AppIcons.plates,
+            tooltip: loc.converterTooltip,
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
           ),
           const SizedBox(width: 12),
-          Tooltip(
-            message: loc.addLiftTitle,
-            child: GlassButton(
-              circular: true,
-              prominent: true,
-              tint: AppColors.purple,
-              onPressed: _addLiftDialog,
-              icon: AppIcons.plus,
-            ),
+          DsFab(
+            primary: true,
+            icon: AppIcons.plus,
+            tooltip: loc.addLiftTitle,
+            onPressed: _addLiftDialog,
           ),
         ],
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 88),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: lifts.length,
-        itemBuilder: (context, i) {
-          final lift = lifts[i];
-          return _LiftCard(
-            name: liftDisplayName(lift),
-            pose: LiftPose.parse(_storage.liftIcon(lift)),
-            lastRm: _storage.lastRm(lift, _unit),
-            last: _storage.history(lift, _unit).firstOrNull,
-            unit: _unit,
-            onTap: () => _openLift(lift),
-          );
-        },
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 120),
+        children: [
+          DsLargeHeader(title: widget.collection.title(loc)),
+          const SizedBox(height: 12),
+          DsBlock(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(Ds.radiusBlock),
+              child: Column(
+                children: [
+                  for (var i = 0; i < lifts.length; i++)
+                    _LiftRow(
+                      name: liftDisplayName(lifts[i]),
+                      pose: LiftPose.parse(_storage.liftIcon(lifts[i])),
+                      lastRm: _storage.lastRm(lifts[i], _unit),
+                      last: _storage.history(lifts[i], _unit).firstOrNull,
+                      unit: _unit,
+                      divider: i < lifts.length - 1,
+                      onTap: () => _openLift(lifts[i]),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _LiftCard extends StatelessWidget {
-  const _LiftCard({
+/// Fila de un movimiento: ícono, nombre y su último RM.
+class _LiftRow extends StatelessWidget {
+  const _LiftRow({
     required this.name,
     required this.pose,
     required this.lastRm,
     required this.last,
     required this.unit,
+    required this.divider,
     required this.onTap,
   });
 
@@ -177,52 +173,23 @@ class _LiftCard extends StatelessWidget {
   final double? lastRm;
   final RmEntry? last;
   final WeightUnit unit;
+  final bool divider;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              LiftIcon(liftName: name, pose: pose, size: 80),
-              const SizedBox(height: 8),
-              Text(
-                name,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 6),
-              // Una sola línea: si el texto es largo se achica en vez de
-              // desbordar la tarjeta.
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  last?.reps != null
-                      ? rmEntryText(loc, last!, unit.label)
-                      : lastRm == null
-                      ? loc.noRmLabel
-                      : loc.historyRowRm(fmtWeight(lastRm!), unit.label),
-                  maxLines: 1,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    final rm = last?.reps != null
+        ? rmEntryText(loc, last!, unit.label)
+        : lastRm == null
+        ? loc.noRmLabel
+        : loc.historyRowRm(fmtWeight(lastRm!), unit.label);
+    return DsRow(
+      leading: LiftIcon(liftName: name, pose: pose, size: 48),
+      title: name,
+      subtitle: rm,
+      divider: divider,
+      onTap: onTap,
     );
   }
 }

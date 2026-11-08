@@ -1088,4 +1088,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get detailExercises => 'Exercises';
+
+  @override
+  String get freeWorkoutRow => 'Free workout';
+
+  @override
+  String get yourRms => 'Your 1RMs';
+
+  @override
+  String get yourRmsEmpty =>
+      'Save a 1RM on any lift and it will show up here, one tap from the calculator.';
 }

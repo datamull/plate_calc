@@ -12,8 +12,13 @@ import 'app_icons.dart';
 ///   Display 34/800 · Título 20/700 · Cuerpo 16/400 · Etiqueta 12/600 MAYÚS
 abstract final class Ds {
   static const gutter = 20.0;
+
+  /// Radios: bloques, botones y chips.
+  static const radiusBlock = 16.0;
+  static const radiusButton = 12.0;
+  static const radiusChip = 10.0;
   static const rowHeight = 56.0;
-  static const done = Color(0xFF2FBF71);
+  static const done = Color(0xFF22C55E);
 
   static Color hairline(BuildContext c) =>
       Theme.of(c).colorScheme.onSurface.withValues(alpha: 0.10);
@@ -23,18 +28,19 @@ abstract final class Ds {
   static const tabular = [FontFeature.tabularFigures()];
 
   static TextStyle display(BuildContext c) => TextStyle(
-    fontSize: 34,
-    fontWeight: FontWeight.w800,
-    height: 1.05,
-    letterSpacing: -0.5,
+    fontFamily: 'BarlowCondensed',
+    fontSize: 40,
+    fontWeight: FontWeight.w700,
+    height: 1.0,
+    letterSpacing: 0,
     color: Theme.of(c).colorScheme.onSurface,
     fontFeatures: tabular,
   );
 
   static TextStyle title(BuildContext c) => TextStyle(
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: FontWeight.w700,
-    letterSpacing: -0.2,
+    letterSpacing: 0,
     color: Theme.of(c).colorScheme.onSurface,
   );
 
@@ -45,7 +51,7 @@ abstract final class Ds {
       TextStyle(fontSize: 14, height: 1.35, color: muted(c));
 
   static TextStyle label(BuildContext c) =>
-      TextStyle(fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 1.1, color: muted(c));
+      TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: 1.3, color: muted(c));
 }
 
 /// Encabezado grande de pantalla, con etiqueta pequeña arriba (p. ej. la fecha).
@@ -234,7 +240,7 @@ class DsPrimaryButton extends StatelessWidget {
 
 /// Tipo de botón: uno principal por pantalla, el resto secundarios o
 /// fantasma.
-enum DsButtonKind { primary, secondary, ghost }
+enum DsButtonKind { primary, secondary, outline, ghost }
 
 /// Botón de la app: se hunde un poco al tocarlo, vibra suave y no tiene
 /// ondas ni sombras. 54 de alto (más que los 44 mínimos de Apple).
@@ -246,7 +252,7 @@ class DsButton extends StatelessWidget {
     this.icon,
     this.kind = DsButtonKind.primary,
     this.expand = true,
-    this.height = 54,
+    this.height = 50,
   });
 
   final String label;
@@ -257,14 +263,18 @@ class DsButton extends StatelessWidget {
   final double height;
 
   static Color secondaryFill(BuildContext c) =>
-      Theme.of(c).brightness == Brightness.dark ? const Color(0xFF222936) : const Color(0xFFE6E9F0);
+      Theme.of(c).brightness == Brightness.dark ? AppColors.surfaceHigh : const Color(0xFFE7E6E1);
 
   @override
   Widget build(BuildContext context) {
     final on = Theme.of(context).colorScheme.onSurface;
     final (bg, fg) = switch (kind) {
-      DsButtonKind.primary => (AppColors.blue, Colors.white),
+      DsButtonKind.primary => (
+        Theme.of(context).brightness == Brightness.dark ? AppColors.chalk : const Color(0xFF111112),
+        Theme.of(context).brightness == Brightness.dark ? AppColors.onAccent : AppColors.chalk,
+      ),
       DsButtonKind.secondary => (secondaryFill(context), on),
+      DsButtonKind.outline => (Colors.transparent, on),
       DsButtonKind.ghost => (Colors.transparent, Ds.muted(context)),
     };
     final style = ButtonStyle(
@@ -284,15 +294,21 @@ class DsButton extends StatelessWidget {
       minimumSize: WidgetStatePropertyAll(Size(expand ? double.infinity : height, height)),
       padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 18)),
       shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Ds.radiusButton),
+          side: kind == DsButtonKind.outline
+              ? BorderSide(color: on.withValues(alpha: 0.16))
+              : BorderSide.none,
+        ),
       ),
       textStyle: WidgetStatePropertyAll(
         TextStyle(
-          fontSize: kind == DsButtonKind.ghost ? 15 : 17,
-          fontWeight: kind == DsButtonKind.ghost ? FontWeight.w600 : FontWeight.w700,
+          fontFamily: 'Barlow',
+          fontSize: kind == DsButtonKind.ghost ? 15 : 16,
+          fontWeight: FontWeight.w600,
         ),
       ),
-      iconSize: const WidgetStatePropertyAll(20),
+      iconSize: const WidgetStatePropertyAll(18),
     );
     final tap = onPressed == null
         ? null
@@ -373,13 +389,12 @@ class DsChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final idle = dark ? const Color(0xFF171B23) : const Color(0xFFE9ECF2);
+    final on = Theme.of(context).colorScheme.onSurface;
     return Semantics(
       button: true,
       selected: selected,
       child: DsPressable(
-        scale: 0.95,
+        scale: 0.96,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
@@ -387,26 +402,28 @@ class DsChip extends StatelessWidget {
             onTap();
           },
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 180),
             curve: Curves.easeOut,
-            height: 36,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
+            height: 34,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: selected ? color.withValues(alpha: dark ? 0.20 : 0.14) : idle,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: selected ? color.withValues(alpha: 0.55) : Colors.transparent,
-              ),
+              color: selected ? AppColors.surfaceHigh : Colors.transparent,
+              borderRadius: BorderRadius.circular(Ds.radiusChip),
+              border: Border.all(color: selected ? AppColors.steelLine : Ds.hairline(context)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (dot) ...[
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: selected ? color : Ds.muted(context).withValues(alpha: 0.6),
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -414,8 +431,8 @@ class DsChip extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: selected ? color : Ds.muted(context),
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    color: selected ? on : Ds.muted(context),
                   ),
                 ),
               ],
@@ -460,14 +477,18 @@ class DsBlock extends StatelessWidget {
   final EdgeInsets padding;
 
   static Color color(BuildContext c) =>
-      Theme.of(c).brightness == Brightness.dark ? const Color(0xFF171B23) : Colors.white;
+      Theme.of(c).brightness == Brightness.dark ? AppColors.surface : Colors.white;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      // Mismo margen que el texto y los botones de la pantalla.
+      margin: const EdgeInsets.symmetric(horizontal: Ds.gutter),
       padding: padding,
-      decoration: BoxDecoration(color: color(context), borderRadius: BorderRadius.circular(24)),
+      decoration: BoxDecoration(
+        color: color(context),
+        borderRadius: BorderRadius.circular(Ds.radiusBlock),
+      ),
       child: child,
     );
   }
@@ -480,22 +501,26 @@ class DsSegmented extends StatelessWidget {
     required this.labels,
     required this.selected,
     required this.onChanged,
+    this.compact = false,
   });
 
   final List<String> labels;
   final int selected;
   final ValueChanged<int> onChanged;
 
+  /// Versión chica, sin margen lateral (para la barra superior).
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final n = labels.length;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: compact ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: Ds.gutter),
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: dark ? const Color(0xFF171B23) : const Color(0xFFE4E7EE),
-        borderRadius: BorderRadius.circular(13),
+        color: dark ? AppColors.surface : const Color(0xFFE7E6E1),
+        borderRadius: BorderRadius.circular(11),
       ),
       child: Stack(
         children: [
@@ -511,10 +536,10 @@ class DsSegmented extends StatelessWidget {
                 widthFactor: 1 / n,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: dark ? const Color(0xFF2C3340) : Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: dark ? const Color(0xFF26262A) : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
                     boxShadow: const [
-                      BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 2)),
+                      BoxShadow(color: Color(0x33000000), blurRadius: 4, offset: Offset(0, 1)),
                     ],
                   ),
                 ),
@@ -536,13 +561,13 @@ class DsSegmented extends StatelessWidget {
                       },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        height: 36,
+                        height: compact ? 30 : 36,
                         alignment: Alignment.center,
                         child: AnimatedDefaultTextStyle(
                           duration: const Duration(milliseconds: 200),
                           style: TextStyle(
+                            fontFamily: 'Barlow',
                             fontSize: 14,
-                            letterSpacing: -0.1,
                             fontWeight: i == selected ? FontWeight.w700 : FontWeight.w500,
                             color: i == selected
                                 ? Theme.of(context).colorScheme.onSurface
@@ -584,6 +609,63 @@ class DsPill extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w800,
           letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
+/// Botón flotante redondo. [primary]: tiza con ícono negro (la acción
+/// principal de la pantalla); si no, acero con borde fino. Sombra neutra,
+/// sin brillos de color.
+class DsFab extends StatelessWidget {
+  const DsFab({
+    super.key,
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.primary = false,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+  final bool primary;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = primary ? 58.0 : 50.0;
+    return Tooltip(
+      message: tooltip,
+      child: Semantics(
+        button: true,
+        label: tooltip,
+        excludeSemantics: true,
+        child: DsPressable(
+          scale: 0.92,
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              onPressed();
+            },
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                color: primary ? AppColors.chalk : AppColors.surfaceHigh,
+                shape: BoxShape.circle,
+                border: primary ? null : Border.all(color: AppColors.steelLine),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x73000000), blurRadius: 20, offset: Offset(0, 8)),
+                ],
+              ),
+              child: Icon(
+                icon,
+                size: primary ? 24 : 21,
+                color: primary ? AppColors.onAccent : AppColors.chalk,
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -367,7 +367,7 @@
   "colSet": "SÉRIE",
   "colPrevious": "PRÉCÉDENT",
   "workoutFinishShort": "Terminer",
-  "styleCrossfit": "CrossFit",
+  "styleCrossfit": "Crosstraining",
   "styleHaltero": "Haltérophilie",
   "styleGym": "Gym",
   "styleCrossfitDesc": "WOD du jour : AMRAP, EMOM, For Time",
@@ -419,5 +419,9 @@
   "aiConsentNo": "Seulement sur mon téléphone",
   "aiSettingTitle": "Photos du tableau",
   "aiSettingSwitch": "Lire avec l’IA (Google Gemini)",
-  "aiSettingHelp": "La photo est envoyée à Google pour la lire. Désactivé : lecture seulement sur ce téléphone."
+  "aiSettingHelp": "La photo est envoyée à Google pour la lire. Désactivé : lecture seulement sur ce téléphone.",
+  "detailDuration": "Durée",
+  "detailResult": "Résultat",
+  "detailMovements": "Mouvements",
+  "detailExercises": "Exercices"
 }

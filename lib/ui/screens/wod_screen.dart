@@ -10,6 +10,7 @@ import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
+import 'workout_detail_screen.dart';
 
 /// Un WOD con reloj: cronómetro (For Time), cuenta regresiva (AMRAP) o
 /// minuto a minuto (EMOM). Al terminar se anota el resultado.
@@ -82,7 +83,7 @@ class _WodScreenState extends State<WodScreen> {
       builder: (_) => _ScoreDialog(wod: _wod, elapsed: _elapsed),
     );
     if (score == null || !mounted) return;
-    await widget.store.saveWodResult(
+    final saved = await widget.store.saveWodResult(
       _wod,
       widget.store.storage.listUnit,
       score: score,
@@ -90,7 +91,11 @@ class _WodScreenState extends State<WodScreen> {
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.wodSaved(score))));
-    Navigator.of(context).pop();
+    await Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => WorkoutDetailScreen(store: widget.store, workoutId: saved.id),
+      ),
+    );
   }
 
   @override

@@ -6,7 +6,8 @@
 ///
 /// Los nombres de los movimientos van en inglés (como el resto de la app) y
 /// los formatos (AMRAP, EMOM, For Time) son los nombres usados en todos los
-/// idiomas. Los nombres de los WOD son lugares de Chile y Quebec.
+/// idiomas. Los WOD de Crosstraining son los de referencia (Fran, Cindy,
+/// Murph...) con sus nombres y pesos Rx de siempre.
 library;
 
 import '../models/weight_unit.dart';
@@ -133,7 +134,7 @@ DailyWorkout dailyFor(TrainingStyle style, DateTime day, {int offset = 0}) {
   return list[i < 0 ? i + list.length : i];
 }
 
-// ── CrossFit / WOD ──────────────────────────────────────────────────────────
+// ── Crosstraining / WOD ──────────────────────────────────────────────────────────
 DailyWorkout _wod(
   String id,
   String name,
@@ -159,103 +160,109 @@ DailyWorkout _wod(
 
 const _i = DailyItem.new;
 
+/// WOD de referencia ("benchmark") con su nombre y peso Rx de siempre: los
+/// "Girls" y los "Hero WODs" que se programan en todos los boxes, más dos
+/// días de fuerza. Rx en hombre/mujer.
 final crossfitLibrary = <DailyWorkout>[
-  _wod('andes', 'Andes', WodFormat.forTime, minutes: 12, [
-    _i('Thruster', reps: '21-15-9', percent: 45, rmOf: 'Front Squat'),
+  _wod('fran', 'Fran', WodFormat.forTime, [
+    _i('Thruster', reps: '21-15-9', rxKg: '43/29', rxLb: '95/65'),
     _i('Pull-Up', reps: '21-15-9'),
   ]),
-  _wod('atacama', 'Atacama', WodFormat.amrap, minutes: 15, [
-    _i('Power Clean', reps: '5', percent: 60, rmOf: 'Clean'),
-    _i('Box Jump', reps: '10', rxKg: '60/50 cm', rxLb: '24/20 in'),
-    _i('Kettlebell Swing', reps: '15', rxKg: '24/16', rxLb: '53/35'),
-  ]),
-  _wod('chiloe', 'Chiloé', WodFormat.emom, minutes: 12, [
-    _i('Min 1 · Burpee', reps: '12'),
-    _i('Min 2 · Wall Ball', reps: '15', rxKg: '9/6', rxLb: '20/14'),
-    _i('Min 3 · Double Under', reps: '40'),
-  ]),
-  _wod('laurentides', 'Laurentides', WodFormat.forTime, rounds: 5, minutes: 20, [
-    _i('Run', reps: '400 m'),
-    _i('Deadlift', reps: '12', percent: 50),
-    _i('Push-Up', reps: '15'),
-  ]),
-  _wod('tadoussac', 'Tadoussac', WodFormat.amrap, minutes: 10, [
-    _i('Hang Power Snatch', reps: '6', percent: 55, rmOf: 'Snatch'),
-    _i('Toes-to-Bar', reps: '9'),
-    _i('Air Squat', reps: '12'),
-  ]),
-  _wod('valparaiso', 'Valparaíso', WodFormat.forTime, minutes: 15, [
-    _i('Wall Ball', reps: '50', rxKg: '9/6', rxLb: '20/14'),
-    _i('Push Press', reps: '40', percent: 50, rmOf: 'Jerk'),
-    _i('Burpee', reps: '30'),
-    _i('Power Clean', reps: '20', percent: 60, rmOf: 'Clean'),
-    _i('Muscle-Up', reps: '10'),
-  ]),
-  _wod('gaspesie', 'Gaspésie', WodFormat.emom, minutes: 10, [
-    _i('Power Clean + Jerk', reps: '2', percent: 65, rmOf: 'Clean'),
-  ]),
-  _wod('torres', 'Torres', WodFormat.forTime, minutes: 18, [
-    _i('Row', reps: '1000 m'),
-    _i('Thruster', reps: '50', percent: 35, rmOf: 'Front Squat'),
-    _i('Pull-Up', reps: '30'),
-  ]),
-  _wod('magog', 'Magog', WodFormat.amrap, minutes: 20, [
+  _wod('cindy', 'Cindy', WodFormat.amrap, minutes: 20, [
     _i('Pull-Up', reps: '5'),
     _i('Push-Up', reps: '10'),
     _i('Air Squat', reps: '15'),
   ]),
-  _wod('rapanui', 'Rapa Nui', WodFormat.forTime, rounds: 3, minutes: 15, [
-    _i('Front Squat', reps: '10', percent: 60),
-    _i('Bar-Facing Burpee', reps: '10'),
-    _i('Toes-to-Bar', reps: '15'),
+  _wod('grace', 'Grace', WodFormat.forTime, [
+    _i('Clean & Jerk', reps: '30', rxKg: '61/43', rxLb: '135/95'),
   ]),
-  _wod('charlevoix', 'Charlevoix', WodFormat.amrap, minutes: 12, [
-    _i('Deadlift', reps: '9', percent: 55),
-    _i('Hang Power Clean', reps: '6', percent: 55, rmOf: 'Clean'),
-    _i('Shoulder-to-Overhead', reps: '3', percent: 55, rmOf: 'Jerk'),
+  _wod('helen', 'Helen', WodFormat.forTime, rounds: 3, [
+    _i('Run', reps: '400 m'),
+    _i('Kettlebell Swing', reps: '21', rxKg: '24/16', rxLb: '53/35'),
+    _i('Pull-Up', reps: '12'),
   ]),
-  _wod('elqui', 'Elqui', WodFormat.forTime, minutes: 10, [
+  _wod('diane', 'Diane', WodFormat.forTime, [
+    _i('Deadlift', reps: '21-15-9', rxKg: '102/70', rxLb: '225/155'),
+    _i('Handstand Push-Up', reps: '21-15-9'),
+  ]),
+  _wod('annie', 'Annie', WodFormat.forTime, [
     _i('Double Under', reps: '50-40-30-20-10'),
     _i('Sit-Up', reps: '50-40-30-20-10'),
   ]),
-  _wod('mauricie', 'Mauricie', WodFormat.emom, minutes: 16, [
-    _i('Min 1 · Row (cal)', reps: '15/12'),
-    _i('Min 2 · Kettlebell Swing', reps: '15', rxKg: '24/16', rxLb: '53/35'),
-    _i('Min 3 · Toes-to-Bar', reps: '12'),
-    _i('Min 4 · Rest', reps: ''),
+  _wod('isabel', 'Isabel', WodFormat.forTime, [
+    _i('Snatch', reps: '30', rxKg: '61/43', rxLb: '135/95'),
   ]),
-  _wod('pucon', 'Pucón', WodFormat.forTime, minutes: 14, [
-    _i('Overhead Squat', reps: '15-12-9', percent: 45, rmOf: 'Snatch'),
-    _i('Chest-to-Bar Pull-Up', reps: '15-12-9'),
-    _i('Box Jump Over', reps: '15-12-9', rxKg: '60/50 cm', rxLb: '24/20 in'),
+  _wod('karen', 'Karen', WodFormat.forTime, [
+    _i('Wall Ball', reps: '150', rxKg: '9/6', rxLb: '20/14'),
   ]),
-  _wod('stelaurent', 'Saint-Laurent', WodFormat.amrap, minutes: 18, [
-    _i('Run', reps: '200 m'),
-    _i('Dumbbell Snatch', reps: '10', rxKg: '22.5/15', rxLb: '50/35'),
-    _i('Burpee Box Jump', reps: '8', rxKg: '60/50 cm', rxLb: '24/20 in'),
+  _wod('jackie', 'Jackie', WodFormat.forTime, [
+    _i('Row', reps: '1000 m'),
+    _i('Thruster', reps: '50', rxKg: '20/15', rxLb: '45/35'),
+    _i('Pull-Up', reps: '30'),
   ]),
-  _wod('fitzroy', 'Fitz Roy', WodFormat.sets, [_i('Back Squat', reps: '5-5-5-3-3-3', percent: 80)]),
-  _wod('montmorency', 'Montmorency', WodFormat.forTime, rounds: 4, minutes: 16, [
-    _i('Row (cal)', reps: '20/16'),
-    _i('Wall Ball', reps: '15', rxKg: '9/6', rxLb: '20/14'),
-    _i('Handstand Push-Up', reps: '10'),
+  _wod('backsquat', 'Back Squat', WodFormat.sets, [
+    _i('Back Squat', reps: '5-5-5-3-3-3', percent: 80),
   ]),
-  _wod('osorno', 'Osorno', WodFormat.amrap, minutes: 8, [
-    _i('Thruster', reps: '8', percent: 40, rmOf: 'Front Squat'),
-    _i('Burpee', reps: '8'),
+  _wod('elizabeth', 'Elizabeth', WodFormat.forTime, [
+    _i('Squat Clean', reps: '21-15-9', rxKg: '61/43', rxLb: '135/95'),
+    _i('Ring Dip', reps: '21-15-9'),
   ]),
-  _wod('abitibi', 'Abitibi', WodFormat.emom, minutes: 14, [
-    _i('Odd · Power Snatch', reps: '3', percent: 65, rmOf: 'Snatch'),
-    _i('Even · Bar Muscle-Up', reps: '5'),
+  _wod('nancy', 'Nancy', WodFormat.forTime, rounds: 5, [
+    _i('Run', reps: '400 m'),
+    _i('Overhead Squat', reps: '15', rxKg: '43/29', rxLb: '95/65'),
   ]),
-  _wod('chillan', 'Chillán', WodFormat.forTime, minutes: 25, [
-    _i('Run', reps: '1 km'),
-    _i('Pull-Up', reps: '50'),
+  _wod('chelsea', 'Chelsea', WodFormat.emom, minutes: 30, [
+    _i('Pull-Up', reps: '5'),
+    _i('Push-Up', reps: '10'),
+    _i('Air Squat', reps: '15'),
+  ]),
+  _wod('kelly', 'Kelly', WodFormat.forTime, rounds: 5, [
+    _i('Run', reps: '400 m'),
+    _i('Box Jump', reps: '30', rxKg: '60/50 cm', rxLb: '24/20 in'),
+    _i('Wall Ball', reps: '30', rxKg: '9/6', rxLb: '20/14'),
+  ]),
+  _wod('dt', 'DT', WodFormat.forTime, rounds: 5, [
+    _i('Deadlift', reps: '12', rxKg: '70/47', rxLb: '155/105'),
+    _i('Hang Power Clean', reps: '9', rxKg: '70/47', rxLb: '155/105'),
+    _i('Push Jerk', reps: '6', rxKg: '70/47', rxLb: '155/105'),
+  ]),
+  _wod('mary', 'Mary', WodFormat.amrap, minutes: 20, [
+    _i('Handstand Push-Up', reps: '5'),
+    _i('Pistol', reps: '10'),
+    _i('Pull-Up', reps: '15'),
+  ]),
+  _wod('amanda', 'Amanda', WodFormat.forTime, [
+    _i('Muscle-Up', reps: '9-7-5'),
+    _i('Squat Snatch', reps: '9-7-5', rxKg: '61/43', rxLb: '135/95'),
+  ]),
+  _wod('angie', 'Angie', WodFormat.forTime, [
+    _i('Pull-Up', reps: '100'),
     _i('Push-Up', reps: '100'),
-    _i('Air Squat', reps: '150'),
-    _i('Run', reps: '1 km'),
+    _i('Sit-Up', reps: '100'),
+    _i('Air Squat', reps: '100'),
   ]),
-  _wod('levis', 'Lévis', WodFormat.sets, [_i('Deadlift', reps: '5-5-3-3-1-1', percent: 85)]),
+  _wod('deadlift', 'Deadlift', WodFormat.sets, [
+    _i('Deadlift', reps: '5-5-3-3-1-1', percent: 85),
+  ]),
+  _wod('barbara', 'Barbara', WodFormat.forTime, rounds: 5, [
+    _i('Pull-Up', reps: '20'),
+    _i('Push-Up', reps: '30'),
+    _i('Sit-Up', reps: '40'),
+    _i('Air Squat', reps: '50'),
+    _i('Rest', reps: '3 min'),
+  ]),
+  _wod('jt', 'JT', WodFormat.forTime, [
+    _i('Handstand Push-Up', reps: '21-15-9'),
+    _i('Ring Dip', reps: '21-15-9'),
+    _i('Push-Up', reps: '21-15-9'),
+  ]),
+  _wod('murph', 'Murph', WodFormat.forTime, [
+    _i('Run', reps: '1 mile'),
+    _i('Pull-Up', reps: '100'),
+    _i('Push-Up', reps: '200'),
+    _i('Air Squat', reps: '300'),
+    _i('Run', reps: '1 mile'),
+  ]),
 ];
 
 // ── Halterofilia ────────────────────────────────────────────────────────────

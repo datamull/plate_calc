@@ -910,7 +910,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get workoutFinishShort => 'Finish';
 
   @override
-  String get styleCrossfit => 'CrossFit';
+  String get styleCrossfit => 'Crosstraining';
 
   @override
   String get styleHaltero => 'Weightlifting';
@@ -1076,4 +1076,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aiSettingHelp =>
       'The photo is sent to Google to read it. Off: read only on this phone.';
+
+  @override
+  String get detailDuration => 'Duration';
+
+  @override
+  String get detailResult => 'Result';
+
+  @override
+  String get detailMovements => 'Movements';
+
+  @override
+  String get detailExercises => 'Exercises';
 }

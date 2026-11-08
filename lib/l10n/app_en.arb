@@ -623,7 +623,7 @@
   "colSet": "SET",
   "colPrevious": "PREVIOUS",
   "workoutFinishShort": "Finish",
-  "styleCrossfit": "CrossFit",
+  "styleCrossfit": "Crosstraining",
   "styleHaltero": "Weightlifting",
   "styleGym": "Gym",
   "styleCrossfitDesc": "Daily WOD: AMRAP, EMOM, For Time",
@@ -689,5 +689,9 @@
   "aiConsentNo": "Only on my phone",
   "aiSettingTitle": "Whiteboard photos",
   "aiSettingSwitch": "Read with AI (Google Gemini)",
-  "aiSettingHelp": "The photo is sent to Google to read it. Off: read only on this phone."
+  "aiSettingHelp": "The photo is sent to Google to read it. Off: read only on this phone.",
+  "detailDuration": "Duration",
+  "detailResult": "Result",
+  "detailMovements": "Movements",
+  "detailExercises": "Exercises"
 }

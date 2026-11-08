@@ -367,7 +367,7 @@
   "colSet": "SERIE",
   "colPrevious": "ANTERIOR",
   "workoutFinishShort": "Terminar",
-  "styleCrossfit": "CrossFit",
+  "styleCrossfit": "Crosstraining",
   "styleHaltero": "Halterofilia",
   "styleGym": "Gym",
   "styleCrossfitDesc": "WOD diario: AMRAP, EMOM, For Time",
@@ -419,5 +419,9 @@
   "aiConsentNo": "Solo en mi teléfono",
   "aiSettingTitle": "Fotos de la pizarra",
   "aiSettingSwitch": "Leer con IA (Google Gemini)",
-  "aiSettingHelp": "La foto se envía a Google para leerla. Apagado: se lee solo en este teléfono."
+  "aiSettingHelp": "La foto se envía a Google para leerla. Apagado: se lee solo en este teléfono.",
+  "detailDuration": "Duración",
+  "detailResult": "Resultado",
+  "detailMovements": "Movimientos",
+  "detailExercises": "Ejercicios"
 }

@@ -1645,7 +1645,7 @@ abstract class AppLocalizations {
   /// No description provided for @styleCrossfit.
   ///
   /// In en, this message translates to:
-  /// **'CrossFit'**
+  /// **'Crosstraining'**
   String get styleCrossfit;
 
   /// No description provided for @styleHaltero.
@@ -1959,6 +1959,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The photo is sent to Google to read it. Off: read only on this phone.'**
   String get aiSettingHelp;
+
+  /// No description provided for @detailDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get detailDuration;
+
+  /// No description provided for @detailResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get detailResult;
+
+  /// No description provided for @detailMovements.
+  ///
+  /// In en, this message translates to:
+  /// **'Movements'**
+  String get detailMovements;
+
+  /// No description provided for @detailExercises.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercises'**
+  String get detailExercises;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

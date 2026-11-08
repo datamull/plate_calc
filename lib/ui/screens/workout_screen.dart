@@ -13,6 +13,7 @@ import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import '../widgets/result_sheet.dart';
 import '../widgets/share_code.dart';
+import 'workout_detail_screen.dart';
 import '../widgets/training_widgets.dart';
 
 /// Registro de un entrenamiento en curso: series, pesos, repeticiones,
@@ -155,7 +156,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     final prs = await _store.finish(_w);
     if (!mounted) return;
     await showWorkoutSummary(context, store: _store, workout: _w, records: prs);
-    if (mounted) Navigator.of(context).pop(true);
+    if (!mounted) return;
+    // Al terminar se ve el detalle de lo que se hizo (queda en el historial).
+    await Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => WorkoutDetailScreen(store: _store, workoutId: _w.id),
+      ),
+    );
   }
 
   Future<void> _discard({bool confirm = true}) async {

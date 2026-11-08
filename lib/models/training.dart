@@ -52,6 +52,26 @@ class ExerciseLog {
   );
 }
 
+/// Una línea de un WOD tal como estaba en la pizarra: "21 · Thruster · 43 kg".
+class WodLine {
+  const WodLine({required this.reps, required this.lift, this.load});
+
+  final String reps;
+  final String lift;
+
+  /// Tu peso calculado o el Rx de la pizarra ("43 kg", "20/14 lb").
+  final String? load;
+
+  Map<String, dynamic> toJson() => {'r': reps, 'l': lift, if (load != null) 'w': load};
+
+  static WodLine? fromJson(Object? raw) {
+    if (raw is! Map) return null;
+    final lift = '${raw['l'] ?? ''}';
+    if (lift.isEmpty) return null;
+    return WodLine(reps: '${raw['r'] ?? ''}', lift: lift, load: raw['w'] as String?);
+  }
+}
+
 /// Un entrenamiento registrado (o en curso).
 class Workout {
   Workout({
@@ -68,7 +88,10 @@ class Workout {
     this.durationSec = 0,
     this.score,
     this.style,
-  }) : exercises = exercises ?? [];
+    this.format,
+    List<WodLine>? wodLines,
+  }) : exercises = exercises ?? [],
+       wodLines = wodLines ?? const [];
 
   final String id;
   DateTime date;
@@ -92,6 +115,10 @@ class Workout {
   /// Estilo del entrenamiento del día: 'crossfit', 'haltero' o 'gym'.
   final String? style;
 
+  /// Formato del WOD ("AMRAP 32′", "5 RFT") y sus movimientos.
+  final String? format;
+  final List<WodLine> wodLines;
+
   Iterable<WorkSet> get doneSets => exercises.expand((e) => e.sets).where((s) => s.done);
 
   Map<String, dynamic> toJson() => {
@@ -108,6 +135,8 @@ class Workout {
     if (durationSec > 0) 'dur': durationSec,
     if (score != null && score!.isNotEmpty) 'sc': score,
     if (style != null) 'st': style,
+    if (format != null && format!.isNotEmpty) 'fm': format,
+    if (wodLines.isNotEmpty) 'wl': wodLines.map((l) => l.toJson()).toList(),
   };
 
   static Workout? fromJson(Object? raw) {
@@ -132,6 +161,11 @@ class Workout {
       durationSec: (j['dur'] as num?)?.toInt() ?? 0,
       score: j['sc'] as String?,
       style: j['st'] as String?,
+      format: j['fm'] as String?,
+      wodLines: [
+        for (final l in (j['wl'] as List? ?? const []))
+          if (WodLine.fromJson(l) case final line?) line,
+      ],
     );
   }
 }

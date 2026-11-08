@@ -106,6 +106,7 @@ class TrainingStore {
       unit: unit,
       title: d.name,
       style: d.style.name,
+      format: d.formatLabel.isEmpty ? null : d.formatLabel,
       planId: dailyKey(d, today),
       exercises: [
         for (final item in d.items)
@@ -148,6 +149,18 @@ class TrainingStore {
       score: score,
       notes: notes,
       durationSec: durationSec,
+      format: d.formatLabel,
+      wodLines: [
+        for (final i in d.items)
+          WodLine(
+            reps: i.reps,
+            lift: i.lift,
+            load: switch (dailyWeight(i, unit)) {
+              final w? => '${_fmt(w)} ${unit.label}',
+              null => i.rx(unit),
+            },
+          ),
+      ],
     );
     await saveWorkout(w);
     return w;
@@ -289,6 +302,8 @@ class TrainingStore {
     return prs;
   }
 }
+
+String _fmt(double v) => v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
 
 // ── Cálculos ────────────────────────────────────────────────────────────────
 

@@ -164,7 +164,7 @@ void main() {
     expect(w.exercises.first.sets.first.reps, 2);
 
     // "5-5-3-3-1-1" se convierte en 6 series.
-    final levis = crossfitLibrary.firstWhere((d) => d.id == 'cf_levis');
+    final levis = crossfitLibrary.firstWhere((d) => d.id == 'cf_deadlift');
     final lw = store.startDaily(levis, WeightUnit.kg);
     expect(lw.exercises.first.sets.map((s) => s.reps), [5, 5, 3, 3, 1, 1]);
   });
@@ -217,6 +217,10 @@ void main() {
     await tester.tap(find.text('Terminar').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    // Al terminar se abre el detalle; al volver, Hoy lo marca como hecho.
+    expect(find.text('Ejercicios'.toUpperCase()), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Hecho'), findsOneWidget);
 
@@ -275,6 +279,11 @@ void main() {
     final field = find.byType(TextField).first;
     await tester.enterText(field, '7');
     await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+    // Detalle del WOD con el resultado y sus movimientos.
+    expect(find.text('7 rds'), findsWidgets);
+    expect(find.text('Movimientos'.toUpperCase()), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.textContaining('Hecho ·'), findsOneWidget);
   });

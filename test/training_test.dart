@@ -281,7 +281,8 @@ void main() {
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
     // Detalle del WOD con el resultado y sus movimientos.
-    expect(find.text('7 rds'), findsWidgets);
+    // El resultado depende del WOD del día (rondas, tiempo o reps).
+    expect(find.text(wod.score == ScoreType.rounds ? '7 rds' : '7'), findsWidgets);
     expect(find.text('Movimientos'.toUpperCase()), findsOneWidget);
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();

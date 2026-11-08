@@ -1,7 +1,8 @@
 /// Biblioteca de entrenamientos del día, escrita para Plate Calc.
 ///
-/// Es programación original (no copiada de CrossFit.com ni de otros sitios,
-/// que no permiten republicar su contenido). Cada estilo rota por fecha, así
+/// Crosstraining usa los WOD de referencia de dominio común; halterofilia y
+/// gym son programación propia. Nada se copia de sitios que no permiten
+/// republicar su contenido (como CrossFit.com). Cada estilo rota por fecha, así
 /// todos los usuarios ven el mismo entrenamiento el mismo día, sin internet.
 ///
 /// Los nombres de los movimientos van en inglés (como el resto de la app) y

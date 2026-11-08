@@ -71,7 +71,8 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'unauthorized' });
     }
     const t0 = Date.now();
-    const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+    const model = String(req.query.model || process.env.GEMINI_MODEL || 'gemini-3.8-flash')
+      .replace(/[^a-z0-9.\-]/gi, '');
     try {
       const r = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,

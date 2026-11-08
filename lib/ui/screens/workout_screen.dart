@@ -160,7 +160,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     // Al terminar se ve el detalle de lo que se hizo (queda en el historial).
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
-        builder: (_) => WorkoutDetailScreen(store: _store, workoutId: _w.id),
+        builder: (_) => WorkoutDetailScreen(store: _store, workoutId: _w.id, justFinished: true),
       ),
     );
   }

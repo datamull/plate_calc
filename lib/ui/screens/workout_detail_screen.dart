@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../data/daily_library.dart';
@@ -71,10 +72,18 @@ class WorkoutSummaryList extends StatelessWidget {
 /// Detalle de un entrenamiento terminado: resultado, duración, movimientos
 /// del WOD y series de cada ejercicio.
 class WorkoutDetailScreen extends StatelessWidget {
-  const WorkoutDetailScreen({super.key, required this.store, required this.workoutId});
+  const WorkoutDetailScreen({
+    super.key,
+    required this.store,
+    required this.workoutId,
+    this.justFinished = false,
+  });
 
   final TrainingStore store;
   final String workoutId;
+
+  /// Recién terminado: el trofeo entra con un pequeño rebote y vibra.
+  final bool justFinished;
 
   Future<void> _delete(BuildContext context, Workout w) async {
     final loc = AppLocalizations.of(context);
@@ -198,7 +207,7 @@ class WorkoutDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFB020), size: 36),
+                  _Trophy(animate: justFinished),
                 ],
               ),
             ),
@@ -360,6 +369,37 @@ class _ExerciseBlock extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Trofeo del resultado. Si [animate], entra con rebote y una vibración.
+class _Trophy extends StatefulWidget {
+  const _Trophy({required this.animate});
+
+  final bool animate;
+
+  @override
+  State<_Trophy> createState() => _TrophyState();
+}
+
+class _TrophyState extends State<_Trophy> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.animate) HapticFeedback.heavyImpact();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const icon = Icon(Icons.emoji_events_rounded, color: Color(0xFFFFB020), size: 40);
+    if (!widget.animate || MediaQuery.disableAnimationsOf(context)) return icon;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.elasticOut,
+      builder: (_, t, c) => Transform.scale(scale: 0.4 + 0.6 * t, child: c),
+      child: icon,
     );
   }
 }

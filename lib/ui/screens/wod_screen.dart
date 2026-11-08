@@ -93,7 +93,8 @@ class _WodScreenState extends State<WodScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc.wodSaved(score))));
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
-        builder: (_) => WorkoutDetailScreen(store: widget.store, workoutId: saved.id),
+        builder: (_) =>
+            WorkoutDetailScreen(store: widget.store, workoutId: saved.id, justFinished: true),
       ),
     );
   }

@@ -63,11 +63,11 @@ class _ProgressViewState extends State<ProgressView> {
     return ListView(
       padding: const EdgeInsets.only(top: 8, bottom: 32),
       children: [
-        _ConsistencyCard(workouts: workouts),
+        DsFadeIn(child: _ConsistencyCard(workouts: workouts)),
         if (lift != null) ...[
           const SizedBox(height: 16),
           SizedBox(
-            height: 40,
+            height: 36,
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -75,29 +75,24 @@ class _ProgressViewState extends State<ProgressView> {
                 for (final l in lifts)
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(liftDisplayName(l)),
+                    child: DsChip(
+                      label: liftDisplayName(l),
                       selected: l == lift,
-                      showCheckmark: false,
-                      selectedColor: AppColors.blue.withValues(alpha: 0.18),
-                      labelStyle: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: l == lift ? AppColors.blue : Ds.muted(context),
-                      ),
-                      side: BorderSide.none,
-                      shape: const StadiumBorder(),
-                      onSelected: (_) => setState(() => _lift = l),
+                      onTap: () => setState(() => _lift = l),
                     ),
                   ),
               ],
             ),
           ),
           const SizedBox(height: 12),
-          _LiftChartCard(
-            history: liftHistory(workouts, lift, unit),
-            unit: unit,
-            metric: _metric,
-            onMetric: (m) => setState(() => _metric = m),
+          DsFadeIn(
+            index: 1,
+            child: _LiftChartCard(
+              history: liftHistory(workouts, lift, unit),
+              unit: unit,
+              metric: _metric,
+              onMetric: (m) => setState(() => _metric = m),
+            ),
           ),
         ],
         if (lifts.isNotEmpty) ...[
@@ -229,8 +224,10 @@ class _ConsistencyCard extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           SizedBox(
-            height: 80,
+            height: 96,
             child: BarChart(
+              duration: const Duration(milliseconds: 450),
+              curve: Curves.easeOutCubic,
               BarChartData(
                 maxY: maxY,
                 alignment: BarChartAlignment.spaceBetween,
@@ -257,12 +254,17 @@ class _ConsistencyCard extends StatelessWidget {
                       x: i,
                       barRods: [
                         BarChartRodData(
-                          toY: counts[i] == 0 ? 0.08 : counts[i].toDouble(),
-                          width: 14,
-                          borderRadius: BorderRadius.circular(5),
+                          toY: counts[i] == 0 ? 0.12 : counts[i].toDouble(),
+                          width: 16,
+                          borderRadius: BorderRadius.circular(6),
                           color: counts[i] == 0
                               ? Ds.hairline(context)
-                              : (i == 11 ? AppColors.blue : AppColors.blue.withValues(alpha: 0.45)),
+                              : (i == 11 ? AppColors.blue : AppColors.blue.withValues(alpha: 0.32)),
+                          backDrawRodData: BackgroundBarChartRodData(
+                            show: true,
+                            toY: maxY,
+                            color: Ds.hairline(context).withValues(alpha: 0.04),
+                          ),
                         ),
                       ],
                     ),
@@ -318,9 +320,9 @@ class _BigNumber extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(value, style: Ds.display(context).copyWith(fontSize: 40)),
+            Text(value, style: Ds.display(context).copyWith(fontSize: 44, letterSpacing: -1.5)),
             const SizedBox(width: 6),
-            Icon(icon, color: color, size: 26),
+            Icon(icon, color: color, size: 22),
           ],
         ),
         Text(label, style: Ds.secondary(context)),
@@ -402,7 +404,7 @@ class _LiftChartCard extends StatelessWidget {
               ),
             )
           else
-            SizedBox(height: 200, child: _line(context, values, locale)),
+            SizedBox(height: 210, child: _line(context, values, locale)),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -437,6 +439,8 @@ class _LiftChartCard extends StatelessWidget {
     final gridColor = Ds.hairline(context);
 
     return LineChart(
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutCubic,
       LineChartData(
         minY: minY,
         maxY: maxY,
@@ -445,7 +449,8 @@ class _LiftChartCard extends StatelessWidget {
         gridData: FlGridData(
           drawVerticalLine: false,
           horizontalInterval: step,
-          getDrawingHorizontalLine: (_) => FlLine(color: gridColor, strokeWidth: 1),
+          getDrawingHorizontalLine: (_) =>
+              FlLine(color: gridColor, strokeWidth: 1, dashArray: const [3, 4]),
         ),
         borderData: FlBorderData(show: false),
         titlesData: FlTitlesData(
@@ -512,10 +517,12 @@ class _LiftChartCard extends StatelessWidget {
             isCurved: true,
             preventCurveOverShooting: true,
             color: AppColors.blue,
-            barWidth: 3,
+            barWidth: 2.5,
+            isStrokeCapRound: true,
             dotData: FlDotData(
+              checkToShowDot: (spot, _) => spot.x == n - 1 || n <= 8,
               getDotPainter: (spot, _, _, i) => FlDotCirclePainter(
-                radius: i == n - 1 ? 5 : 3,
+                radius: i == n - 1 ? 5 : 2.5,
                 color: AppColors.blue,
                 strokeWidth: i == n - 1 ? 3 : 0,
                 strokeColor: DsBlock.color(context),
@@ -527,7 +534,7 @@ class _LiftChartCard extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.blue.withValues(alpha: 0.25),
+                  AppColors.blue.withValues(alpha: 0.22),
                   AppColors.blue.withValues(alpha: 0),
                 ],
               ),
@@ -547,27 +554,12 @@ class _MetricChip extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(
-          color: on ? Theme.of(context).colorScheme.onSurface : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: on ? Colors.transparent : Ds.hairline(context)),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
-            color: on ? DsBlock.color(context) : Ds.muted(context),
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => DsChip(
+    label: label,
+    selected: on,
+    onTap: onTap,
+    color: Theme.of(context).colorScheme.onSurface,
+  );
 }
 
 class _RecordRow extends StatelessWidget {

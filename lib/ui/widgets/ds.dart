@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
 
@@ -144,6 +145,8 @@ class DsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Ds.hairline(context),
       child: Container(
         constraints: const BoxConstraints(minHeight: Ds.rowHeight),
         margin: const EdgeInsets.only(left: Ds.gutter),
@@ -170,7 +173,11 @@ class DsRow extends StatelessWidget {
             if (trailing != null)
               trailing!
             else if (onTap != null)
-              Icon(Icons.chevron_right, color: Ds.muted(context), size: 20),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Ds.muted(context).withValues(alpha: 0.6),
+                size: 22,
+              ),
           ],
         ),
       ),
@@ -223,17 +230,228 @@ class DsPrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
-      child: FilledButton.icon(
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.blue,
-          minimumSize: const Size.fromHeight(56),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
-        ),
-        icon: Icon(icon ?? Icons.play_arrow_rounded),
-        label: Text(label),
-        onPressed: onPressed,
+      child: DsButton(label: label, icon: icon ?? Icons.play_arrow_rounded, onPressed: onPressed),
+    );
+  }
+}
+
+/// Tipo de botón: uno principal por pantalla, el resto secundarios o
+/// fantasma.
+enum DsButtonKind { primary, secondary, ghost }
+
+/// Botón de la app: se hunde un poco al tocarlo, vibra suave y no tiene
+/// ondas ni sombras. 54 de alto (más que los 44 mínimos de Apple).
+class DsButton extends StatelessWidget {
+  const DsButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.icon,
+    this.kind = DsButtonKind.primary,
+    this.expand = true,
+    this.height = 54,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final IconData? icon;
+  final DsButtonKind kind;
+  final bool expand;
+  final double height;
+
+  static Color secondaryFill(BuildContext c) =>
+      Theme.of(c).brightness == Brightness.dark ? const Color(0xFF222936) : const Color(0xFFE6E9F0);
+
+  @override
+  Widget build(BuildContext context) {
+    final on = Theme.of(context).colorScheme.onSurface;
+    final (bg, fg) = switch (kind) {
+      DsButtonKind.primary => (AppColors.blue, Colors.white),
+      DsButtonKind.secondary => (secondaryFill(context), on),
+      DsButtonKind.ghost => (Colors.transparent, Ds.muted(context)),
+    };
+    final style = ButtonStyle(
+      backgroundColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.disabled) && kind != DsButtonKind.ghost
+            ? bg.withValues(alpha: 0.35)
+            : bg,
       ),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.disabled) ? fg.withValues(alpha: 0.45) : fg,
+      ),
+      overlayColor: WidgetStateProperty.resolveWith(
+        (s) => s.contains(WidgetState.pressed) ? Colors.black.withValues(alpha: 0.10) : null,
+      ),
+      splashFactory: NoSplash.splashFactory,
+      elevation: const WidgetStatePropertyAll(0),
+      minimumSize: WidgetStatePropertyAll(Size(expand ? double.infinity : height, height)),
+      padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 18)),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      textStyle: WidgetStatePropertyAll(
+        TextStyle(
+          fontSize: kind == DsButtonKind.ghost ? 15 : 17,
+          fontWeight: kind == DsButtonKind.ghost ? FontWeight.w600 : FontWeight.w700,
+          letterSpacing: -0.2,
+        ),
+      ),
+      iconSize: const WidgetStatePropertyAll(20),
+    );
+    final tap = onPressed == null
+        ? null
+        : () {
+            HapticFeedback.selectionClick();
+            onPressed!();
+          };
+    final child = Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (icon != null) ...[Icon(icon), if (label.isNotEmpty) const SizedBox(width: 8)],
+        if (label.isNotEmpty) Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
+      ],
+    );
+    final button = kind == DsButtonKind.ghost
+        ? TextButton(style: style, onPressed: tap, child: child)
+        : FilledButton(style: style, onPressed: tap, child: child);
+    return DsPressable(enabled: onPressed != null, child: button);
+  }
+}
+
+/// Se encoge un poco mientras se mantiene presionado (sin animación si el
+/// usuario pidió reducir el movimiento). No captura el toque: solo escucha.
+class DsPressable extends StatefulWidget {
+  const DsPressable({super.key, required this.child, this.enabled = true, this.scale = 0.97});
+
+  final Widget child;
+  final bool enabled;
+  final double scale;
+
+  @override
+  State<DsPressable> createState() => _DsPressableState();
+}
+
+class _DsPressableState extends State<DsPressable> {
+  bool _down = false;
+
+  void _set(bool v) {
+    if (widget.enabled && _down != v) setState(() => _down = v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.disableAnimationsOf(context);
+    return Listener(
+      onPointerDown: (_) => _set(true),
+      onPointerUp: (_) => _set(false),
+      onPointerCancel: (_) => _set(false),
+      child: AnimatedScale(
+        scale: _down && !still ? widget.scale : 1,
+        duration: Duration(milliseconds: _down ? 90 : 160),
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// Píldora seleccionable (estilos, ejercicios, métricas).
+class DsChip extends StatelessWidget {
+  const DsChip({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.color = AppColors.blue,
+    this.dot = false,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final Color color;
+
+  /// Muestra un punto del color antes del texto.
+  final bool dot;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final idle = dark ? const Color(0xFF171B23) : const Color(0xFFE9ECF2);
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: DsPressable(
+        scale: 0.95,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            if (!selected) HapticFeedback.selectionClick();
+            onTap();
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            height: 36,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? color.withValues(alpha: dark ? 0.20 : 0.14) : idle,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: selected ? color.withValues(alpha: 0.55) : Colors.transparent,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (dot) ...[
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? color : Ds.muted(context),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Aparece con un leve desplazamiento hacia arriba. [index] escalona la
+/// entrada de las filas de una lista.
+class DsFadeIn extends StatelessWidget {
+  const DsFadeIn({super.key, required this.child, this.index = 0});
+
+  final Widget child;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return child;
+    final delay = (index.clamp(0, 8)) * 0.06;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 360 + (delay * 1000).round()),
+      curve: Interval(delay / (0.36 + delay), 1, curve: Curves.easeOutCubic),
+      builder: (_, t, c) => Opacity(
+        opacity: t,
+        child: Transform.translate(offset: Offset(0, (1 - t) * 12), child: c),
+      ),
+      child: child,
     );
   }
 }
@@ -275,52 +493,73 @@ class DsSegmented extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final n = labels.length;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: dark ? const Color(0xFF171B23) : const Color(0xFFE4E7EE),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(13),
       ),
-      child: Row(
+      child: Stack(
         children: [
-          for (var i = 0; i < labels.length; i++)
-            Expanded(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onChanged(i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  height: 38,
-                  alignment: Alignment.center,
+          // Fondo del segmento elegido: se desliza.
+          Positioned.fill(
+            child: AnimatedAlign(
+              duration: MediaQuery.disableAnimationsOf(context)
+                  ? Duration.zero
+                  : const Duration(milliseconds: 260),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment(n == 1 ? 0 : -1 + 2 * selected / (n - 1), 0),
+              child: FractionallySizedBox(
+                widthFactor: 1 / n,
+                child: Container(
                   decoration: BoxDecoration(
-                    color: i == selected
-                        ? (dark ? const Color(0xFF2A303B) : Colors.white)
-                        : Colors.transparent,
+                    color: dark ? const Color(0xFF2C3340) : Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                    boxShadow: i == selected && !dark
-                        ? const [
-                            BoxShadow(
-                              color: Color(0x14000000),
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Text(
-                    labels[i],
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: i == selected ? FontWeight.w700 : FontWeight.w500,
-                      color: i == selected
-                          ? Theme.of(context).colorScheme.onSurface
-                          : Ds.muted(context),
-                    ),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x1F000000), blurRadius: 8, offset: Offset(0, 2)),
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
+          Row(
+            children: [
+              for (var i = 0; i < n; i++)
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    selected: i == selected,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        if (i != selected) HapticFeedback.selectionClick();
+                        onChanged(i);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        height: 36,
+                        alignment: Alignment.center,
+                        child: AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 200),
+                          style: TextStyle(
+                            fontSize: 14,
+                            letterSpacing: -0.1,
+                            fontWeight: i == selected ? FontWeight.w700 : FontWeight.w500,
+                            color: i == selected
+                                ? Theme.of(context).colorScheme.onSurface
+                                : Ds.muted(context),
+                          ),
+                          child: Text(labels[i], maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );

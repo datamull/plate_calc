@@ -6,6 +6,7 @@ import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../widgets/training_widgets.dart';
 import 'plan_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Crear o editar una rutina / programa (también lo usa el coach).
 class PlanEditorScreen extends StatefulWidget {
@@ -162,7 +163,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
                         ),
                         title: Text(planItemText(loc, widget.store, _plan.days[d].items[i], unit)),
                         trailing: IconButton(
-                          icon: const Icon(Icons.close),
+                          icon: const Icon(AppIcons.close),
                           onPressed: () => setState(() => _plan.days[d].items.removeAt(i)),
                         ),
                         onTap: () async {
@@ -171,7 +172,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
                         },
                       ),
                     TextButton.icon(
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(AppIcons.plus),
                       label: Text(loc.planAddExercise),
                       onPressed: () => _addItem(_plan.days[d]),
                     ),
@@ -180,7 +181,7 @@ class _PlanEditorScreenState extends State<PlanEditorScreen> {
               ),
             ),
           OutlinedButton.icon(
-            icon: const Icon(Icons.add),
+            icon: const Icon(AppIcons.plus),
             label: Text(loc.planAddDay),
             onPressed: () => setState(
               () => _plan.days.add(PlanDay(name: loc.planDayDefault(_plan.days.length + 1))),

@@ -4,6 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../l10n/app_localizations.dart';
+import 'app_icons.dart';
 
 /// Muestra un código para compartir: QR para escanear con la app y botón para
 /// copiarlo y mandarlo por WhatsApp, correo, etc.
@@ -51,7 +52,7 @@ Future<void> showShareCodeSheet(
               ),
               const SizedBox(height: 16),
               FilledButton.icon(
-                icon: const Icon(Icons.copy),
+                icon: const Icon(AppIcons.copy),
                 label: Text(loc.shareCopyCode),
                 onPressed: () async {
                   await Clipboard.setData(ClipboardData(text: code));
@@ -131,7 +132,7 @@ class _CodeInputState extends State<_CodeInput> {
             Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
             FilledButton.icon(
-              icon: const Icon(Icons.qr_code_scanner),
+              icon: const Icon(AppIcons.scanQr),
               label: Text(loc.shareScanQr),
               onPressed: _scan,
             ),
@@ -145,7 +146,7 @@ class _CodeInputState extends State<_CodeInput> {
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   tooltip: loc.sharePaste,
-                  icon: const Icon(Icons.content_paste),
+                  icon: const Icon(AppIcons.paste),
                   onPressed: _paste,
                 ),
               ),

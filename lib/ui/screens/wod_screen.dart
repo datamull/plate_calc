@@ -11,6 +11,7 @@ import '../../utils/format.dart';
 import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import 'workout_detail_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Un WOD con reloj: cronómetro (For Time), cuenta regresiva (AMRAP) o
 /// minuto a minuto (EMOM). Al terminar se anota el resultado.
@@ -192,7 +193,7 @@ class _WodScreenState extends State<WodScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                         textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                       ),
-                      icon: Icon(_running ? Icons.pause_rounded : Icons.play_arrow_rounded),
+                      icon: Icon(_running ? AppIcons.pause : AppIcons.play),
                       label: Text(
                         _running ? loc.wodPause : (_elapsed == 0 ? loc.wodGo : loc.wodContinue),
                       ),
@@ -208,7 +209,7 @@ class _WodScreenState extends State<WodScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                         textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                       ),
-                      icon: const Icon(Icons.flag_rounded),
+                      icon: const Icon(AppIcons.flagFill),
                       label: Text(loc.workoutFinishShort),
                       onPressed: _finish,
                     ),

@@ -11,6 +11,7 @@ import '../../services/board_ai.dart';
 import '../../services/cloud_sync.dart';
 import '../../utils/format.dart';
 import '../widgets/plate_colors.dart';
+import '../widgets/app_icons.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({
@@ -90,9 +91,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: Icon(
-                widget.cloud?.available == true
-                    ? Icons.cloud_done_outlined
-                    : Icons.cloud_off_outlined,
+                widget.cloud?.available == true ? AppIcons.cloudDone : AppIcons.cloudOff,
               ),
               title: Text(widget.cloud?.available == true ? loc.iCloudSyncOn : loc.iCloudSyncOff),
             ),
@@ -221,7 +220,7 @@ class _InventoryEditorState extends State<_InventoryEditor> {
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: _save,
-                  icon: const Icon(Icons.save),
+                  icon: const Icon(AppIcons.saveFill),
                   label: Text(loc.inventorySaveButton),
                 ),
               ),
@@ -263,12 +262,12 @@ class _InventoryEditorState extends State<_InventoryEditor> {
           children: [
             OutlinedButton.icon(
               onPressed: () => _addPlate(u),
-              icon: const Icon(Icons.add),
+              icon: const Icon(AppIcons.plus),
               label: Text(loc.inventoryAddPlate),
             ),
             TextButton.icon(
               onPressed: () => _reset(u),
-              icon: const Icon(Icons.restore),
+              icon: const Icon(AppIcons.restore),
               label: Text(loc.inventoryReset),
             ),
           ],
@@ -372,14 +371,14 @@ class _PlateTile extends StatelessWidget {
               visualDensity: VisualDensity.compact,
               iconSize: 20,
               onPressed: plate.count > 0 ? onMinus : null,
-              icon: const Icon(Icons.remove),
+              icon: const Icon(AppIcons.minus),
             ),
             Text('${plate.count}', style: const TextStyle(fontWeight: FontWeight.bold)),
             IconButton(
               visualDensity: VisualDensity.compact,
               iconSize: 20,
               onPressed: onPlus,
-              icon: const Icon(Icons.add),
+              icon: const Icon(AppIcons.plus),
             ),
           ],
         ),

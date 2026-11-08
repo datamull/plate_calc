@@ -15,6 +15,7 @@ import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import 'training_home.dart';
 import 'workout_detail_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Progreso: constancia (12 semanas), un gráfico por ejercicio y récords.
 /// Poco texto: números grandes y gráficos con ejes legibles.
@@ -47,7 +48,7 @@ class _ProgressViewState extends State<ProgressView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.insights, size: 48, color: Ds.muted(context)),
+              Icon(AppIcons.chart, size: 48, color: Ds.muted(context)),
               const SizedBox(height: 12),
               Text(loc.progressEmpty, textAlign: TextAlign.center, style: Ds.secondary(context)),
             ],
@@ -208,7 +209,7 @@ class _ConsistencyCard extends StatelessWidget {
                 child: _BigNumber(
                   value: '$streak',
                   label: loc.statStreak,
-                  icon: Icons.local_fire_department,
+                  icon: AppIcons.fire,
                   color: const Color(0xFFFF7A3D),
                 ),
               ),
@@ -216,7 +217,7 @@ class _ConsistencyCard extends StatelessWidget {
                 child: _BigNumber(
                   value: '$thisWeek',
                   label: loc.statThisWeek,
-                  icon: Icons.bolt,
+                  icon: AppIcons.bolt,
                   color: AppColors.blue,
                 ),
               ),

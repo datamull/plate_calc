@@ -15,6 +15,7 @@ import '../widgets/result_sheet.dart';
 import '../widgets/share_code.dart';
 import 'workout_detail_screen.dart';
 import '../widgets/training_widgets.dart';
+import '../widgets/app_icons.dart';
 
 /// Registro de un entrenamiento en curso: series, pesos, repeticiones,
 /// descanso entre series y calculadora de discos por serie.
@@ -117,7 +118,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             for (final s in const [30, 60, 90, 120, 180, 240, 300])
               ListTile(
                 title: Text(fmtDuration(s)),
-                trailing: s == _store.restSeconds ? const Icon(Icons.check) : null,
+                trailing: s == _store.restSeconds ? const Icon(AppIcons.check) : null,
                 onTap: () => Navigator.of(ctx).pop(s),
               ),
           ],
@@ -280,7 +281,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              icon: const Icon(Icons.add),
+              icon: const Icon(AppIcons.plus),
               label: Text(loc.workoutAddExercise),
               onPressed: _addExercise,
             ),
@@ -300,7 +301,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          DsPrimaryButton(label: loc.workoutFinish, icon: Icons.flag_outlined, onPressed: _finish),
+          DsPrimaryButton(label: loc.workoutFinish, icon: AppIcons.flag, onPressed: _finish),
         ],
       ),
       bottomNavigationBar: _rest == null
@@ -339,7 +340,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                       IconButton(
                         tooltip: loc.restSkip,
                         color: Colors.white,
-                        icon: const Icon(Icons.skip_next),
+                        icon: const Icon(AppIcons.skip),
                         onPressed: () => setState(() => _rest = null),
                       ),
                     ],
@@ -420,11 +421,11 @@ class _ExerciseBlock extends StatelessWidget {
                 if (onPlates != null)
                   IconButton(
                     tooltip: loc.workoutPlates,
-                    icon: const Icon(Icons.fitness_center, size: 20),
+                    icon: const Icon(AppIcons.trainFill, size: 20),
                     onPressed: onPlates,
                   ),
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.more_horiz, color: Ds.muted(context)),
+                  icon: Icon(AppIcons.more, color: Ds.muted(context)),
                   onSelected: (_) => onRemove(),
                   itemBuilder: (_) => [
                     PopupMenuItem(value: 'remove', child: Text(loc.workoutRemoveExercise)),
@@ -491,7 +492,7 @@ class _ExerciseBlock extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: Ds.gutter - 8),
             child: TextButton.icon(
               style: TextButton.styleFrom(minimumSize: const Size.fromHeight(40)),
-              icon: const Icon(Icons.add, size: 18),
+              icon: const Icon(AppIcons.plus, size: 18),
               label: Text(loc.workoutAddSet),
               onPressed: () {
                 final last = log.sets.isEmpty ? WorkSet(reps: 5) : log.sets.last;
@@ -627,7 +628,7 @@ class _SetRow extends StatelessWidget {
             child: IconButton(
               tooltip: loc.workoutSetDone,
               icon: Icon(
-                set.done ? Icons.check_circle : Icons.radio_button_unchecked,
+                set.done ? AppIcons.checkCircle : AppIcons.circle,
                 color: set.done ? Ds.done : Ds.muted(context),
               ),
               onPressed: onToggle,
@@ -644,7 +645,7 @@ class _SetRow extends StatelessWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: Ds.gutter),
         color: scheme.error,
-        child: const Icon(Icons.delete_outline, color: Colors.white),
+        child: const Icon(AppIcons.trash, color: Colors.white),
       ),
       onDismissed: (_) => onRemove!(),
       child: row,
@@ -686,7 +687,7 @@ Future<void> showWorkoutSummary(
         actions: [
           if (workout.coach != null)
             TextButton.icon(
-              icon: const Icon(Icons.send),
+              icon: const Icon(AppIcons.send),
               label: Text(loc.sendToCoach),
               onPressed: () => shareResultWithCoach(ctx, store, workout),
             ),

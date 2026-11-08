@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
+import 'app_icons.dart';
 
 /// Posición del levantamiento que se dibuja en el pictograma.
 enum LiftPose {
@@ -361,7 +362,7 @@ Future<({LiftPose? pose})?> showLiftIconPicker(
               Center(
                 child: TextButton.icon(
                   onPressed: () => Navigator.of(ctx).pop((pose: null)),
-                  icon: Icon(current == null ? Icons.check_circle : Icons.auto_awesome, size: 18),
+                  icon: Icon(current == null ? AppIcons.checkCircle : AppIcons.sparkle, size: 18),
                   label: Text(loc.iconAuto),
                 ),
               ),

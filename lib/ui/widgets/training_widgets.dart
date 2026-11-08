@@ -8,6 +8,7 @@ import '../../services/app_storage.dart';
 import '../../services/training_store.dart';
 import '../theme/app_theme.dart';
 import 'lift_icon.dart';
+import 'app_icons.dart';
 
 /// Pictograma del ejercicio respetando el que eligió el usuario.
 Widget liftIconFor(AppStorage storage, String lift, {double size = 40}) {
@@ -63,7 +64,7 @@ class _ExercisePickerState extends State<_ExercisePicker> {
               controller: _ctrl,
               autofocus: false,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(AppIcons.search),
                 hintText: loc.pickExerciseHint,
                 border: const OutlineInputBorder(),
               ),
@@ -72,7 +73,7 @@ class _ExercisePickerState extends State<_ExercisePicker> {
           ),
           if (q.isNotEmpty && !exact)
             ListTile(
-              leading: const Icon(Icons.add),
+              leading: const Icon(AppIcons.plus),
               title: Text(loc.pickExerciseNew(_query.trim())),
               onTap: () => Navigator.of(context).pop(_query.trim()),
             ),

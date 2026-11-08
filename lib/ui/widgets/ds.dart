@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/app_theme.dart';
+import 'app_icons.dart';
 
 /// Sistema visual de la parte de entrenamiento ("instrumento de
 /// entrenamiento"): superficies planas separadas por líneas finas, un solo
@@ -173,11 +174,7 @@ class DsRow extends StatelessWidget {
             if (trailing != null)
               trailing!
             else if (onTap != null)
-              Icon(
-                Icons.chevron_right_rounded,
-                color: Ds.muted(context).withValues(alpha: 0.6),
-                size: 22,
-              ),
+              Icon(AppIcons.chevron, color: Ds.muted(context).withValues(alpha: 0.6), size: 22),
           ],
         ),
       ),
@@ -230,7 +227,7 @@ class DsPrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
-      child: DsButton(label: label, icon: icon ?? Icons.play_arrow_rounded, onPressed: onPressed),
+      child: DsButton(label: label, icon: icon ?? AppIcons.play, onPressed: onPressed),
     );
   }
 }
@@ -293,7 +290,6 @@ class DsButton extends StatelessWidget {
         TextStyle(
           fontSize: kind == DsButtonKind.ghost ? 15 : 17,
           fontWeight: kind == DsButtonKind.ghost ? FontWeight.w600 : FontWeight.w700,
-          letterSpacing: -0.2,
         ),
       ),
       iconSize: const WidgetStatePropertyAll(20),

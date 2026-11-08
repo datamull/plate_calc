@@ -242,9 +242,7 @@ final crossfitLibrary = <DailyWorkout>[
     _i('Sit-Up', reps: '100'),
     _i('Air Squat', reps: '100'),
   ]),
-  _wod('deadlift', 'Deadlift', WodFormat.sets, [
-    _i('Deadlift', reps: '5-5-3-3-1-1', percent: 85),
-  ]),
+  _wod('deadlift', 'Deadlift', WodFormat.sets, [_i('Deadlift', reps: '5-5-3-3-1-1', percent: 85)]),
   _wod('barbara', 'Barbara', WodFormat.forTime, rounds: 5, [
     _i('Pull-Up', reps: '20'),
     _i('Push-Up', reps: '30'),

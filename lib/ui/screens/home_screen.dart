@@ -14,6 +14,7 @@ import '../widgets/percent_table.dart';
 import '../widgets/result_sheet.dart';
 import '../widgets/rm_history_sheet.dart';
 import 'unit_converter_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Calculadora de discos para un movimiento.
 class HomeScreen extends StatefulWidget {
@@ -252,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             tooltip: loc.converterTooltip,
-            icon: const Icon(Icons.calculate_outlined),
+            icon: const Icon(AppIcons.plates),
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
@@ -260,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             tooltip: loc.saveRmTooltip,
             onPressed: _saveRm,
-            icon: const Icon(Icons.save_outlined),
+            icon: const Icon(AppIcons.save),
           ),
         ],
       ),
@@ -414,14 +415,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 displayName: name,
                 unit: _unit,
               ),
-              icon: Icons.history,
+              icon: AppIcons.history,
               label: loc.historyButton,
             ),
             const SizedBox(height: 24),
             TextButton.icon(
               style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
               onPressed: _deleteMovement,
-              icon: const Icon(Icons.delete_outline),
+              icon: const Icon(AppIcons.trash),
               label: Text(loc.deleteMovementButton(name)),
             ),
           ],

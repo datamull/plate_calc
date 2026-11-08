@@ -15,6 +15,7 @@ import '../widgets/ds.dart';
 import 'training_home.dart';
 import 'wod_screen.dart';
 import 'workout_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Foto de una pizarra → texto (ML Kit, en el teléfono, sin internet) →
 /// WOD para revisar y empezar.
@@ -28,12 +29,12 @@ Future<void> scanBoard(BuildContext context, TrainingStore store) async {
         mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
-            leading: const Icon(Icons.photo_camera_outlined),
+            leading: const Icon(AppIcons.camera),
             title: Text(loc.scanCamera),
             onTap: () => Navigator.pop(ctx, ImageSource.camera),
           ),
           ListTile(
-            leading: const Icon(Icons.photo_library_outlined),
+            leading: const Icon(AppIcons.gallery),
             title: Text(loc.scanGallery),
             onTap: () => Navigator.pop(ctx, ImageSource.gallery),
           ),
@@ -129,7 +130,7 @@ Future<bool?> askAiConsent(BuildContext context) {
   return showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      icon: const Icon(Icons.auto_awesome, color: AppColors.purple),
+      icon: const Icon(AppIcons.sparkle, color: AppColors.purple),
       title: Text(loc.aiConsentTitle),
       content: Text(loc.aiConsentBody),
       actions: [
@@ -358,7 +359,7 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
                         ),
                         IconButton(
                           tooltip: loc.delete,
-                          icon: Icon(Icons.close, size: 18, color: Ds.muted(context)),
+                          icon: Icon(AppIcons.close, size: 18, color: Ds.muted(context)),
                           onPressed: () => setState(() => _items.removeAt(i)),
                         ),
                       ],
@@ -367,7 +368,7 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
-                    icon: const Icon(Icons.add, size: 18),
+                    icon: const Icon(AppIcons.plus, size: 18),
                     label: Text(loc.workoutAddExercise),
                     onPressed: () => _edit(null),
                   ),
@@ -393,7 +394,7 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
           const SizedBox(height: 8),
           Center(
             child: TextButton.icon(
-              icon: const Icon(Icons.photo_camera_outlined, size: 18),
+              icon: const Icon(AppIcons.camera, size: 18),
               label: Text(loc.scanRetake),
               onPressed: () async {
                 final nav = Navigator.of(context);

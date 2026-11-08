@@ -8,6 +8,7 @@ import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import '../widgets/lift_icon.dart';
 import 'rm_list_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Primera pantalla: elegir entre Haltero (movimientos olímpicos) y Gym
 /// (ejercicios por grupo muscular).
@@ -30,7 +31,7 @@ class CategoryScreen extends StatelessWidget {
               title: 'Plate Calc',
               trailing: IconButton(
                 tooltip: loc.settingsTooltip,
-                icon: const Icon(Icons.settings_outlined),
+                icon: const Icon(AppIcons.settings),
                 onPressed: onOpenSettings,
               ),
             ),
@@ -198,7 +199,7 @@ class _BigCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right, color: Ds.muted(context)),
+                Icon(AppIcons.chevron, color: Ds.muted(context)),
               ],
             ),
           ),

@@ -6,6 +6,7 @@ import 'package:plate_calc/models/weight_unit.dart';
 import 'package:plate_calc/services/app_storage.dart';
 import 'package:plate_calc/services/training_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:plate_calc/ui/widgets/app_icons.dart';
 
 /// Las pantallas de entrenamiento no se desbordan en un iPhone chico
 /// (375 × 667) en ningún idioma ni estilo.
@@ -45,7 +46,7 @@ void main() {
       await tester.pumpWidget(PlateCalcApp(storage: storage));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.fitness_center_outlined));
+      await tester.tap(find.byIcon(AppIcons.train));
       await tester.pumpAndSettle();
       for (final chip in find.byType(ChoiceChip).evaluate().toList()) {
         await tester.tap(find.byWidget(chip.widget));

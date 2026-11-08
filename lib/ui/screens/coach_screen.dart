@@ -14,6 +14,7 @@ import '../widgets/training_widgets.dart';
 import 'plan_editor_screen.dart';
 import 'plan_screen.dart';
 import 'workout_detail_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Pestaña Coach: el coach arma planes para su box, los comparte por QR o
 /// código, y recibe los resultados de sus alumnos de la misma forma.
@@ -132,11 +133,11 @@ class _CoachScreenState extends State<CoachScreen> {
               leading: CircleAvatar(
                 radius: 22,
                 backgroundColor: AppColors.blue.withValues(alpha: 0.15),
-                child: const Icon(Icons.sports, color: AppColors.blue),
+                child: const Icon(AppIcons.whistle, color: AppColors.blue),
               ),
               title: _store.coachName.isEmpty ? loc.coachSetupTitle : _store.coachName,
               subtitle: _store.coachBox.isEmpty ? loc.coachSetupSubtitle : loc.coachProfile,
-              trailing: Icon(Icons.edit_outlined, color: Ds.muted(context), size: 20),
+              trailing: Icon(AppIcons.edit, color: Ds.muted(context), size: 20),
               onTap: _editProfile,
               divider: false,
             ),
@@ -152,7 +153,7 @@ class _CoachScreenState extends State<CoachScreen> {
                 subtitle: loc.planDaysCount(p.days.length),
                 trailing: IconButton(
                   tooltip: loc.planShare,
-                  icon: const Icon(Icons.qr_code, color: AppColors.blue),
+                  icon: const Icon(AppIcons.qr, color: AppColors.blue),
                   onPressed: () => showShareCodeSheet(
                     context,
                     title: loc.planShareTitle(p.name),
@@ -163,7 +164,7 @@ class _CoachScreenState extends State<CoachScreen> {
                 onTap: () => _open(PlanScreen(store: _store, planId: p.id)),
               ),
             DsRow(
-              leading: const Icon(Icons.add, color: AppColors.blue),
+              leading: const Icon(AppIcons.plus, color: AppColors.blue),
               title: loc.coachCreatePlan,
               onTap: _newPlan,
               divider: false,
@@ -171,7 +172,7 @@ class _CoachScreenState extends State<CoachScreen> {
 
             DsSection(loc.coachAthletesTitle),
             DsRow(
-              leading: const Icon(Icons.qr_code_scanner, color: AppColors.blue),
+              leading: const Icon(AppIcons.scanQr, color: AppColors.blue),
               title: loc.importResultTitle,
               onTap: _importResult,
             ),
@@ -230,7 +231,7 @@ class AthleteScreen extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: loc.delete,
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(AppIcons.trash),
             onPressed: () async {
               final ok = await showDialog<bool>(
                 context: context,

@@ -9,6 +9,7 @@ import '../widgets/glass_button.dart';
 import '../widgets/lift_icon.dart';
 import '../widgets/rm_history_sheet.dart';
 import 'unit_converter_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Ejercicio sin barra olímpica (mancuernas, máquina, peso corporal): se
 /// guarda peso, repeticiones hechas y, si se quiere, rondas, con su
@@ -197,7 +198,7 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
         actions: [
           IconButton(
             tooltip: loc.converterTooltip,
-            icon: const Icon(Icons.calculate_outlined),
+            icon: const Icon(AppIcons.plates),
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
@@ -205,7 +206,7 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
           IconButton(
             tooltip: loc.saveRmTooltip,
             onPressed: _saveRm,
-            icon: const Icon(Icons.save_outlined),
+            icon: const Icon(AppIcons.save),
           ),
         ],
       ),
@@ -290,14 +291,14 @@ class _SimpleRmScreenState extends State<SimpleRmScreen> {
                 displayName: name,
                 unit: _unit,
               ),
-              icon: Icons.history,
+              icon: AppIcons.history,
               label: loc.historyButton,
             ),
             const SizedBox(height: 24),
             TextButton.icon(
               style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
               onPressed: _deleteMovement,
-              icon: const Icon(Icons.delete_outline),
+              icon: const Icon(AppIcons.trash),
               label: Text(loc.deleteMovementButton(name)),
             ),
           ],

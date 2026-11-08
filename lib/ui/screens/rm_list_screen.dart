@@ -13,6 +13,7 @@ import '../widgets/rm_history_sheet.dart';
 import 'home_screen.dart';
 import 'simple_rm_screen.dart';
 import 'unit_converter_screen.dart';
+import '../widgets/app_icons.dart';
 
 class RmListScreen extends StatefulWidget {
   const RmListScreen({
@@ -104,7 +105,7 @@ class _RmListScreenState extends State<RmListScreen> {
           if (widget.onOpenSettings != null)
             IconButton(
               tooltip: loc.settingsTooltip,
-              icon: const Icon(Icons.settings),
+              icon: const Icon(AppIcons.settingsFill),
               onPressed: widget.onOpenSettings,
             ),
         ],
@@ -121,7 +122,7 @@ class _RmListScreenState extends State<RmListScreen> {
               onPressed: () => Navigator.of(
                 context,
               ).push(MaterialPageRoute<void>(builder: (_) => const UnitConverterScreen())),
-              icon: Icons.calculate_outlined,
+              icon: AppIcons.plates,
             ),
           ),
           const SizedBox(width: 12),
@@ -132,7 +133,7 @@ class _RmListScreenState extends State<RmListScreen> {
               prominent: true,
               tint: AppColors.purple,
               onPressed: _addLiftDialog,
-              icon: Icons.add,
+              icon: AppIcons.plus,
             ),
           ),
         ],

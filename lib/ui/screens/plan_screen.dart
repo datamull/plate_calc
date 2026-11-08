@@ -9,6 +9,7 @@ import '../../utils/format.dart';
 import '../widgets/share_code.dart';
 import 'plan_editor_screen.dart';
 import 'workout_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Texto de un ejercicio del plan: "Snatch 5×2 · 70% (70 kg)".
 String planItemText(AppLocalizations loc, TrainingStore store, PlanItem i, WeightUnit unit) {
@@ -123,7 +124,7 @@ class _PlanScreenState extends State<PlanScreen> {
         actions: [
           IconButton(
             tooltip: loc.planShare,
-            icon: const Icon(Icons.qr_code),
+            icon: const Icon(AppIcons.qr),
             onPressed: () => _share(plan),
           ),
           PopupMenuButton<String>(
@@ -153,7 +154,7 @@ class _PlanScreenState extends State<PlanScreen> {
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  const Icon(Icons.sports, size: 18),
+                  const Icon(AppIcons.whistle, size: 18),
                   const SizedBox(width: 6),
                   Text(
                     (plan.box ?? '').isEmpty
@@ -171,7 +172,7 @@ class _PlanScreenState extends State<PlanScreen> {
           if (next != null)
             FilledButton.icon(
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-              icon: const Icon(Icons.play_arrow),
+              icon: const Icon(AppIcons.play),
               label: Text(loc.planStartNext(plan.days[next].name)),
               onPressed: () => _start(plan, next),
             ),
@@ -181,7 +182,7 @@ class _PlanScreenState extends State<PlanScreen> {
               child: ExpansionTile(
                 initiallyExpanded: d == next,
                 leading: Icon(
-                  done.contains(d) ? Icons.check_circle : Icons.circle_outlined,
+                  done.contains(d) ? AppIcons.checkCircle : AppIcons.circle,
                   color: done.contains(d) ? Colors.green : null,
                 ),
                 title: Text(plan.days[d].name),
@@ -197,7 +198,7 @@ class _PlanScreenState extends State<PlanScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.play_arrow),
+                      icon: const Icon(AppIcons.play),
                       label: Text(loc.planStartDay),
                       onPressed: () => _start(plan, d),
                     ),

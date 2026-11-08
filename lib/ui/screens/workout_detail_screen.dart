@@ -12,6 +12,7 @@ import '../../utils/format.dart';
 import '../widgets/ds.dart';
 import '../widgets/training_widgets.dart';
 import 'training_home.dart';
+import '../widgets/app_icons.dart';
 
 /// Texto de una serie: "80 kg × 3 @8".
 String setText(WorkSet s, String unit) =>
@@ -148,14 +149,14 @@ class WorkoutDetailScreen extends StatelessWidget {
         actions: [
           PopupMenuButton<String>(
             tooltip: loc.edit,
-            icon: const Icon(Icons.more_horiz),
+            icon: const Icon(AppIcons.more),
             onSelected: (_) => _delete(context, w),
             itemBuilder: (_) => [
               PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    const Icon(Icons.delete_outline, color: Color(0xFFE5484D)),
+                    const Icon(AppIcons.trash, color: Color(0xFFE5484D)),
                     const SizedBox(width: 10),
                     Text(loc.delete, style: const TextStyle(color: Color(0xFFE5484D))),
                   ],
@@ -362,7 +363,7 @@ class _ExerciseBlock extends StatelessWidget {
                     Text('RPE ${fmtWeight(log.sets[i].rpe!)}', style: Ds.secondary(context)),
                   if (identical(log.sets[i], heaviest) && log.sets.length > 1) ...[
                     const SizedBox(width: 8),
-                    const Icon(Icons.star_rounded, size: 18, color: Color(0xFFFFB020)),
+                    const Icon(AppIcons.star, size: 18, color: Color(0xFFFFB020)),
                   ],
                 ],
               ),
@@ -392,7 +393,7 @@ class _TrophyState extends State<_Trophy> {
 
   @override
   Widget build(BuildContext context) {
-    const icon = Icon(Icons.emoji_events_rounded, color: Color(0xFFFFB020), size: 40);
+    const icon = Icon(AppIcons.trophy, color: Color(0xFFFFB020), size: 40);
     if (!widget.animate || MediaQuery.disableAnimationsOf(context)) return icon;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),

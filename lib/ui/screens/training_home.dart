@@ -16,6 +16,7 @@ import 'progress_screen.dart';
 import 'wod_screen.dart';
 import 'workout_detail_screen.dart';
 import 'workout_screen.dart';
+import '../widgets/app_icons.dart';
 
 /// Color de cada estilo (solo en etiquetas y puntos).
 Color styleColor(TrainingStyle s) => switch (s) {
@@ -64,7 +65,7 @@ class _TrainingHomeState extends State<TrainingHome> {
               title: loc.tabTrain,
               trailing: IconButton(
                 tooltip: loc.stylesTitle,
-                icon: const Icon(Icons.tune_rounded),
+                icon: const Icon(AppIcons.tune),
                 onPressed: _editStyles,
               ),
             ),
@@ -143,7 +144,7 @@ class _StylesSheetState extends State<_StylesSheet> {
             const SizedBox(height: 16),
             DsPrimaryButton(
               label: loc.keyboardDone,
-              icon: Icons.check,
+              icon: AppIcons.check,
               onPressed: _on.isEmpty
                   ? null
                   : () async {
@@ -271,7 +272,7 @@ class _TodayViewState extends State<TodayView> {
           const SizedBox(height: 20),
           DsPrimaryButton(
             label: loc.stylesChoose,
-            icon: Icons.tune,
+            icon: AppIcons.tune,
             onPressed: widget.onEditStyles,
           ),
         ],
@@ -335,7 +336,7 @@ class _TodayViewState extends State<TodayView> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: DsButton(
             kind: DsButtonKind.secondary,
-            icon: Icons.photo_camera_outlined,
+            icon: AppIcons.camera,
             label: loc.scanButton,
             onPressed: () async {
               await scanBoard(context, _store);
@@ -349,7 +350,7 @@ class _TodayViewState extends State<TodayView> {
           child: DsButton(
             kind: DsButtonKind.ghost,
             height: 48,
-            icon: Icons.add_rounded,
+            icon: AppIcons.plus,
             label: loc.todayFreeWorkout,
             onPressed: _startFree,
           ),
@@ -360,7 +361,7 @@ class _TodayViewState extends State<TodayView> {
             child: DsButton(
               kind: DsButtonKind.ghost,
               height: 44,
-              icon: Icons.north_east_rounded,
+              icon: AppIcons.external,
               label: loc.crossfitOfficialWod,
               onPressed: () => launchUrl(
                 Uri.parse('https://www.crossfit.com/wod'),
@@ -396,7 +397,7 @@ class _ResumeBanner extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
               child: Row(
                 children: [
-                  const Icon(Icons.timer_outlined, color: Colors.white),
+                  const Icon(AppIcons.timer, color: Colors.white),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -410,7 +411,7 @@ class _ResumeBanner extends StatelessWidget {
                     loc.todayResume,
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
                   ),
-                  const Icon(Icons.chevron_right_rounded, color: Colors.white),
+                  const Icon(AppIcons.chevron, color: Colors.white),
                 ],
               ),
             ),
@@ -505,7 +506,7 @@ class WodCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
-                        const Icon(Icons.check_circle_rounded, color: Ds.done),
+                        const Icon(AppIcons.checkCircle, color: Ds.done),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -519,7 +520,7 @@ class WodCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded, color: Ds.done),
+                        const Icon(AppIcons.chevron, color: Ds.done),
                       ],
                     ),
                   ),
@@ -530,11 +531,7 @@ class WodCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: DsButton(
-                    icon: Icons.play_arrow_rounded,
-                    label: loc.todayStart,
-                    onPressed: onStart,
-                  ),
+                  child: DsButton(icon: AppIcons.play, label: loc.todayStart, onPressed: onStart),
                 ),
                 if (onOther != null) ...[
                   const SizedBox(width: 10),
@@ -543,7 +540,7 @@ class WodCard extends StatelessWidget {
                     child: DsButton(
                       kind: DsButtonKind.secondary,
                       expand: false,
-                      icon: Icons.shuffle_rounded,
+                      icon: AppIcons.shuffle,
                       label: loc.todayOther,
                       onPressed: onOther,
                     ),
@@ -741,7 +738,11 @@ class HistoryRow extends StatelessWidget {
         ),
       ),
       title: w.title.isEmpty ? loc.workoutFree : w.title,
-      subtitle: w.score?.isNotEmpty == true ? w.score : (lifts.isEmpty ? null : lifts),
+      subtitle: w.score?.isNotEmpty == true
+          ? w.score
+          : (lifts.isNotEmpty && lifts != w.title)
+          ? lifts
+          : (w.durationSec > 0 ? fmtDuration(w.durationSec) : null),
       onTap: onTap,
     );
   }

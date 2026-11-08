@@ -4,6 +4,7 @@ import 'package:plate_calc/main.dart';
 import 'package:plate_calc/models/weight_unit.dart';
 import 'package:plate_calc/services/app_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:plate_calc/ui/widgets/app_icons.dart';
 
 Future<void> pumpApp(WidgetTester tester, Map<String, Object> prefs, {String? open}) async {
   SharedPreferences.setMockInitialValues(prefs);
@@ -82,7 +83,7 @@ void main() {
     expect(find.widgetWithText(TextField, '135'), findsWidgets);
 
     // Botón de la calculadora dentro del movimiento.
-    await tester.tap(find.byIcon(Icons.calculate_outlined));
+    await tester.tap(find.byIcon(AppIcons.plates));
     await tester.pumpAndSettle();
     expect(find.text('Conversor de unidades'), findsOneWidget);
   });
@@ -122,7 +123,7 @@ void main() {
   testWidgets('agregar y eliminar un movimiento', (tester) async {
     await pumpApp(tester, {'app_locale': 'es'}, open: 'Haltero');
 
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.byIcon(AppIcons.plus));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Front Squat');
     await tester.tap(find.text('Guardar'));
@@ -140,7 +141,7 @@ void main() {
 
   testWidgets('ajustes: cambiar idioma y guardar inventario', (tester) async {
     await pumpApp(tester, {'app_locale': 'es'});
-    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.tap(find.byIcon(AppIcons.settings));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Inglés'));
@@ -149,7 +150,7 @@ void main() {
 
     await tester.tap(find.text('Inventory'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.add).first); // +1 al disco de 25 kg
+    await tester.tap(find.byIcon(AppIcons.plus).first); // +1 al disco de 25 kg
     await tester.pumpAndSettle();
     await tester.tap(find.text('Save inventory'));
     await tester.pumpAndSettle();
@@ -180,7 +181,7 @@ void main() {
     await tester.enterText(find.widgetWithText(TextField, 'Peso'), '30');
     await tester.enterText(find.widgetWithText(TextField, 'Repeticiones hechas'), '12');
     await tester.enterText(find.widgetWithText(TextField, 'Rondas'), '3');
-    await tester.tap(find.byIcon(Icons.save_outlined));
+    await tester.tap(find.byIcon(AppIcons.save));
     await tester.pumpAndSettle();
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getDouble('rm_Dumbbell Press_kg'), 30);
@@ -193,7 +194,7 @@ void main() {
     await tester.tap(find.text('Chest Fly'));
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'Repeticiones hechas'), '15');
-    await tester.tap(find.byIcon(Icons.save_outlined));
+    await tester.tap(find.byIcon(AppIcons.save));
     await tester.pumpAndSettle();
     expect(find.text('Último: Peso corporal × 15 reps'), findsOneWidget);
     await tester.tap(find.byType(BackButton));
@@ -216,7 +217,7 @@ void main() {
     await pumpApp(tester, {'app_locale': 'es'}, open: 'Gym');
     await tester.tap(find.text('Brazos'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.byIcon(AppIcons.plus));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'EZ Curl');
     await tester.tap(find.byType(Switch));

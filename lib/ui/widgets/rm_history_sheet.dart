@@ -4,6 +4,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../utils/format.dart';
+import 'app_icons.dart';
 
 /// Texto de un registro: "RM: 100 kg" con barra, o "20 kg × 12 · 3 rondas"
 /// en ejercicios sin barra (con peso 0 = peso corporal).
@@ -103,7 +104,7 @@ class _RmHistorySheetState extends State<_RmHistorySheet> {
                 ),
                 TextButton.icon(
                   onPressed: _entries.isEmpty ? null : _clear,
-                  icon: const Icon(Icons.delete_outline),
+                  icon: const Icon(AppIcons.trash),
                   label: Text(loc.historyClear),
                 ),
               ],
@@ -130,16 +131,16 @@ class _RmHistorySheetState extends State<_RmHistorySheet> {
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 16),
                         color: Theme.of(context).colorScheme.errorContainer,
-                        child: const Icon(Icons.delete_outline),
+                        child: const Icon(AppIcons.trash),
                       ),
                       onDismissed: (_) => _delete(e),
                       child: ListTile(
-                        leading: const Icon(Icons.history),
+                        leading: const Icon(AppIcons.history),
                         title: Text(rmEntryText(loc, e, u)),
                         subtitle: Text(fmtDateTime(e.ts)),
                         trailing: IconButton(
                           tooltip: loc.deleteRecordTooltip,
-                          icon: const Icon(Icons.close),
+                          icon: const Icon(AppIcons.close),
                           onPressed: () => _delete(e),
                         ),
                       ),

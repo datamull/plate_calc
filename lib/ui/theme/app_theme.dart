@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 
-/// Identidad "Tiza y Hierro": base monocroma (hierro, acero, tiza) y un
-/// único color de señal para lo activo y los datos clave.
+/// Identidad "Tiza y Hierro": base monocroma (hierro, acero, tiza) con los
+/// colores del logo: azul de señal para lo activo y morado para Gym.
 abstract final class AppColors {
   static const background = Color(0xFF0B0B0C); // hierro
   static const surface = Color(0xFF141415); // acero
   static const surfaceHigh = Color(0xFF1C1C1E); // acero elevado
   static const steelLine = Color(0xFF26262A);
 
-  /// Color de señal (naranja quemado). El nombre se mantiene por
-  /// compatibilidad con el código existente.
-  static const blue = Color(0xFFFF5A1F);
+  /// Color de señal: el azul del logo de Kilo.
+  static const blue = Color(0xFF1893E2);
   static const onAccent = Color(0xFF0B0B0C);
 
   /// Tiza: texto principal y relleno del botón principal.
@@ -19,9 +18,9 @@ abstract final class AppColors {
   static const chalk = white;
   static const muted = Color(0xFF8D8B86);
 
-  /// Halterofilia (amarillo de disco de 15) y Gym (tiza apagada).
+  /// Halterofilia (amarillo de disco de 15) y Gym (morado del logo).
   static const sky = Color(0xFFE9C46A);
-  static const purple = Color(0xFFB9B6AE);
+  static const purple = Color(0xFF8A52E0);
 
   static const brandGradient = LinearGradient(
     colors: [blue, blue],

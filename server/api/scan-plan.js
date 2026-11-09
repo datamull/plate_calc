@@ -51,6 +51,10 @@ Layout and notation commonly used by boxes (follow these):
 - "Every 2:00 x5": format "emom", minutes 10, notes "Every 2:00 x5".
 - "1 min on, 1 min off 3x" and similar intervals: format "for_time", notes with the interval scheme.
 - "Max …" reps: reps "Max".
+- Two workouts in the same column (e.g. "Emom 12 (UPPER)" then "Emom 12 (GLUTES)") are separate blocks; put the part in
+  parentheses in the title ("FORCE / TECHNIQUE · UPPER").
+- Keep the implement: "db hang snatch" is "Dumbbell Hang Snatch" (never a barbell lift), "kb swing" is "Kettlebell Swing".
+- "Squat Snatch" / "Squat Clean" stay as written.
 - "8|8" or "6/6" with the same number twice means per side: reps "8/8".
 - Only use a name from the list when it is really the same movement. "2db step over box" is "Dumbbell Box Step-Over",
   not a lunge; "Side plank on the ring" stays as is. Keep the movement's own name (in English) when unsure.
@@ -132,7 +136,9 @@ export default async function handler(req, res) {
   const models = forced
     ? [forced]
     : [
-        process.env.PLAN_MODEL || process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+        // 3.5 Flash lee PDFs de box con precisión y en ~15 s; el liviano es
+        // el respaldo si está ocupado.
+        process.env.PLAN_MODEL || 'gemini-3.5-flash',
         process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.5-flash-lite',
       ];
   const deadline = Date.now() + 55000;
@@ -140,9 +146,9 @@ export default async function handler(req, res) {
   for (const model of models) {
     const left = deadline - Date.now();
     if (left < 6000) break;
-    // El modelo principal tiene 28 s; si no alcanza, el liviano responde rápido.
+    // El principal tiene 38 s; si no alcanza, el liviano responde rápido.
     const isLast = model === models[models.length - 1];
-    const out = await callPlan(model, key, pdf, Math.min(left, isLast ? 50000 : 28000));
+    const out = await callPlan(model, key, pdf, Math.min(left, isLast ? 50000 : 38000));
     if (out.plan) return res.status(200).json({ ...cleanPlan(out.plan), model });
     last = { status: out.status, detail: out.detail, model };
     console.error('gemini plan fallo', model, out.status, out.detail);

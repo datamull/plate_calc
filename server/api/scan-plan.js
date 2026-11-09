@@ -127,10 +127,14 @@ export default async function handler(req, res) {
   if (typeof pdf !== 'string' || pdf.length < 100) return res.status(400).json({ error: 'pdf' });
   if (pdf.length > MAX_PDF_CHARS) return res.status(413).json({ error: 'too_large' });
 
-  const models = [
-    process.env.GEMINI_MODEL || 'gemini-3.6-flash',
-    process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.5-flash-lite',
-  ];
+  // ?model= solo para pruebas (la ruta ya exige el token).
+  const forced = String(req.query?.model || '').replace(/[^a-z0-9.\-]/gi, '');
+  const models = forced
+    ? [forced]
+    : [
+        process.env.PLAN_MODEL || process.env.GEMINI_MODEL || 'gemini-3.6-flash',
+        process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.5-flash-lite',
+      ];
   const deadline = Date.now() + 55000;
   let last = { status: 0, detail: '' };
   for (const model of models) {
@@ -138,7 +142,7 @@ export default async function handler(req, res) {
     if (left < 6000) break;
     // El modelo principal tiene 28 s; si no alcanza, el liviano responde rápido.
     const isLast = model === models[models.length - 1];
-    const out = await callPlan(model, key, pdf, Math.min(left, isLast ? 45000 : 28000));
+    const out = await callPlan(model, key, pdf, Math.min(left, isLast ? 50000 : 28000));
     if (out.plan) return res.status(200).json({ ...cleanPlan(out.plan), model });
     last = { status: out.status, detail: out.detail, model };
     console.error('gemini plan fallo', model, out.status, out.detail);

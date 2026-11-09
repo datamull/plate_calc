@@ -1160,4 +1160,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planReadByAi => 'Read by AI. Check weights and reps before you start.';
+
+  @override
+  String get barCenterLabel => 'CENTER';
 }

@@ -716,5 +716,6 @@
   "planReplaceTitle": "Replace the plan?",
   "planReplaceBody": "The current plan is removed. What you already trained stays in your history.",
   "planReplaceConfirm": "Replace",
-  "planReadByAi": "Read by AI. Check weights and reps before you start."
+  "planReadByAi": "Read by AI. Check weights and reps before you start.",
+  "barCenterLabel": "CENTER"
 }

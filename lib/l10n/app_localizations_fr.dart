@@ -1171,4 +1171,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get planReadByAi =>
       'Lu par IA. Vérifiez les charges et les répétitions avant de commencer.';
+
+  @override
+  String get barCenterLabel => 'CENTRE';
 }

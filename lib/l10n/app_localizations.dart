@@ -2115,6 +2115,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Read by AI. Check weights and reps before you start.'**
   String get planReadByAi;
+
+  /// No description provided for @barCenterLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CENTER'**
+  String get barCenterLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

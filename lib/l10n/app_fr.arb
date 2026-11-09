@@ -445,5 +445,6 @@
   "planReplaceTitle": "Remplacer le plan ?",
   "planReplaceBody": "Le plan actuel est supprimé. Ce que vous avez déjà fait reste dans l'historique.",
   "planReplaceConfirm": "Remplacer",
-  "planReadByAi": "Lu par IA. Vérifiez les charges et les répétitions avant de commencer."
+  "planReadByAi": "Lu par IA. Vérifiez les charges et les répétitions avant de commencer.",
+  "barCenterLabel": "CENTRE"
 }

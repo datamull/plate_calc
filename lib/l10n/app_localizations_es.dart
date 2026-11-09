@@ -1167,4 +1167,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get planReadByAi => 'Leído con IA. Revisa pesos y repeticiones antes de empezar.';
+
+  @override
+  String get barCenterLabel => 'CENTRO';
 }

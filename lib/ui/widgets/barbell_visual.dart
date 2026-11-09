@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
+
 import '../../models/weight_unit.dart';
 import '../../utils/format.dart';
 import 'plate_colors.dart';
@@ -24,14 +26,21 @@ class BarbellView extends StatelessWidget {
       height: height,
       width: double.infinity,
       child: CustomPaint(
-        painter: _HalfBarbellPainter(perSide: perSide, unit: unit),
+        painter: _HalfBarbellPainter(
+          perSide: perSide,
+          unit: unit,
+          centerLabel: AppLocalizations.of(context).barCenterLabel,
+        ),
       ),
     );
   }
 }
 
 class _HalfBarbellPainter extends CustomPainter {
-  _HalfBarbellPainter({required this.perSide, required this.unit});
+  _HalfBarbellPainter({required this.perSide, required this.unit, required this.centerLabel});
+
+  /// Texto de la marca del centro de la barra, en el idioma de la app.
+  final String centerLabel;
 
   final List<double> perSide;
   final WeightUnit unit;
@@ -102,9 +111,9 @@ class _HalfBarbellPainter extends CustomPainter {
       canvas.drawLine(Offset(edge, y), Offset(edge, y + 4), centerLine);
     }
     final centerTxt = TextPainter(
-      text: const TextSpan(
-        text: 'CENTRO',
-        style: TextStyle(
+      text: TextSpan(
+        text: centerLabel,
+        style: const TextStyle(
           color: Color(0xFF8FB4F5),
           fontSize: 9,
           letterSpacing: 1.1,
@@ -212,5 +221,5 @@ class _HalfBarbellPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_HalfBarbellPainter old) =>
-      !listEquals(old.perSide, perSide) || old.unit != unit;
+      !listEquals(old.perSide, perSide) || old.unit != unit || old.centerLabel != centerLabel;
 }

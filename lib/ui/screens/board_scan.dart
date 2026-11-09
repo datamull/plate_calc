@@ -177,14 +177,16 @@ class ScanReviewScreen extends StatefulWidget {
     super.key,
     required this.store,
     required this.wod,
-    required this.imagePath,
+    this.imagePath,
     this.rawText = '',
     this.byAi = false,
   });
 
   final TrainingStore store;
   final DailyWorkout wod;
-  final String imagePath;
+
+  /// Foto de la pizarra; null si el WOD viene de un PDF del plan.
+  final String? imagePath;
 
   /// Texto tal como lo leyó la cámara (para revisar qué entendió).
   final String rawText;
@@ -257,18 +259,19 @@ class _ScanReviewScreenState extends State<ScanReviewScreen> {
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: const EdgeInsets.only(bottom: 32),
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: Image.file(
-                File(widget.imagePath),
-                height: 160,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const SizedBox(height: 0),
+          if (widget.imagePath != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.file(
+                  File(widget.imagePath!),
+                  height: 160,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => const SizedBox(height: 0),
+                ),
               ),
             ),
-          ),
           if (widget.byAi)
             Padding(
               padding: const EdgeInsets.fromLTRB(Ds.gutter, 0, Ds.gutter, 8),

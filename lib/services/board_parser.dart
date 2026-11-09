@@ -115,6 +115,16 @@ class BoardParser {
 
   /// Busca el movimiento en [text]: exacto, el alias más largo contenido, o
   /// con hasta 2 letras distintas (errores de lectura de la foto).
+  /// Solo coincidencia exacta (o plural) con un nombre o abreviatura
+  /// conocidos. Para lo que ya viene limpio de la IA: "Side Plank On The Ring"
+  /// no debe terminar como "Ring Dip".
+  static String? exactMove(String text) {
+    final n = _norm(text);
+    if (n.isEmpty) return null;
+    final singular = n.endsWith('s') ? n.substring(0, n.length - 1) : n;
+    return _alias[n] ?? _alias[singular];
+  }
+
   static String? matchMove(String text) {
     final n = _norm(text);
     if (n.isEmpty) return null;

@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import '../data/daily_library.dart';
 import '../data/defaults.dart';
 import '../models/training.dart';
+import '../models/week_plan.dart';
 import '../models/weight_unit.dart';
 import 'app_storage.dart';
 
@@ -26,6 +27,7 @@ class TrainingStore {
   static const _kAthleteName = 'training_athlete_name';
   static const _kRest = 'training_rest';
   static const _kStyles = 'training_styles';
+  static const _kWeekPlan = 'training_week_plan';
 
   // ── Entrenamientos ────────────────────────────────────────────────────────
   /// Del más reciente al más antiguo.
@@ -55,6 +57,24 @@ class TrainingStore {
 
   int get restSeconds => storage.readInt(_kRest) ?? 90;
   Future<void> setRestSeconds(int s) => storage.writeInt(_kRest, s);
+
+  // ── Plan semanal (PDF leído con IA) ─────────────────────────────────────────
+  /// Plan guardado tal como se recibió (ver [WeekPlan.envelope]).
+  Object? get weekPlanRaw => storage.readJson(_kWeekPlan);
+
+  WeekPlan? weekPlan({required String fallbackName}) =>
+      WeekPlan.fromJson(weekPlanRaw, fallbackName: fallbackName);
+
+  /// Reemplaza el plan (al subir el PDF de la semana siguiente).
+  Future<void> saveWeekPlan(Map<String, Object?> envelope) =>
+      storage.writeJson(_kWeekPlan, envelope);
+
+  Future<void> clearWeekPlan() => storage.writeJson(_kWeekPlan, null);
+
+  /// El entrenamiento hecho de un bloque del plan, se haya hecho el día que
+  /// fuera.
+  Workout? planDone(DailyWorkout d) =>
+      workouts.where((w) => w.planId?.startsWith('daily_${d.id}_') ?? false).firstOrNull;
 
   // ── Estilos y entrenamiento del día ─────────────────────────────────────────
   /// Estilos que el usuario eligió ver. Vacío = aún no eligió.

@@ -1102,4 +1102,69 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get yourRmsEmpty =>
       'Guarda tu RM en un movimiento y aparecerá aquí para calcular en un toque.';
+
+  @override
+  String get tabPlan => 'Plan';
+
+  @override
+  String get planEmptyTitle => 'Tu semana, en un PDF';
+
+  @override
+  String get planEmptyBody =>
+      'Sube la planificación que te manda tu coach o tu box. La IA la lee y deja cada día listo para entrenar.';
+
+  @override
+  String get planUpload => 'Subir PDF del plan';
+
+  @override
+  String get planReplace => 'Nuevo PDF';
+
+  @override
+  String get planReplaceHint =>
+      'Cuando llegue el plan de la otra semana, súbelo y reemplaza a este.';
+
+  @override
+  String get planReading => 'Leyendo tu plan… puede tardar hasta un minuto.';
+
+  @override
+  String planWeekOf(String date) {
+    return 'Semana del $date';
+  }
+
+  @override
+  String get planRestDay => 'Día de descanso';
+
+  @override
+  String get planRestBody => 'No hay entrenamiento planificado para este día.';
+
+  @override
+  String get planErrorOffline =>
+      'No se pudo leer el plan. Revisa tu conexión e inténtalo de nuevo.';
+
+  @override
+  String get planErrorTooLarge =>
+      'El PDF pesa más de 3 MB. Expórtalo más liviano e inténtalo de nuevo.';
+
+  @override
+  String get planErrorUnreadable =>
+      'No encontré entrenamientos en ese PDF. ¿Es la planificación semanal?';
+
+  @override
+  String get planAiOff => 'La lectura con IA no está disponible en esta versión.';
+
+  @override
+  String get planAiDeclined => 'Para leer el PDF hay que activar la lectura con IA en Ajustes.';
+
+  @override
+  String get planReplaceTitle => '¿Reemplazar el plan?';
+
+  @override
+  String get planReplaceBody =>
+      'El plan actual se borra. Lo que ya entrenaste queda en el historial.';
+
+  @override
+  String get planReplaceConfirm => 'Reemplazar';
+
+  @override
+  String get planReadByAi => 'Leído con IA. Revisa pesos y repeticiones antes de empezar.';
 }

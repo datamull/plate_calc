@@ -1098,4 +1098,66 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get yourRmsEmpty =>
       'Save a 1RM on any lift and it will show up here, one tap from the calculator.';
+
+  @override
+  String get tabPlan => 'Plan';
+
+  @override
+  String get planEmptyTitle => 'Your week, from a PDF';
+
+  @override
+  String get planEmptyBody =>
+      'Upload the program your coach or box sends you. AI reads it and gets every day ready to train.';
+
+  @override
+  String get planUpload => 'Upload plan PDF';
+
+  @override
+  String get planReplace => 'New PDF';
+
+  @override
+  String get planReplaceHint => 'When next week\'s plan arrives, upload it to replace this one.';
+
+  @override
+  String get planReading => 'Reading your plan… this can take up to a minute.';
+
+  @override
+  String planWeekOf(String date) {
+    return 'Week of $date';
+  }
+
+  @override
+  String get planRestDay => 'Rest day';
+
+  @override
+  String get planRestBody => 'No training planned for this day.';
+
+  @override
+  String get planErrorOffline => 'Couldn\'t read the plan. Check your connection and try again.';
+
+  @override
+  String get planErrorTooLarge => 'The PDF is over 3 MB. Export a lighter version and try again.';
+
+  @override
+  String get planErrorUnreadable =>
+      'I couldn\'t find workouts in that PDF. Is it the weekly program?';
+
+  @override
+  String get planAiOff => 'AI reading is not available in this version.';
+
+  @override
+  String get planAiDeclined => 'To read the PDF, turn on AI reading in Settings.';
+
+  @override
+  String get planReplaceTitle => 'Replace the plan?';
+
+  @override
+  String get planReplaceBody =>
+      'The current plan is removed. What you already trained stays in your history.';
+
+  @override
+  String get planReplaceConfirm => 'Replace';
+
+  @override
+  String get planReadByAi => 'Read by AI. Check weights and reps before you start.';
 }

@@ -65,7 +65,8 @@ class BoardAi {
       if (raw is! Map) continue;
       final move = '${raw['movement'] ?? ''}'.trim();
       if (move.isEmpty) continue;
-      final known = BoardParser.matchMove(move);
+      // La IA ya entrega nombres normalizados: solo coincidencias exactas.
+      final known = BoardParser.exactMove(move);
       final reps = '${raw['reps'] ?? ''}'.trim();
       final rx = raw['rx'] is String && (raw['rx'] as String).trim().isNotEmpty
           ? (raw['rx'] as String).trim()

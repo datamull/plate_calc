@@ -1105,4 +1105,70 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get yourRmsEmpty =>
       'Enregistrez votre 1RM sur un mouvement et il apparaîtra ici, à un toucher du calculateur.';
+
+  @override
+  String get tabPlan => 'Plan';
+
+  @override
+  String get planEmptyTitle => 'Votre semaine, en un PDF';
+
+  @override
+  String get planEmptyBody =>
+      'Importez la programmation envoyée par votre coach ou votre box. L\'IA la lit et prépare chaque jour d\'entraînement.';
+
+  @override
+  String get planUpload => 'Importer le PDF du plan';
+
+  @override
+  String get planReplace => 'Nouveau PDF';
+
+  @override
+  String get planReplaceHint =>
+      'Quand le plan de la semaine suivante arrive, importez-le pour remplacer celui-ci.';
+
+  @override
+  String get planReading => 'Lecture de votre plan… cela peut prendre jusqu\'à une minute.';
+
+  @override
+  String planWeekOf(String date) {
+    return 'Semaine du $date';
+  }
+
+  @override
+  String get planRestDay => 'Jour de repos';
+
+  @override
+  String get planRestBody => 'Aucun entraînement prévu ce jour-là.';
+
+  @override
+  String get planErrorOffline =>
+      'Impossible de lire le plan. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get planErrorTooLarge =>
+      'Le PDF dépasse 3 Mo. Exportez une version plus légère et réessayez.';
+
+  @override
+  String get planErrorUnreadable =>
+      'Je n\'ai trouvé aucun entraînement dans ce PDF. Est-ce bien la programmation de la semaine ?';
+
+  @override
+  String get planAiOff => 'La lecture par IA n\'est pas disponible dans cette version.';
+
+  @override
+  String get planAiDeclined => 'Pour lire le PDF, activez la lecture par IA dans les Réglages.';
+
+  @override
+  String get planReplaceTitle => 'Remplacer le plan ?';
+
+  @override
+  String get planReplaceBody =>
+      'Le plan actuel est supprimé. Ce que vous avez déjà fait reste dans l\'historique.';
+
+  @override
+  String get planReplaceConfirm => 'Remplacer';
+
+  @override
+  String get planReadByAi =>
+      'Lu par IA. Vérifiez les charges et les répétitions avant de commencer.';
 }

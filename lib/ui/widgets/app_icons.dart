@@ -48,6 +48,10 @@ abstract final class AppIcons {
   static const IconData cloudDone = IconData(0xe1b0, fontFamily: 'PhosphorBold');
   static const IconData whistle = IconData(0xe730, fontFamily: 'PhosphorBold');
 
+  static const IconData pdf = IconData(0xe702, fontFamily: 'PhosphorBold');
+  static const IconData refresh = IconData(0xe094, fontFamily: 'PhosphorBold');
+  static const IconData rest = IconData(0xe330, fontFamily: 'PhosphorBold');
+
   // Progreso y resultados.
   static const IconData fire = IconData(0xe242, fontFamily: 'PhosphorFill');
   static const IconData bolt = IconData(0xe2de, fontFamily: 'PhosphorFill');

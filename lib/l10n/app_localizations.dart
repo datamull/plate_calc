@@ -2001,6 +2001,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save a 1RM on any lift and it will show up here, one tap from the calculator.'**
   String get yourRmsEmpty;
+
+  /// No description provided for @tabPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get tabPlan;
+
+  /// No description provided for @planEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your week, from a PDF'**
+  String get planEmptyTitle;
+
+  /// No description provided for @planEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload the program your coach or box sends you. AI reads it and gets every day ready to train.'**
+  String get planEmptyBody;
+
+  /// No description provided for @planUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload plan PDF'**
+  String get planUpload;
+
+  /// No description provided for @planReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'New PDF'**
+  String get planReplace;
+
+  /// No description provided for @planReplaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When next week\'s plan arrives, upload it to replace this one.'**
+  String get planReplaceHint;
+
+  /// No description provided for @planReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading your plan… this can take up to a minute.'**
+  String get planReading;
+
+  /// No description provided for @planWeekOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Week of {date}'**
+  String planWeekOf(String date);
+
+  /// No description provided for @planRestDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest day'**
+  String get planRestDay;
+
+  /// No description provided for @planRestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No training planned for this day.'**
+  String get planRestBody;
+
+  /// No description provided for @planErrorOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t read the plan. Check your connection and try again.'**
+  String get planErrorOffline;
+
+  /// No description provided for @planErrorTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'The PDF is over 3 MB. Export a lighter version and try again.'**
+  String get planErrorTooLarge;
+
+  /// No description provided for @planErrorUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'I couldn\'t find workouts in that PDF. Is it the weekly program?'**
+  String get planErrorUnreadable;
+
+  /// No description provided for @planAiOff.
+  ///
+  /// In en, this message translates to:
+  /// **'AI reading is not available in this version.'**
+  String get planAiOff;
+
+  /// No description provided for @planAiDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'To read the PDF, turn on AI reading in Settings.'**
+  String get planAiDeclined;
+
+  /// No description provided for @planReplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace the plan?'**
+  String get planReplaceTitle;
+
+  /// No description provided for @planReplaceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The current plan is removed. What you already trained stays in your history.'**
+  String get planReplaceBody;
+
+  /// No description provided for @planReplaceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get planReplaceConfirm;
+
+  /// No description provided for @planReadByAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Read by AI. Check weights and reps before you start.'**
+  String get planReadByAi;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

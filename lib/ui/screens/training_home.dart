@@ -13,6 +13,7 @@ import '../theme/app_theme.dart';
 import '../widgets/ds.dart';
 import '../widgets/training_widgets.dart' show fmtDuration;
 import 'board_scan.dart';
+import 'plan_view.dart';
 import 'progress_screen.dart';
 import 'wod_screen.dart';
 import 'workout_detail_screen.dart';
@@ -72,7 +73,7 @@ class _TrainingHomeState extends State<TrainingHome> {
             ),
             const SizedBox(height: 4),
             DsSegmented(
-              labels: [loc.tabToday, loc.historyTitle, loc.tabProgress],
+              labels: [loc.tabToday, loc.tabPlan, loc.historyTitle, loc.tabProgress],
               selected: _view,
               onChanged: (i) => setState(() {
                 _view = i;
@@ -86,8 +87,9 @@ class _TrainingHomeState extends State<TrainingHome> {
                 switchInCurve: Curves.easeOut,
                 switchOutCurve: Curves.easeIn,
                 child: switch (_view) {
-                  1 => HistoryView(key: key, store: widget.store),
-                  2 => ProgressView(key: key, store: widget.store),
+                  1 => PlanView(key: key, store: widget.store),
+                  2 => HistoryView(key: key, store: widget.store),
+                  3 => ProgressView(key: key, store: widget.store),
                   _ => TodayView(key: key, store: widget.store, onEditStyles: _editStyles),
                 },
               ),

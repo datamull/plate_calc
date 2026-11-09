@@ -7,7 +7,7 @@
 //   APP_TOKEN       texto secreto que la app manda en "x-app-token" (obligatoria)
 //   GEMINI_MODEL    modelo a usar (opcional, por defecto gemini-3.6-flash)
 
-const MOVES = [
+export const MOVES = [
   'Wall Ball', 'Double Under', 'Single Under', 'Row', 'Bike', 'Ski', 'Run', 'Burpee',
   'Bar-Facing Burpee', 'Burpee Box Jump', 'Box Jump', 'Box Jump Over', 'Pull-Up',
   'Chest-to-Bar Pull-Up', 'Toes-to-Bar', 'Muscle-Up', 'Bar Muscle-Up', 'Handstand Push-Up',
@@ -138,7 +138,7 @@ export default async function handler(req, res) {
   return res.status(502).json({ error: 'gemini', ...last });
 }
 
-async function callGemini(model, key, image, mime, timeoutMs) {
+export async function callGemini(model, key, image, mime, timeoutMs) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   try {
     const r = await fetch(url, {
@@ -169,7 +169,7 @@ async function callGemini(model, key, image, mime, timeoutMs) {
   }
 }
 
-function safeJson(s) {
+export function safeJson(s) {
   try {
     return JSON.parse(s);
   } catch {

@@ -51,6 +51,11 @@ Layout and notation commonly used by boxes (follow these):
 - "Every 2:00 x5": format "emom", minutes 10, notes "Every 2:00 x5".
 - "1 min on, 1 min off 3x" and similar intervals: format "for_time", notes with the interval scheme.
 - "Max …" reps: reps "Max".
+- "8|8" or "6/6" with the same number twice means per side: reps "8/8".
+- Only use a name from the list when it is really the same movement. "2db step over box" is "Dumbbell Box Step-Over",
+  not a lunge; "Side plank on the ring" stays as is. Keep the movement's own name (in English) when unsure.
+- Units: box and jump heights are inches ("24/20 in"); wall balls, dumbbells, kettlebells and barbells are pounds
+  ("30/20 lb") unless "kg" is written.
 - Day headers can carry a theme ("CROSSFIT", "HYROX", "TEAM WOD"): use it to choose style (all of these are "crossfit")
   and you may mention it in notes of the first block.
 - Plan title: the document heading (e.g. "IMPULSION / PROGRAMMATION HEBDOMADAIRE").`;
@@ -131,7 +136,9 @@ export default async function handler(req, res) {
   for (const model of models) {
     const left = deadline - Date.now();
     if (left < 6000) break;
-    const out = await callPlan(model, key, pdf, Math.min(left, 45000));
+    // El modelo principal tiene 28 s; si no alcanza, el liviano responde rápido.
+    const isLast = model === models[models.length - 1];
+    const out = await callPlan(model, key, pdf, Math.min(left, isLast ? 45000 : 28000));
     if (out.plan) return res.status(200).json({ ...cleanPlan(out.plan), model });
     last = { status: out.status, detail: out.detail, model };
     console.error('gemini plan fallo', model, out.status, out.detail);
@@ -155,6 +162,8 @@ async function callPlan(model, key, pdf, timeoutMs) {
           temperature: 0,
           response_mime_type: 'application/json',
           response_schema: SCHEMA,
+          // Leer un PDF ordenado no necesita razonamiento largo: más rápido.
+          thinkingConfig: { thinkingLevel: 'low' },
         },
       }),
     });

@@ -42,14 +42,16 @@ Layout and notation commonly used by boxes (follow these):
 - "+" joins work done together in the same set, never an option: "Max wall walk + 1 front shspu" is ONE item,
   movement "Wall Walk + 1 Strict HSPU" (each wall walk followed by 1 strict handstand push-up). Never move the part
   after "+" to the options or notes.
-- "/" between movement names in one line ("Max clean/snatch/thruster") means the athlete chooses one: movement = the
-  first, the others in notes ("Options: Snatch, Thruster"). "Ou" / "or" also means an option.
-- Weight lines like "Poids 1: … Poids 2: … Poids 3: …" (or "Weight 1/2/3") give the load for each option of the
-  loaded movement, in order (Poids 1 = first option, Poids 2 = second…). Put Poids 1's RX in that item's rx and the rest
-  in notes ("Snatch 155/105 lb, Thruster 135/95 lb"). Never give those weights to bodyweight movements
-  (wall walk, burpee, pull-up, rope climb, HSPU…): their rx is null.
-- "a|b|c" between movements means scaling options (RX first): use the FIRST as movement and mention the others in notes
-  ("Options: C2B, Pull-Up"). "16|12 Cal" means men|women: reps "16/12 cal".
+- Alternatives the athlete chooses between are all equal options: "/" between movement names
+  ("Max clean/snatch/thruster"), "|" between movements ("BMU|C2b|Pull up") and "Ou" / "or".
+  Write them as ONE item whose movement lists every option in order, joined with " / "
+  ("Clean / Snatch / Thruster", "Bar Muscle-Up / Chest-to-Bar Pull-Up / Pull-Up", "Burpee Pull-Up / Rope Climb").
+  Never keep only the first one and never move the others to notes.
+- Weight lines like "Poids 1: … Poids 2: … Poids 3: …" (or "Weight 1/2/3") give the load for each option, in order
+  (Poids 1 = first option…). Each line lists levels RX / intermediate / scaled, men|women. rx = the RX of each option in
+  the same order, joined with " · " ("185/125 lb · 155/105 lb · 135/95 lb"). Intermediate and scaled levels go to notes.
+  Never give those weights to bodyweight movements (wall walk, burpee, pull-up, rope climb, HSPU…): their rx is null.
+- "16|12 Cal" (numbers, not movements) means men|women: reps "16/12 cal".
 - Weight groups like "(24|20) (50|35) (35|25)" are levels RX / intermediate / scaled, each men|women.
   rx = the first group written with "/" and the unit if known ("24/20 in", "50/35 lb"; lb if no unit and the values look
   like pounds). Put the other levels in notes ("Inter 35/25 lb, Scaled 25/15").

@@ -39,6 +39,15 @@ Layout and notation commonly used by boxes (follow these):
   right column, then the sections below.
 - Skip sections that are not a real workout: "Échauffement / Warm-up" when it only says "au choix coach" or similar,
   and placeholders like "XXXX", "À compléter", "TBD", "-". A day with only placeholders is skipped.
+- "+" joins work done together in the same set, never an option: "Max wall walk + 1 front shspu" is ONE item,
+  movement "Wall Walk + 1 Strict HSPU" (each wall walk followed by 1 strict handstand push-up). Never move the part
+  after "+" to the options or notes.
+- "/" between movement names in one line ("Max clean/snatch/thruster") means the athlete chooses one: movement = the
+  first, the others in notes ("Options: Snatch, Thruster"). "Ou" / "or" also means an option.
+- Weight lines like "Poids 1: … Poids 2: … Poids 3: …" (or "Weight 1/2/3") give the load for each option of the
+  loaded movement, in order (Poids 1 = first option, Poids 2 = second…). Put Poids 1's RX in that item's rx and the rest
+  in notes ("Snatch 155/105 lb, Thruster 135/95 lb"). Never give those weights to bodyweight movements
+  (wall walk, burpee, pull-up, rope climb, HSPU…): their rx is null.
 - "a|b|c" between movements means scaling options (RX first): use the FIRST as movement and mention the others in notes
   ("Options: C2B, Pull-Up"). "16|12 Cal" means men|women: reps "16/12 cal".
 - Weight groups like "(24|20) (50|35) (35|25)" are levels RX / intermediate / scaled, each men|women.
@@ -49,7 +58,8 @@ Layout and notation commonly used by boxes (follow these):
   (tempo, pauses like "*3 sec Pause*") goes to notes.
 - "3X" / "3 rounds" over a list of accessories: format "sets", rounds 3; "rest 1:00min" goes to notes.
 - "Every 2:00 x5": format "emom", minutes 10, notes "Every 2:00 x5".
-- "1 min on, 1 min off 3x" and similar intervals: format "for_time", notes with the interval scheme.
+- "1 min on, 1 min off 3x" and similar intervals of max effort: format "amrap", minutes = the work interval (1),
+  rounds = the number of intervals (3), notes with the scheme ("1 min on / 1 min off").
 - "Max …" reps: reps "Max".
 - Two workouts in the same column (e.g. "Emom 12 (UPPER)" then "Emom 12 (GLUTES)") are separate blocks; put the part in
   parentheses in the title ("FORCE / TECHNIQUE · UPPER").

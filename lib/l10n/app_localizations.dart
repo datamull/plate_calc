@@ -2121,6 +2121,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'CENTER'**
   String get barCenterLabel;
+
+  /// No description provided for @orOption.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get orOption;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1170,4 +1170,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get barCenterLabel => 'CENTRO';
+
+  @override
+  String get orOption => 'o';
 }

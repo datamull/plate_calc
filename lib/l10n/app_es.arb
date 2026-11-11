@@ -446,5 +446,6 @@
   "planReplaceBody": "El plan actual se borra. Lo que ya entrenaste queda en el historial.",
   "planReplaceConfirm": "Reemplazar",
   "planReadByAi": "Leído con IA. Revisa pesos y repeticiones antes de empezar.",
-  "barCenterLabel": "CENTRO"
+  "barCenterLabel": "CENTRO",
+  "orOption": "o"
 }

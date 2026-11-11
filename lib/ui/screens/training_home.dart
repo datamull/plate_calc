@@ -582,6 +582,9 @@ class WodItemRow extends StatelessWidget {
         : item.percent != null
         ? '${fmtWeight(item.percent!)}% RM'
         : item.rx(unit);
+    // Alternativas del plan ("Clean / Snatch / Thruster"), cada una con su peso.
+    final options = item.lift.split(' / ').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    final optionWeights = (right ?? '').split(' · ').map((e) => e.trim()).toList();
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
@@ -605,8 +608,13 @@ class WodItemRow extends StatelessWidget {
                 ),
               ),
             ),
-          Expanded(child: Text(liftDisplayName(item.lift), style: Ds.body(context))),
-          if (right != null)
+          if (options.length > 1)
+            Expanded(
+              child: _Options(options: options, weights: optionWeights),
+            )
+          else
+            Expanded(child: Text(liftDisplayName(item.lift), style: Ds.body(context))),
+          if (right != null && options.length == 1)
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 120),
               child: Text(
@@ -697,6 +705,45 @@ class _HistoryViewState extends State<HistoryView> {
             ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// Movimientos alternativos de una misma línea, uno debajo del otro.
+class _Options extends StatelessWidget {
+  const _Options({required this.options, required this.weights});
+
+  final List<String> options;
+
+  /// Peso de cada opción en el mismo orden (puede faltar).
+  final List<String> weights;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < options.length; i++)
+          Padding(
+            padding: EdgeInsets.only(top: i == 0 ? 0 : 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                if (i > 0) ...[
+                  Text(loc.orOption, style: Ds.secondary(context)),
+                  const SizedBox(width: 6),
+                ],
+                Expanded(child: Text(liftDisplayName(options[i]), style: Ds.body(context))),
+                if (i < weights.length && weights[i].isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  Text(weights[i], style: Ds.secondary(context)),
+                ],
+              ],
+            ),
+          ),
       ],
     );
   }

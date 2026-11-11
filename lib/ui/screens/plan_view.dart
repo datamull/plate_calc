@@ -443,7 +443,13 @@ class _BlockView extends StatelessWidget {
       if (block.title != null) block.title!.toUpperCase(),
       if (wod.formatLabel.isNotEmpty) wod.formatLabel.toUpperCase(),
     ].join('  ·  ');
-    final showName = wod.name.trim().toLowerCase() != (block.title ?? '').trim().toLowerCase();
+    // Sin nombre propio (p. ej. "AMRAP 1′" generado): no repetir lo que ya dice
+    // la línea de arriba.
+    final n = wod.name.trim().toLowerCase();
+    final showName =
+        n.isNotEmpty &&
+        n != (block.title ?? '').trim().toLowerCase() &&
+        !wod.formatLabel.toLowerCase().startsWith(n);
 
     return Container(
       margin: const EdgeInsets.fromLTRB(Ds.gutter, 16, Ds.gutter, 0),

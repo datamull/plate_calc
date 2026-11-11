@@ -96,8 +96,13 @@ class DailyWorkout {
 
   /// Etiqueta corta del formato: "AMRAP 12", "5 RONDAS FOR TIME", "EMOM 10".
   String get formatLabel => switch (format) {
-    WodFormat.amrap => 'AMRAP $minutes′',
-    WodFormat.emom => 'EMOM $minutes′',
+    // Intervalos ("1 min on / 1 min off ×3") llegan como AMRAP con rondas.
+    WodFormat.amrap => [
+      'AMRAP',
+      if (minutes != null) ' $minutes′',
+      if (rounds != null && rounds! > 1) ' ×$rounds',
+    ].join(),
+    WodFormat.emom => minutes == null ? 'EMOM' : 'EMOM $minutes′',
     WodFormat.forTime =>
       rounds != null && rounds! > 1
           ? '$rounds RFT'

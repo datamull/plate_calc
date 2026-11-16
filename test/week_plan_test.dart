@@ -148,7 +148,15 @@ void main() {
     );
     await pumpPlan(tester, store);
 
+    // Va al final de la lista: según el día puede estar fuera de pantalla.
+    await tester.scrollUntilVisible(
+      find.text('Nuevo PDF'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Nuevo PDF'), findsOneWidget);
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 3000));
+    await tester.pumpAndSettle();
     // Elegir el miércoles muestra su WOD.
     final wed = WeekPlan.mondayOf(DateTime.now()).add(const Duration(days: 2));
     // La tira de días va antes que los bloques: el primero es el del día.

@@ -447,5 +447,22 @@
   "planReplaceConfirm": "Reemplazar",
   "planReadByAi": "Leído con IA. Revisa pesos y repeticiones antes de empezar.",
   "barCenterLabel": "CENTRO",
-  "orOption": "o"
+  "orOption": "o",
+  "planWeekPickTitle": "¿De qué semana es este plan?",
+  "planWeekPickBody": "Puedes cambiarla después tocando la fecha.",
+  "planWeekSave": "Guardar en esta semana",
+  "planWeekTaken": "Esa semana ya tiene un plan: se reemplazará.",
+  "planThisWeek": "Esta semana",
+  "planNextWeek": "Próxima semana",
+  "planLastWeek": "Semana pasada",
+  "planMoveTitle": "Semana del plan",
+  "planMoveSave": "Mover a esta semana",
+  "planDelete": "Eliminar este plan",
+  "planPrevWeek": "Semana anterior",
+  "planNextWeekA11y": "Semana siguiente",
+  "planMarkDone": "Marcar el día como hecho",
+  "planMarkedDone": "Día marcado como hecho.",
+  "planReminderRow": "Aviso a las 20:00 si no lo marcaste",
+  "reminderTitle": "¿Entrenaste hoy?",
+  "reminderBody": "Marca el entrenamiento del plan como hecho en Kilo."
 }

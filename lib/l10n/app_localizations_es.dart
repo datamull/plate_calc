@@ -1173,4 +1173,55 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get orOption => 'o';
+
+  @override
+  String get planWeekPickTitle => '¿De qué semana es este plan?';
+
+  @override
+  String get planWeekPickBody => 'Puedes cambiarla después tocando la fecha.';
+
+  @override
+  String get planWeekSave => 'Guardar en esta semana';
+
+  @override
+  String get planWeekTaken => 'Esa semana ya tiene un plan: se reemplazará.';
+
+  @override
+  String get planThisWeek => 'Esta semana';
+
+  @override
+  String get planNextWeek => 'Próxima semana';
+
+  @override
+  String get planLastWeek => 'Semana pasada';
+
+  @override
+  String get planMoveTitle => 'Semana del plan';
+
+  @override
+  String get planMoveSave => 'Mover a esta semana';
+
+  @override
+  String get planDelete => 'Eliminar este plan';
+
+  @override
+  String get planPrevWeek => 'Semana anterior';
+
+  @override
+  String get planNextWeekA11y => 'Semana siguiente';
+
+  @override
+  String get planMarkDone => 'Marcar el día como hecho';
+
+  @override
+  String get planMarkedDone => 'Día marcado como hecho.';
+
+  @override
+  String get planReminderRow => 'Aviso a las 20:00 si no lo marcaste';
+
+  @override
+  String get reminderTitle => '¿Entrenaste hoy?';
+
+  @override
+  String get reminderBody => 'Marca el entrenamiento del plan como hecho en Kilo.';
 }

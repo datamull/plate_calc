@@ -210,6 +210,8 @@ void main() {
     }
 
     // Empezar → registrar una serie → terminar → queda "Hecho".
+    await tester.ensureVisible(find.text('Empezar'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Empezar'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Serie hecha').first);

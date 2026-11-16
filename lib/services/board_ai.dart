@@ -72,6 +72,9 @@ class BoardAi {
           ? (raw['rx'] as String).trim()
           : null;
       final pct = raw['percent'] is num ? (raw['percent'] as num).toDouble() : null;
+      final note = raw['note'] is String && (raw['note'] as String).trim().isNotEmpty
+          ? (raw['note'] as String).trim()
+          : null;
       // "5x5" en fuerza → series y reps para registrar.
       final sr = RegExp(r'^(\d+)\s*[x×]\s*(\d+)$').firstMatch(reps);
       items.add(
@@ -85,6 +88,7 @@ class BoardAi {
           // El Rx se muestra tal como está en la pizarra ("20/14 lb").
           rxKg: rx,
           rxLb: rx,
+          note: note,
         ),
       );
     }

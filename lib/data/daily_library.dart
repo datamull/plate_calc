@@ -37,6 +37,7 @@ class DailyItem {
     this.rmOf,
     this.rxKg,
     this.rxLb,
+    this.note,
   });
 
   /// Movimiento (clave en inglés).
@@ -58,6 +59,10 @@ class DailyItem {
   /// Peso Rx hombre/mujer cuando no depende del RM ("24/16").
   final String? rxKg;
   final String? rxLb;
+
+  /// Comentario del coach para este movimiento, tal como viene escrito
+  /// ("@ 70-75-80%", "desde el piso"). Se muestra en gris bajo el nombre.
+  final String? note;
 
   String get rmLift => rmOf ?? lift;
 

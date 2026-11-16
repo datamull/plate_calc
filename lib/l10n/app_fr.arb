@@ -447,5 +447,22 @@
   "planReplaceConfirm": "Remplacer",
   "planReadByAi": "Lu par IA. Vérifiez les charges et les répétitions avant de commencer.",
   "barCenterLabel": "CENTRE",
-  "orOption": "ou"
+  "orOption": "ou",
+  "planWeekPickTitle": "Ce plan est pour quelle semaine ?",
+  "planWeekPickBody": "Vous pourrez la changer en touchant la date.",
+  "planWeekSave": "Enregistrer pour cette semaine",
+  "planWeekTaken": "Cette semaine a déjà un plan : il sera remplacé.",
+  "planThisWeek": "Cette semaine",
+  "planNextWeek": "Semaine prochaine",
+  "planLastWeek": "Semaine dernière",
+  "planMoveTitle": "Semaine du plan",
+  "planMoveSave": "Déplacer à cette semaine",
+  "planDelete": "Supprimer ce plan",
+  "planPrevWeek": "Semaine précédente",
+  "planNextWeekA11y": "Semaine suivante",
+  "planMarkDone": "Marquer la journée comme faite",
+  "planMarkedDone": "Journée marquée comme faite.",
+  "planReminderRow": "Rappel à 20 h si ce n'est pas coché",
+  "reminderTitle": "Entraînement fait aujourd'hui ?",
+  "reminderBody": "Marquez l'entraînement du plan comme fait dans Kilo."
 }

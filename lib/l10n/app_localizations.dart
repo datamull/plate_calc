@@ -2127,6 +2127,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'or'**
   String get orOption;
+
+  /// No description provided for @planWeekPickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which week is this plan for?'**
+  String get planWeekPickTitle;
+
+  /// No description provided for @planWeekPickBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change it later by tapping the date.'**
+  String get planWeekPickBody;
+
+  /// No description provided for @planWeekSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to this week'**
+  String get planWeekSave;
+
+  /// No description provided for @planWeekTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'That week already has a plan: it will be replaced.'**
+  String get planWeekTaken;
+
+  /// No description provided for @planThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get planThisWeek;
+
+  /// No description provided for @planNextWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Next week'**
+  String get planNextWeek;
+
+  /// No description provided for @planLastWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Last week'**
+  String get planLastWeek;
+
+  /// No description provided for @planMoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan week'**
+  String get planMoveTitle;
+
+  /// No description provided for @planMoveSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to this week'**
+  String get planMoveSave;
+
+  /// No description provided for @planDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this plan'**
+  String get planDelete;
+
+  /// No description provided for @planPrevWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous week'**
+  String get planPrevWeek;
+
+  /// No description provided for @planNextWeekA11y.
+  ///
+  /// In en, this message translates to:
+  /// **'Next week'**
+  String get planNextWeekA11y;
+
+  /// No description provided for @planMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark the day as done'**
+  String get planMarkDone;
+
+  /// No description provided for @planMarkedDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Day marked as done.'**
+  String get planMarkedDone;
+
+  /// No description provided for @planReminderRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder at 8 pm if not marked'**
+  String get planReminderRow;
+
+  /// No description provided for @reminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you train today?'**
+  String get reminderTitle;
+
+  /// No description provided for @reminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark today\'s plan workout as done in Kilo.'**
+  String get reminderBody;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

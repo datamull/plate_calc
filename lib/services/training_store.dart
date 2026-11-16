@@ -28,6 +28,8 @@ class TrainingStore {
   static const _kRest = 'training_rest';
   static const _kStyles = 'training_styles';
   static const _kWeekPlan = 'training_week_plan';
+  static const _kWeekPlans = 'training_week_plans';
+  static const _kPlanReminders = 'training_plan_reminders';
 
   // ── Entrenamientos ────────────────────────────────────────────────────────
   /// Del más reciente al más antiguo.
@@ -58,18 +60,102 @@ class TrainingStore {
   int get restSeconds => storage.readInt(_kRest) ?? 90;
   Future<void> setRestSeconds(int s) => storage.writeInt(_kRest, s);
 
-  // ── Plan semanal (PDF leído con IA) ─────────────────────────────────────────
-  /// Plan guardado tal como se recibió (ver [WeekPlan.envelope]).
-  Object? get weekPlanRaw => storage.readJson(_kWeekPlan);
+  // ── Planes semanales (PDF leídos con IA) ────────────────────────────────────
+  /// Cuántas semanas se guardan (medio año).
+  static const maxWeekPlans = 26;
 
-  WeekPlan? weekPlan({required String fallbackName}) =>
-      WeekPlan.fromJson(weekPlanRaw, fallbackName: fallbackName);
+  /// Planes guardados tal como se recibieron (ver [WeekPlan.envelope]), uno
+  /// por semana. Incluye el plan único de versiones anteriores.
+  List<Map<String, Object?>> get _planEnvelopes {
+    final raw = storage.readJson(_kWeekPlans);
+    final list = raw is List
+        ? [
+            for (final e in raw)
+              if (e is Map) Map<String, Object?>.from(e),
+          ]
+        : <Map<String, Object?>>[];
+    final legacy = storage.readJson(_kWeekPlan);
+    if (list.isEmpty && legacy is Map) list.add(Map<String, Object?>.from(legacy));
+    return list;
+  }
 
-  /// Reemplaza el plan (al subir el PDF de la semana siguiente).
-  Future<void> saveWeekPlan(Map<String, Object?> envelope) =>
-      storage.writeJson(_kWeekPlan, envelope);
+  Future<void> _writePlans(List<Map<String, Object?>> list) async {
+    list.sort((a, b) => '${a['weekStart']}'.compareTo('${b['weekStart']}'));
+    while (list.length > maxWeekPlans) {
+      list.removeAt(0);
+    }
+    await storage.writeJson(_kWeekPlans, list);
+    if (storage.readJson(_kWeekPlan) != null) await storage.writeJson(_kWeekPlan, null);
+  }
 
-  Future<void> clearWeekPlan() => storage.writeJson(_kWeekPlan, null);
+  static String _weekKey(Object? iso) => '$iso'.split('T').first;
+
+  /// Todos los planes, de la semana más antigua a la más nueva.
+  List<WeekPlan> weekPlans({required String fallbackName}) => [
+    for (final e in _planEnvelopes)
+      if (WeekPlan.fromJson(e, fallbackName: fallbackName) case final p?) p,
+  ]..sort((a, b) => a.weekStart.compareTo(b.weekStart));
+
+  /// El plan que se muestra al entrar: el de esta semana; si no hay, el
+  /// próximo; si no, el último.
+  WeekPlan? weekPlan({required String fallbackName, DateTime? now}) {
+    final plans = weekPlans(fallbackName: fallbackName);
+    if (plans.isEmpty) return null;
+    final today = now ?? DateTime.now();
+    return plans.where((p) => p.contains(today)).firstOrNull ??
+        plans.where((p) => p.weekStart.isAfter(today)).firstOrNull ??
+        plans.last;
+  }
+
+  /// Si ya hay un plan para la semana de [monday] (sin contar [exceptId]).
+  bool hasPlanFor(DateTime monday, {String? exceptId}) {
+    final key = _weekKey(WeekPlan.mondayOf(monday).toIso8601String());
+    return _planEnvelopes.any((e) => _weekKey(e['weekStart']) == key && e['id'] != exceptId);
+  }
+
+  /// Guarda un plan nuevo. Si ya había uno para esa semana, lo reemplaza;
+  /// los de otras semanas se conservan.
+  Future<void> saveWeekPlan(Map<String, Object?> envelope) {
+    final key = _weekKey(envelope['weekStart']);
+    return _writePlans([
+      for (final e in _planEnvelopes)
+        if (_weekKey(e['weekStart']) != key) e,
+      envelope,
+    ]);
+  }
+
+  /// Cambia la semana de un plan (reemplaza al que hubiera en esa semana).
+  Future<void> moveWeekPlan(String id, DateTime monday) {
+    final iso = WeekPlan.mondayOf(monday).toIso8601String();
+    final key = _weekKey(iso);
+    return _writePlans([
+      for (final e in _planEnvelopes)
+        if (e['id'] == id) {...e, 'weekStart': iso} else if (_weekKey(e['weekStart']) != key) e,
+    ]);
+  }
+
+  Future<void> deleteWeekPlan(String id) => _writePlans([
+    for (final e in _planEnvelopes)
+      if (e['id'] != id) e,
+  ]);
+
+  /// Aviso al final del día si el entrenamiento del plan sigue pendiente.
+  bool get planRemindersOn => storage.readJson(_kPlanReminders) != false;
+
+  Future<void> setPlanReminders(bool on) => storage.writeJson(_kPlanReminders, on);
+
+  /// Marca bloques del plan como hechos sin haberlos registrado (se entrenó
+  /// sin abrir la app). Quedan en el historial con las cargas del plan.
+  Future<void> markPlanDone(List<DailyWorkout> wods, WeightUnit unit, DateTime day) async {
+    final now = DateTime.now();
+    final sameDay = day.year == now.year && day.month == now.month && day.day == now.day;
+    for (final d in wods) {
+      if (planDone(d) != null) continue;
+      final w = startDaily(d, unit, day: day);
+      if (!sameDay) w.date = DateTime(day.year, day.month, day.day, 12);
+      await saveWorkout(w);
+    }
+  }
 
   /// El entrenamiento hecho de un bloque del plan, se haya hecho el día que
   /// fuera.
@@ -102,9 +188,20 @@ class TrainingStore {
   /// Tu peso para un movimiento del día (% de tu RM), o null sin RM.
   double? dailyWeight(DailyItem item, WeightUnit unit) {
     if (item.percent == null) return null;
-    final rm = storage.lastRm(item.rmLift, unit);
-    if (rm == null || rm <= 0) return null;
+    final rm = rmFor(item.rmLift, unit);
+    if (rm == null) return null;
     return roundLoad(rm * item.percent! / 100, unit);
+  }
+
+  /// RM del movimiento en [unit]; si solo está guardado en la otra unidad, se
+  /// convierte.
+  double? rmFor(String lift, WeightUnit unit) {
+    final rm = storage.lastRm(lift, unit);
+    if (rm != null && rm > 0) return rm;
+    final other = unit == WeightUnit.kg ? WeightUnit.lb : WeightUnit.kg;
+    final o = storage.lastRm(lift, other);
+    if (o == null || o <= 0) return null;
+    return unit == WeightUnit.kg ? o / 2.20462 : o * 2.20462;
   }
 
   static String dailyKey(DailyWorkout d, DateTime day) =>

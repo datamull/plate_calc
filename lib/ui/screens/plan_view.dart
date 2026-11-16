@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/training.dart';
 import '../../models/week_plan.dart';
 import '../../services/plan_ai.dart';
+import '../../services/plan_reminders.dart';
 import '../../services/training_store.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_icons.dart';
@@ -18,8 +19,8 @@ import 'training_home.dart';
 import 'workout_detail_screen.dart';
 
 /// Plan semanal: se sube el PDF que manda el coach, la IA lo lee y cada día
-/// queda listo para entrenar. La semana siguiente se sube el nuevo y
-/// reemplaza al anterior.
+/// queda listo para entrenar. Cada PDF queda guardado con su semana y se
+/// recorren con las flechas.
 class PlanView extends StatefulWidget {
   const PlanView({super.key, required this.store});
 
@@ -31,46 +32,32 @@ class PlanView extends StatefulWidget {
 
 class _PlanViewState extends State<PlanView> {
   TrainingStore get _store => widget.store;
+
+  /// Plan elegido con las flechas (null = el de esta semana).
+  String? _planId;
   int? _day;
   bool _busy = false;
 
-  Future<void> _upload({required bool replacing}) async {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncReminders());
+  }
+
+  Future<void> _syncReminders() async {
+    if (!mounted) return;
+    final loc = AppLocalizations.of(context);
+    await PlanReminders.sync(
+      _store,
+      title: loc.reminderTitle,
+      body: loc.reminderBody,
+      fallbackName: loc.scanDefaultName,
+    );
+  }
+
+  Future<void> _upload() async {
     final loc = AppLocalizations.of(context);
     if (!PlanAi.enabled) return _snack(loc.planAiOff);
-
-    if (replacing) {
-      final ok = await showModalBottomSheet<bool>(
-        context: context,
-        showDragHandle: true,
-        builder: (ctx) => SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(Ds.gutter, 0, Ds.gutter, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(loc.planReplaceTitle, style: Ds.title(ctx)),
-                const SizedBox(height: 6),
-                Text(loc.planReplaceBody, style: Ds.secondary(ctx)),
-                const SizedBox(height: 20),
-                DsButton(
-                  icon: AppIcons.pdf,
-                  label: loc.planReplaceConfirm,
-                  onPressed: () => Navigator.pop(ctx, true),
-                ),
-                const SizedBox(height: 4),
-                DsButton(
-                  kind: DsButtonKind.ghost,
-                  label: MaterialLocalizations.of(ctx).cancelButtonLabel,
-                  onPressed: () => Navigator.pop(ctx, false),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-      if (ok != true || !mounted) return;
-    }
 
     // Apple (5.1.2(i)): permiso antes de enviar datos a una IA de terceros.
     var consent = _store.storage.aiConsent;
@@ -93,33 +80,115 @@ class _PlanViewState extends State<PlanView> {
     final bytes = await file.readAsBytes();
     final (json, error) = await PlanAi.read(bytes);
     if (!mounted) return;
+    setState(() => _busy = false);
     if (json == null) {
-      setState(() => _busy = false);
       return _snack(switch (error) {
         PlanReadError.tooLarge => loc.planErrorTooLarge,
         PlanReadError.unreadable => loc.planErrorUnreadable,
         _ => loc.planErrorOffline,
       });
     }
-    await _store.saveWeekPlan(WeekPlan.envelope(json, now: DateTime.now(), fileName: file.name));
+
+    // Se elige la semana antes de guardar (el PDF suele llegar el fin de
+    // semana anterior).
+    final now = DateTime.now();
+    final pick = await _pickWeek(
+      initial: WeekPlan.suggestedWeek(json, now),
+      title: loc.planWeekPickTitle,
+      body: loc.planWeekPickBody,
+      confirm: loc.planWeekSave,
+    );
+    if (pick?.week == null || !mounted) return;
+    final env = WeekPlan.envelope(json, now: now, fileName: file.name, weekStart: pick!.week);
+    await _store.saveWeekPlan(env);
     if (!mounted) return;
     unawaited(HapticFeedback.mediumImpact());
     setState(() {
-      _busy = false;
+      _planId = '${env['id']}';
       _day = null;
     });
+    if (_store.planRemindersOn) await PlanReminders.requestPermission();
+    await _syncReminders();
+  }
+
+  Future<({DateTime? week, bool delete})?> _pickWeek({
+    required DateTime initial,
+    required String title,
+    String? body,
+    required String confirm,
+    String? exceptId,
+    bool canDelete = false,
+  }) => showModalBottomSheet<({DateTime? week, bool delete})>(
+    context: context,
+    showDragHandle: true,
+    builder: (_) => _WeekSheet(
+      store: _store,
+      initial: initial,
+      title: title,
+      body: body,
+      confirm: confirm,
+      exceptId: exceptId,
+      canDelete: canDelete,
+    ),
+  );
+
+  /// Tocar la fecha: cambiar la semana del plan o eliminarlo.
+  Future<void> _editWeek(WeekPlan plan) async {
+    final loc = AppLocalizations.of(context);
+    final pick = await _pickWeek(
+      initial: plan.weekStart,
+      title: loc.planMoveTitle,
+      confirm: loc.planMoveSave,
+      exceptId: plan.id,
+      canDelete: true,
+    );
+    if (pick == null || !mounted) return;
+    if (pick.delete) {
+      await _store.deleteWeekPlan(plan.id);
+      _planId = null;
+    } else if (pick.week != null) {
+      await _store.moveWeekPlan(plan.id, pick.week!);
+      _planId = plan.id;
+    }
+    if (!mounted) return;
+    setState(() => _day = null);
+    await _syncReminders();
+  }
+
+  Future<void> _markDayDone(WeekPlan plan, int day, List<PlanBlock> blocks) async {
+    final loc = AppLocalizations.of(context);
+    await _store.markPlanDone(
+      [for (final b in blocks) b.wod],
+      _store.storage.listUnit,
+      plan.dateOf(day),
+    );
+    if (!mounted) return;
+    unawaited(HapticFeedback.mediumImpact());
+    setState(() {});
+    _snack(loc.planMarkedDone);
+    await _syncReminders();
+  }
+
+  Future<void> _setReminders(bool on) async {
+    await _store.setPlanReminders(on);
+    if (on) await PlanReminders.requestPermission();
+    if (!mounted) return;
+    setState(() {});
+    await _syncReminders();
   }
 
   void _snack(String msg) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
-  Future<void> _start(PlanBlock b) async {
+  Future<void> _start(PlanBlock b, DateTime day) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ScanReviewScreen(store: _store, wod: b.wod, byAi: true),
       ),
     );
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {});
+    await _syncReminders();
   }
 
   Future<void> _openDone(Workout w) async {
@@ -128,63 +197,91 @@ class _PlanViewState extends State<PlanView> {
         builder: (_) => WorkoutDetailScreen(store: _store, workoutId: w.id),
       ),
     );
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {});
+    await _syncReminders();
   }
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     if (_busy) return _Reading(text: loc.planReading);
-    final plan = _store.weekPlan(fallbackName: loc.scanDefaultName);
-    if (plan == null) return _Empty(onUpload: () => _upload(replacing: false));
+    final plans = _store.weekPlans(fallbackName: loc.scanDefaultName);
+    if (plans.isEmpty) return _Empty(onUpload: _upload);
 
+    final plan =
+        plans.where((p) => p.id == _planId).firstOrNull ??
+        _store.weekPlan(fallbackName: loc.scanDefaultName)!;
+    final index = plans.indexOf(plan);
     final today = DateTime.now();
-    final inWeek =
-        !today.isBefore(plan.weekStart) &&
-        today.isBefore(plan.weekStart.add(const Duration(days: 7)));
-    final day =
-        _day ??
-        (inWeek && plan.days.containsKey(today.weekday)
-            ? today.weekday
-            : (inWeek ? today.weekday : plan.days.keys.reduce((a, b) => a < b ? a : b)));
+    final inWeek = plan.contains(today);
+    final day = _day ?? (inWeek ? today.weekday : plan.days.keys.reduce((a, b) => a < b ? a : b));
     final blocks = plan.days[day] ?? const <PlanBlock>[];
+    final pending = blocks.where((b) => _store.planDone(b.wod) == null).toList();
     final locale = Localizations.localeOf(context).toString();
+
+    void go(int i) {
+      HapticFeedback.selectionClick();
+      setState(() {
+        _planId = plans[i].id;
+        _day = null;
+      });
+    }
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 32),
       children: [
-        // Encabezado: semana y reemplazo del PDF.
+        // Encabezado: semana (tocar para cambiarla) y flechas entre planes.
         Padding(
-          padding: const EdgeInsets.fromLTRB(Ds.gutter, 4, 12, 0),
+          padding: const EdgeInsets.fromLTRB(Ds.gutter, 4, 8, 0),
           child: Row(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      loc.planWeekOf(DateFormat.MMMd(locale).format(plan.weekStart)).toUpperCase(),
-                      style: Ds.label(context),
+                child: Semantics(
+                  button: true,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _editWeek(plan),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                loc
+                                    .planWeekOf(DateFormat.MMMd(locale).format(plan.weekStart))
+                                    .toUpperCase(),
+                                style: Ds.label(context),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(AppIcons.edit, size: 13, color: Ds.muted(context)),
+                          ],
+                        ),
+                        if (plan.title != null || plan.fileName != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            plan.title ?? plan.fileName!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Ds.body(context).copyWith(fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ],
                     ),
-                    if (plan.title != null || plan.fileName != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        plan.title ?? plan.fileName!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: Ds.body(context).copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ),
-              DsButton(
-                kind: DsButtonKind.ghost,
-                expand: false,
-                height: 40,
-                icon: AppIcons.refresh,
-                label: loc.planReplace,
-                onPressed: () => _upload(replacing: true),
+              _ArrowButton(
+                left: true,
+                label: loc.planPrevWeek,
+                onTap: index > 0 ? () => go(index - 1) : null,
+              ),
+              _ArrowButton(
+                left: false,
+                label: loc.planNextWeekA11y,
+                onTap: index < plans.length - 1 ? () => go(index + 1) : null,
               ),
             ],
           ),
@@ -221,11 +318,49 @@ class _PlanViewState extends State<PlanView> {
                 block: blocks[i],
                 first: i == 0,
                 done: _store.planDone(blocks[i].wod),
-                onStart: () => _start(blocks[i]),
+                onStart: () => _start(blocks[i], plan.dateOf(day)),
                 onOpenDone: _openDone,
               ),
             ),
+        // Entrenó sin registrar en la app: un toque y el día queda hecho.
+        if (pending.isNotEmpty && !plan.dateOf(day).isAfter(today)) ...[
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
+            child: DsButton(
+              kind: DsButtonKind.ghost,
+              height: 48,
+              icon: AppIcons.checkCircle,
+              label: loc.planMarkDone,
+              onPressed: () => _markDayDone(plan, day, pending),
+            ),
+          ),
+        ],
         const SizedBox(height: 18),
+        DsBlock(
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          child: Column(
+            children: [
+              DsRow(
+                leading: Icon(AppIcons.timer, size: 20, color: Ds.muted(context)),
+                title: loc.planReminderRow,
+                trailing: Switch.adaptive(
+                  value: _store.planRemindersOn,
+                  activeTrackColor: AppColors.blue,
+                  onChanged: _setReminders,
+                ),
+                divider: true,
+              ),
+              DsRow(
+                leading: Icon(AppIcons.pdf, size: 20, color: Ds.muted(context)),
+                title: loc.planReplace,
+                onTap: _upload,
+                divider: false,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
           child: Row(
@@ -238,6 +373,158 @@ class _PlanViewState extends State<PlanView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Flecha para pasar a la semana anterior o siguiente.
+class _ArrowButton extends StatelessWidget {
+  const _ArrowButton({required this.left, required this.label, required this.onTap});
+
+  final bool left;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final on = Theme.of(context).colorScheme.onSurface;
+    return Semantics(
+      button: true,
+      enabled: onTap != null,
+      label: label,
+      excludeSemantics: true,
+      child: DsPressable(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(
+              child: Transform.flip(
+                flipX: left,
+                child: Icon(
+                  AppIcons.chevron,
+                  size: 18,
+                  color: onTap == null ? Ds.muted(context).withValues(alpha: 0.35) : on,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Elegir la semana de un plan: ‹ semana del 16 nov. ›
+class _WeekSheet extends StatefulWidget {
+  const _WeekSheet({
+    required this.store,
+    required this.initial,
+    required this.title,
+    required this.confirm,
+    this.body,
+    this.exceptId,
+    this.canDelete = false,
+  });
+
+  final TrainingStore store;
+  final DateTime initial;
+  final String title;
+  final String? body;
+  final String confirm;
+  final String? exceptId;
+  final bool canDelete;
+
+  @override
+  State<_WeekSheet> createState() => _WeekSheetState();
+}
+
+class _WeekSheetState extends State<_WeekSheet> {
+  late DateTime _week = WeekPlan.mondayOf(widget.initial);
+
+  void _shift(int weeks) {
+    HapticFeedback.selectionClick();
+    setState(() => _week = DateTime(_week.year, _week.month, _week.day + 7 * weeks));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
+    final thisMonday = WeekPlan.mondayOf(DateTime.now());
+    final diff = (_week.difference(thisMonday).inHours / (24 * 7)).round();
+    final relative = switch (diff) {
+      0 => loc.planThisWeek,
+      1 => loc.planNextWeek,
+      -1 => loc.planLastWeek,
+      _ => null,
+    };
+    final end = DateTime(_week.year, _week.month, _week.day + 6);
+    final taken = widget.store.hasPlanFor(_week, exceptId: widget.exceptId);
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(Ds.gutter, 0, Ds.gutter, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(widget.title, style: Ds.title(context)),
+            if (widget.body != null) ...[
+              const SizedBox(height: 6),
+              Text(widget.body!, style: Ds.secondary(context)),
+            ],
+            const SizedBox(height: 22),
+            Row(
+              children: [
+                _ArrowButton(left: true, label: loc.planPrevWeek, onTap: () => _shift(-1)),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        '${DateFormat.MMMd(locale).format(_week)} – '
+                        '${DateFormat.MMMd(locale).format(end)}',
+                        textAlign: TextAlign.center,
+                        style: Ds.display(context).copyWith(fontSize: 28),
+                      ),
+                      const SizedBox(height: 4),
+                      Text((relative ?? '${_week.year}').toUpperCase(), style: Ds.label(context)),
+                    ],
+                  ),
+                ),
+                _ArrowButton(left: false, label: loc.planNextWeekA11y, onTap: () => _shift(1)),
+              ],
+            ),
+            const SizedBox(height: 16),
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 150),
+              opacity: taken ? 1 : 0,
+              child: Text(
+                loc.planWeekTaken,
+                textAlign: TextAlign.center,
+                style: Ds.secondary(context),
+              ),
+            ),
+            const SizedBox(height: 16),
+            DsButton(
+              icon: AppIcons.check,
+              label: widget.confirm,
+              onPressed: () => Navigator.pop(context, (week: _week, delete: false)),
+            ),
+            if (widget.canDelete) ...[
+              const SizedBox(height: 4),
+              DsButton(
+                kind: DsButtonKind.ghost,
+                icon: AppIcons.trash,
+                label: loc.planDelete,
+                onPressed: () => Navigator.pop(context, (week: null, delete: true)),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

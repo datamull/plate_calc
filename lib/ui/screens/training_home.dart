@@ -577,11 +577,16 @@ class WodItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final w = store.dailyWeight(item, unit);
-    final right = w != null
-        ? '${fmtWeight(w)} ${unit.label}'
-        : item.percent != null
-        ? '${fmtWeight(item.percent!)}% RM'
-        : item.rx(unit);
+    // El porcentaje (o el comentario del coach) va en gris bajo el nombre;
+    // a la derecha queda tu peso calculado o el Rx.
+    // Bajo el nombre, en gris, solo el porcentaje pedido: tal como lo
+    // escribió el coach ("@ 70-75-80%") o el que se usó para el cálculo.
+    final note = (item.note?.contains('%') ?? false)
+        ? item.note!
+        : item.percent == null
+        ? ''
+        : '${fmtWeight(item.percent!)}%';
+    final right = w != null ? '${fmtWeight(w)} ${unit.label}' : item.rx(unit);
     // Alternativas del plan ("Clean / Snatch / Thruster"), cada una con su peso.
     final options = item.lift.split(' / ').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
     final optionWeights = (right ?? '').split(' · ').map((e) => e.trim()).toList();
@@ -608,12 +613,21 @@ class WodItemRow extends StatelessWidget {
                 ),
               ),
             ),
-          if (options.length > 1)
-            Expanded(
-              child: _Options(options: options, weights: optionWeights),
-            )
-          else
-            Expanded(child: Text(liftDisplayName(item.lift), style: Ds.body(context))),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (options.length > 1)
+                  _Options(options: options, weights: optionWeights)
+                else
+                  Text(liftDisplayName(item.lift), style: Ds.body(context)),
+                if (note.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(note, style: Ds.secondary(context)),
+                ],
+              ],
+            ),
+          ),
           if (right != null && options.length == 1)
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 120),

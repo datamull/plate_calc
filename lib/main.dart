@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'l10n/app_localizations.dart';
 import 'services/app_storage.dart';
 import 'services/cloud_sync.dart';
+import 'services/plan_reminders.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/screens/app_settings_screen.dart';
 import 'ui/screens/main_shell.dart';
@@ -19,6 +22,8 @@ Future<void> main() async {
   final cloud = CloudSync(storage);
   await cloud.start();
   runApp(PlateCalcApp(storage: storage, cloud: cloud));
+  // Avisos del plan (fin del día); no retrasa el primer frame.
+  unawaited(PlanReminders.init());
 }
 
 class PlateCalcApp extends StatefulWidget {

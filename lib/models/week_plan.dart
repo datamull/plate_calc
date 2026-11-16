@@ -55,16 +55,30 @@ class WeekPlan {
     Map<String, dynamic> server, {
     required DateTime now,
     String? fileName,
+    DateTime? weekStart,
   }) {
-    final ws = DateTime.tryParse('${server['week_start'] ?? ''}');
     return {
       'id': 'plan${now.millisecondsSinceEpoch}',
       'uploadedAt': now.toIso8601String(),
-      'weekStart': mondayOf(ws ?? now).toIso8601String(),
+      'weekStart': mondayOf(weekStart ?? suggestedWeek(server, now)).toIso8601String(),
       'file': fileName,
       'plan': server,
     };
   }
+
+  /// Semana que se propone al subir un PDF: la fecha escrita en el PDF si la
+  /// hay; si no, la semana siguiente cuando se sube de viernes a domingo
+  /// (el plan llega antes de empezar la semana) y la actual de lunes a jueves.
+  static DateTime suggestedWeek(Map<String, dynamic> server, DateTime now) {
+    final written = DateTime.tryParse('${server['week_start'] ?? ''}');
+    if (written != null) return mondayOf(written);
+    final monday = mondayOf(now);
+    return now.weekday >= DateTime.friday ? monday.add(const Duration(days: 7)) : monday;
+  }
+
+  /// Si [day] cae en la semana del plan.
+  bool contains(DateTime day) =>
+      !day.isBefore(weekStart) && day.isBefore(weekStart.add(const Duration(days: 7)));
 
   static WeekPlan? fromJson(Object? raw, {required String fallbackName}) {
     if (raw is! Map) return null;

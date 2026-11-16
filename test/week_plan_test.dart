@@ -64,6 +64,61 @@ void main() {
     expect(store.planDone(block), isNotNull);
   });
 
+
+  test('la semana propuesta: la del PDF, o la siguiente si se sube el fin de semana', () {
+    expect(WeekPlan.suggestedWeek({}, DateTime(2026, 11, 11)), DateTime(2026, 11, 9));
+    expect(WeekPlan.suggestedWeek({}, DateTime(2026, 11, 13)), DateTime(2026, 11, 16));
+    expect(WeekPlan.suggestedWeek({}, DateTime(2026, 11, 15, 22)), DateTime(2026, 11, 16));
+    expect(
+      WeekPlan.suggestedWeek({'week_start': '2026-11-25'}, DateTime(2026, 11, 15)),
+      DateTime(2026, 11, 23),
+    );
+  });
+
+  test('cada semana guarda su plan; se puede mover y borrar', () async {
+    // Plan único de la versión anterior: se conserva.
+    final old = WeekPlan.envelope(_server(), now: DateTime(2026, 11, 9));
+    SharedPreferences.setMockInitialValues({'training_week_plan': jsonEncode(old)});
+    final store = TrainingStore(await AppStorage.load());
+    expect(store.weekPlans(fallbackName: 'WOD').single.weekStart, DateTime(2026, 11, 9));
+
+    final next = WeekPlan.envelope(
+      _server(),
+      now: DateTime(2026, 11, 15, 1),
+      weekStart: DateTime(2026, 11, 18),
+    );
+    await store.saveWeekPlan(next);
+    var plans = store.weekPlans(fallbackName: 'WOD');
+    expect(plans.map((p) => p.weekStart), [DateTime(2026, 11, 9), DateTime(2026, 11, 16)]);
+    expect(store.weekPlan(fallbackName: 'WOD', now: DateTime(2026, 11, 17))!.id, next['id']);
+    expect(store.hasPlanFor(DateTime(2026, 11, 20)), isTrue);
+
+    // Mover el de la semana 9 a la 16 reemplaza al que estaba ahí.
+    await store.moveWeekPlan('${old['id']}', DateTime(2026, 11, 16));
+    plans = store.weekPlans(fallbackName: 'WOD');
+    expect(plans.single.id, old['id']);
+    expect(plans.single.weekStart, DateTime(2026, 11, 16));
+
+    await store.deleteWeekPlan('${old['id']}');
+    expect(store.weekPlans(fallbackName: 'WOD'), isEmpty);
+  });
+
+  test('marcar el día como hecho sin registrar', () async {
+    SharedPreferences.setMockInitialValues({});
+    final store = TrainingStore(await AppStorage.load());
+    await store.saveWeekPlan(
+      WeekPlan.envelope(_server(), now: DateTime(2026, 11, 9), weekStart: DateTime(2026, 11, 9)),
+    );
+    final plan = store.weekPlan(fallbackName: 'WOD', now: DateTime(2026, 11, 9))!;
+    final wods = [for (final b in plan.days[1]!) b.wod];
+    await store.markPlanDone(wods, WeightUnit.kg, plan.dateOf(1));
+    expect(wods.every((w) => store.planDone(w) != null), isTrue);
+    expect(store.planDone(wods.first)!.date, DateTime(2026, 11, 9, 12));
+    // Volver a marcar no duplica.
+    await store.markPlanDone(wods, WeightUnit.kg, plan.dateOf(1));
+    expect(store.workouts.length, wods.length);
+  });
+
   Future<void> pumpPlan(WidgetTester tester, TrainingStore store) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -88,7 +143,9 @@ void main() {
   testWidgets('con plan: días, bloques y cambio de día', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final store = TrainingStore(await AppStorage.load());
-    await store.saveWeekPlan(WeekPlan.envelope(_server(), now: DateTime.now()));
+    await store.saveWeekPlan(
+      WeekPlan.envelope(_server(), now: DateTime.now(), weekStart: DateTime.now()),
+    );
     await pumpPlan(tester, store);
 
     expect(find.text('Nuevo PDF'), findsOneWidget);

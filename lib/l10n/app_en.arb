@@ -705,7 +705,13 @@
   "planReplaceHint": "When next week's plan arrives, upload it to replace this one.",
   "planReading": "Reading your plan… this can take up to a minute.",
   "planWeekOf": "Week of {date}",
-  "@planWeekOf": {"placeholders": {"date": {"type": "String"}}},
+  "@planWeekOf": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "planRestDay": "Rest day",
   "planRestBody": "No training planned for this day.",
   "planErrorOffline": "Couldn't read the plan. Check your connection and try again.",
@@ -718,5 +724,22 @@
   "planReplaceConfirm": "Replace",
   "planReadByAi": "Read by AI. Check weights and reps before you start.",
   "barCenterLabel": "CENTER",
-  "orOption": "or"
+  "orOption": "or",
+  "planWeekPickTitle": "Which week is this plan for?",
+  "planWeekPickBody": "You can change it later by tapping the date.",
+  "planWeekSave": "Save to this week",
+  "planWeekTaken": "That week already has a plan: it will be replaced.",
+  "planThisWeek": "This week",
+  "planNextWeek": "Next week",
+  "planLastWeek": "Last week",
+  "planMoveTitle": "Plan week",
+  "planMoveSave": "Move to this week",
+  "planDelete": "Delete this plan",
+  "planPrevWeek": "Previous week",
+  "planNextWeekA11y": "Next week",
+  "planMarkDone": "Mark the day as done",
+  "planMarkedDone": "Day marked as done.",
+  "planReminderRow": "Reminder at 8 pm if not marked",
+  "reminderTitle": "Did you train today?",
+  "reminderBody": "Mark today's plan workout as done in Kilo."
 }

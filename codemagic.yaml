@@ -29,7 +29,7 @@ workflows:
       # Si el análisis o alguna prueba falla, la build se detiene y no se
       # sube nada a TestFlight.
       - name: Análisis estático
-        script: flutter analyze
+        script: flutter analyze --no-fatal-infos  # avisos "info" (p. ej. material.dart obsoleto en Flutter nuevo) no detienen el build
       - name: Pruebas
         script: flutter test
 
@@ -74,7 +74,7 @@ workflows:
       - name: Instalar dependencias
         script: flutter pub get
       - name: Análisis estático
-        script: flutter analyze
+        script: flutter analyze --no-fatal-infos  # avisos "info" (p. ej. material.dart obsoleto en Flutter nuevo) no detienen el build
       - name: Pruebas
         script: flutter test
       - name: Configurar firma

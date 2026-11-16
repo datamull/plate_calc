@@ -28,6 +28,9 @@ Rules:
       If none matches, write the movement in English, Title Case.
     - rx: weight or height as written ("20/14 lb", "24/16 kg"); null if none.
     - percent: number if written as "@ 75%" (use the main/top percentage); null otherwise.
+    - note: the percentages written for this movement EXACTLY as written ("@ 70-75-80%", "5x3 @ 75%", "80% du 1RM"),
+      plus any short comment that belongs to this movement only ("from the floor", "tempo 3-1-1", "pause at knee");
+      null when there is none. Never put the rx weight here.
   - notes: one short line with important instructions (tempo, rest, scaling) or null.
 - week_start: the Monday of that week as YYYY-MM-DD if a date is written; otherwise null.
 - title: the plan's title if written (e.g. "Semana 3 · Fuerza"); otherwise null.
@@ -83,6 +86,7 @@ const ITEM = {
     movement: { type: 'STRING' },
     rx: { type: 'STRING', nullable: true },
     percent: { type: 'NUMBER', nullable: true },
+    note: { type: 'STRING', nullable: true },
   },
   required: ['reps', 'movement'],
 };

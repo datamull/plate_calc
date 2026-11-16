@@ -195,6 +195,7 @@ export function clean(w) {
         movement: str(i.movement),
         rx: str(i.rx),
         percent: Number.isFinite(Number(i.percent)) && i.percent !== null ? Number(i.percent) : null,
+        note: str(i.note) ? str(i.note).slice(0, 60) : null,
       })),
   };
 }

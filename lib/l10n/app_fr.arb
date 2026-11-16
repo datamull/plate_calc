@@ -464,5 +464,7 @@
   "planMarkedDone": "Journée marquée comme faite.",
   "planReminderRow": "Rappel à 20 h si ce n'est pas coché",
   "reminderTitle": "Entraînement fait aujourd'hui ?",
-  "reminderBody": "Marquez l'entraînement du plan comme fait dans Kilo."
+  "reminderBody": "Marquez l'entraînement du plan comme fait dans Kilo.",
+  "notificationsTitle": "Notifications",
+  "planReminderHelp": "En fin de journée, vous demande si l'entraînement du plan est fait."
 }

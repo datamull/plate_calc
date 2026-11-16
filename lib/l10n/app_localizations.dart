@@ -2229,6 +2229,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark today\'s plan workout as done in Kilo.'**
   String get reminderBody;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsTitle;
+
+  /// No description provided for @planReminderHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'At the end of the day, asks whether you completed the plan\'s workout.'**
+  String get planReminderHelp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

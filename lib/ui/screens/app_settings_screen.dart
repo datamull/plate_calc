@@ -9,6 +9,8 @@ import '../../models/weight_unit.dart';
 import '../../services/app_storage.dart';
 import '../../services/board_ai.dart';
 import '../../services/cloud_sync.dart';
+import '../../services/plan_reminders.dart';
+import '../../services/training_store.dart';
 import '../../utils/format.dart';
 import '../widgets/plate_colors.dart';
 import '../widgets/app_icons.dart';
@@ -35,6 +37,21 @@ class AppSettingsScreen extends StatefulWidget {
 
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
   late String? _localeCode = widget.currentLocaleCode;
+  late final _training = TrainingStore(widget.storage);
+
+  Future<void> _setReminders(bool on) async {
+    await _training.setPlanReminders(on);
+    if (on) await PlanReminders.requestPermission();
+    if (!mounted) return;
+    setState(() {});
+    final loc = AppLocalizations.of(context);
+    await PlanReminders.sync(
+      _training,
+      title: loc.reminderTitle,
+      body: loc.reminderBody,
+      fallbackName: loc.scanDefaultName,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +113,15 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               title: Text(widget.cloud?.available == true ? loc.iCloudSyncOn : loc.iCloudSyncOff),
             ),
           ],
+          const SizedBox(height: 24),
+          Text(loc.notificationsTitle, style: Theme.of(context).textTheme.titleMedium),
+          SwitchListTile.adaptive(
+            contentPadding: EdgeInsets.zero,
+            value: _training.planRemindersOn,
+            title: Text(loc.planReminderRow),
+            subtitle: Text(loc.planReminderHelp),
+            onChanged: _setReminders,
+          ),
           if (BoardAi.enabled) ...[
             const SizedBox(height: 24),
             Text(loc.aiSettingTitle, style: Theme.of(context).textTheme.titleMedium),

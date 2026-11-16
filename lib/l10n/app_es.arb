@@ -464,5 +464,7 @@
   "planMarkedDone": "Día marcado como hecho.",
   "planReminderRow": "Aviso a las 20:00 si no lo marcaste",
   "reminderTitle": "¿Entrenaste hoy?",
-  "reminderBody": "Marca el entrenamiento del plan como hecho en Kilo."
+  "reminderBody": "Marca el entrenamiento del plan como hecho en Kilo.",
+  "notificationsTitle": "Notificaciones",
+  "planReminderHelp": "Al final del día te pregunta si completaste el entrenamiento del plan."
 }

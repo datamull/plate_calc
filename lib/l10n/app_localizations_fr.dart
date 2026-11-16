@@ -1228,4 +1228,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reminderBody => 'Marquez l\'entraînement du plan comme fait dans Kilo.';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String get planReminderHelp =>
+      'En fin de journée, vous demande si l\'entraînement du plan est fait.';
 }

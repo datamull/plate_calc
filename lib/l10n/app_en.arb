@@ -741,5 +741,7 @@
   "planMarkedDone": "Day marked as done.",
   "planReminderRow": "Reminder at 8 pm if not marked",
   "reminderTitle": "Did you train today?",
-  "reminderBody": "Mark today's plan workout as done in Kilo."
+  "reminderBody": "Mark today's plan workout as done in Kilo.",
+  "notificationsTitle": "Notifications",
+  "planReminderHelp": "At the end of the day, asks whether you completed the plan's workout."
 }

@@ -1224,4 +1224,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reminderBody => 'Marca el entrenamiento del plan como hecho en Kilo.';
+
+  @override
+  String get notificationsTitle => 'Notificaciones';
+
+  @override
+  String get planReminderHelp =>
+      'Al final del día te pregunta si completaste el entrenamiento del plan.';
 }

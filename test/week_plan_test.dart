@@ -140,6 +140,28 @@ void main() {
     expect(find.text('Subir PDF del plan'), findsOneWidget);
   });
 
+  testWidgets('botón fijo abajo: marca todo el día como hecho', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final store = TrainingStore(await AppStorage.load());
+    // Semana ya pasada: abre en su primer día con entrenamiento (pendiente).
+    final monday = WeekPlan.mondayOf(DateTime.now()).subtract(const Duration(days: 7));
+    await store.saveWeekPlan(
+      WeekPlan.envelope(_server(), now: monday, weekStart: monday),
+    );
+    await pumpPlan(tester, store);
+
+    final button = find.text('Marcar el día como hecho');
+    expect(button, findsOneWidget);
+    // Está fijo bajo la lista, visible sin desplazarse.
+    expect(tester.getBottomLeft(button).dy, greaterThan(500));
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+
+    final plan = store.weekPlans(fallbackName: 'WOD').single;
+    expect(plan.days[1]!.every((b) => store.planDone(b.wod) != null), isTrue);
+    expect(button, findsNothing);
+  });
+
   testWidgets('con plan: días, bloques y cambio de día', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final store = TrainingStore(await AppStorage.load());

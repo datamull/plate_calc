@@ -169,14 +169,6 @@ class _PlanViewState extends State<PlanView> {
     await _syncReminders();
   }
 
-  Future<void> _setReminders(bool on) async {
-    await _store.setPlanReminders(on);
-    if (on) await PlanReminders.requestPermission();
-    if (!mounted) return;
-    setState(() {});
-    await _syncReminders();
-  }
-
   void _snack(String msg) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
@@ -228,7 +220,11 @@ class _PlanViewState extends State<PlanView> {
       });
     }
 
-    return ListView(
+    // Entrenó sin registrar en la app: botón fijo abajo para dejar todo el
+    // día como hecho (no se muestra en días futuros ni si ya está hecho).
+    final canMark = pending.isNotEmpty && !plan.dateOf(day).isAfter(today);
+
+    final list = ListView(
       padding: const EdgeInsets.only(bottom: 32),
       children: [
         // Encabezado: semana (tocar para cambiarla) y flechas entre planes.
@@ -322,35 +318,11 @@ class _PlanViewState extends State<PlanView> {
                 onOpenDone: _openDone,
               ),
             ),
-        // Entrenó sin registrar en la app: un toque y el día queda hecho.
-        if (pending.isNotEmpty && !plan.dateOf(day).isAfter(today)) ...[
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Ds.gutter),
-            child: DsButton(
-              kind: DsButtonKind.ghost,
-              height: 48,
-              icon: AppIcons.checkCircle,
-              label: loc.planMarkDone,
-              onPressed: () => _markDayDone(plan, day, pending),
-            ),
-          ),
-        ],
         const SizedBox(height: 18),
         DsBlock(
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Column(
             children: [
-              DsRow(
-                leading: Icon(AppIcons.timer, size: 20, color: Ds.muted(context)),
-                title: loc.planReminderRow,
-                trailing: Switch.adaptive(
-                  value: _store.planRemindersOn,
-                  activeTrackColor: AppColors.blue,
-                  onChanged: _setReminders,
-                ),
-                divider: true,
-              ),
               DsRow(
                 leading: Icon(AppIcons.pdf, size: 20, color: Ds.muted(context)),
                 title: loc.planReplace,
@@ -371,6 +343,33 @@ class _PlanViewState extends State<PlanView> {
               Expanded(child: Text(loc.planReadByAi, style: Ds.secondary(context))),
             ],
           ),
+        ),
+      ],
+    );
+
+    return Column(
+      children: [
+        Expanded(child: list),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          child: canMark
+              ? DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    border: const Border(top: BorderSide(color: AppColors.steelLine)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(Ds.gutter, 12, Ds.gutter, 12),
+                    child: DsButton(
+                      kind: DsButtonKind.secondary,
+                      icon: AppIcons.checkCircle,
+                      label: loc.planMarkDone,
+                      onPressed: () => _markDayDone(plan, day, pending),
+                    ),
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
         ),
       ],
     );
